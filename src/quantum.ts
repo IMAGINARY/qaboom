@@ -79,8 +79,8 @@ export function randomQubit() {
   // https://mathworld.wolfram.com/SpherePointPicking.html
   const u = Math.random();
   const v = Math.random();
-  const theta = 2 * Math.PI * u;
-  const phi = Math.acos(2 * v - 1);
+  const phi = 2 * Math.PI * u;
+  const theta = Math.acos(2 * v - 1);
   return qubitFromSpherical({ theta, phi });
 }
 
