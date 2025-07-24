@@ -1,15 +1,14 @@
-import * as math from "mathjs";
 import { GraphicsContext, Graphics } from "pixi.js";
-import { getColor, getBlochCoords, randomQubit } from "./quantum";
+import { getColor, getBlochCoords, randomQubit, type Qubit } from "./quantum";
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
-export default class Qubit {
+export default class QubitPiece {
   // The qubit value
-  value: math.Matrix;
+  value: Qubit;
   sprite: Graphics;
 
-  constructor(value: math.Matrix) {
+  constructor(value: Qubit) {
     this.value = value;
     this.sprite = new Graphics(
       new GraphicsContext()
@@ -21,6 +20,6 @@ export default class Qubit {
 
   // return a random qubit
   static random() {
-    return new Qubit(randomQubit());
+    return new QubitPiece(randomQubit());
   }
 }

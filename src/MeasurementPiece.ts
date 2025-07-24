@@ -1,13 +1,18 @@
-import * as math from "mathjs";
-import { Graphics, GraphicsContext } from "pixi.js";
-import { getBlochCoords, getColor, getOrtho, randomQubit } from "./quantum";
+import { Graphics } from "pixi.js";
+import {
+  getBlochCoords,
+  getColor,
+  getOrtho,
+  randomQubit,
+  type Qubit,
+} from "./quantum";
 
 // Represents a measurement along an axis
-export default class Measurement {
-  base: math.Matrix;
-  ortho: math.Matrix;
+export default class MeasurementPiece {
+  base: Qubit;
+  ortho: Qubit;
   sprite: Graphics;
-  constructor(base: math.Matrix) {
+  constructor(base: Qubit) {
     this.base = base;
     this.ortho = getOrtho(base);
     const baseColor = getColor(getBlochCoords(this.base));
@@ -21,6 +26,6 @@ export default class Measurement {
   }
 
   static random() {
-    return new Measurement(randomQubit());
+    return new MeasurementPiece(randomQubit());
   }
 }

@@ -1,6 +1,7 @@
 import * as math from "mathjs";
 import { interpolate, formatCss, formatHex } from "culori";
 
+export type Qubit = math.Matrix<math.Complex>;
 // Common bases
 export const ZERO = math.matrix([math.complex(1), math.complex(0)]);
 export const ONE = math.matrix([math.complex(0), math.complex(1)]);
@@ -27,7 +28,7 @@ export function qubitFromSpherical({
 }: {
   theta: number;
   phi: number;
-}) {
+}): Qubit {
   return math.matrix([
     math.complex(Math.cos(theta / 2)),
     (math as any).Complex.fromPolar(Math.sin(theta / 2), phi),
@@ -44,7 +45,7 @@ export function getColor({ phi, theta }: { theta: number; phi: number }) {
   return formatHex(interpLight(theta / Math.PI));
 }
 
-export function getBlochCoords(qubit: math.Matrix) {
+export function getBlochCoords(qubit: Qubit) {
   let alpha = math.complex(qubit.get([0]));
   let beta = qubit.get([1]);
   let theta = 2 * Math.acos(alpha.toPolar().r);
@@ -61,7 +62,7 @@ export function getBlochCoords(qubit: math.Matrix) {
   return { phi, theta };
 }
 
-export function getOrtho(qubit: math.Matrix) {
+export function getOrtho(qubit: Qubit) {
   const { phi, theta } = getBlochCoords(qubit);
   const phi2 = phi + Math.PI;
   const theta2 = Math.PI - theta;

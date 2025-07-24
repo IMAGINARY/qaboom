@@ -1,8 +1,8 @@
 import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
 import "pixi.js/math-extras";
-import Qubit from "./Qubit";
+import QubitPiece from "./QubitPiece";
 import { range } from "lodash-es";
-import Measurement from "./Measurement";
+import MeasurementPiece from "./MeasurementPiece";
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
@@ -11,9 +11,9 @@ const RATE = 1000;
 // The "game board": the currently existing grid of qubits.
 export default class Board {
   view: Container;
-  grid: (Qubit | null)[][];
+  grid: (QubitPiece | null)[][];
   // Either a pair of qubit, a gate, or a measurement
-  current: Qubit | Measurement | null = null;
+  current: QubitPiece | MeasurementPiece | null = null;
   currentPosition = new Point(Math.floor(BOARD_WIDTH / 2), 0);
 
   time: number = 0;
@@ -44,7 +44,7 @@ export default class Board {
     for (let i = BOARD_HEIGHT - fillHeight; i < BOARD_HEIGHT; i++) {
       const row = [];
       for (let j = 0; j < BOARD_WIDTH; j++) {
-        const qubit = Qubit.random();
+        const qubit = QubitPiece.random();
         qubit.sprite.position = new Point(
           (j + 0.5) * CELL_SIZE,
           (i + 0.5) * CELL_SIZE
@@ -76,10 +76,10 @@ export default class Board {
     }
 
     // If it's a pair of qubits, just add it to the grid.
-    if (this.current instanceof Qubit) {
+    if (this.current instanceof QubitPiece) {
       this.grid[this.currentPosition.y][this.currentPosition.x] = this.current;
       this.newCurrent();
-    } else if (this.current instanceof Measurement) {
+    } else if (this.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
       // TODO
     }
@@ -88,9 +88,9 @@ export default class Board {
 
   newCurrent() {
     if (Math.random() < 1 / 8) {
-      this.current = Measurement.random();
+      this.current = MeasurementPiece.random();
     } else {
-      this.current = Qubit.random();
+      this.current = QubitPiece.random();
     }
     this.updateCurrent(new Point(Math.min(BOARD_WIDTH / 2), 0));
     this.view.addChild(this.current.sprite);
