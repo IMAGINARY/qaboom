@@ -146,15 +146,24 @@ export default class Board {
   resolve() {
     // If it's a pair of qubits, just add it to the grid.
     if (this.current instanceof QubitPair) {
+      const secondPosition = this.currentPosition.add(
+        this.current.orientation === "vertical" ? UP : RIGHT
+      );
+      // If the second position of the qubit is higher than the initial position,
+      // it's game over.
+      if (secondPosition.y < 0) {
+        this.onGameOver?.();
+        return;
+      }
       this.view.addChild(this.current.first.sprite);
       this.view.addChild(this.current.second.sprite);
       this.setPiece(this.currentPosition, this.current.first);
-      this.setPiece(
-        this.currentPosition.add(
-          this.current.orientation === "vertical" ? UP : RIGHT
-        ),
-        this.current.second
-      );
+      this.setPiece(secondPosition, this.current.second);
+      // If the starting cell is occupied, it's game over.
+      if (this.containsPoint(startingCell)) {
+        this.onGameOver?.();
+        return;
+      }
       this.currentState = "fall";
     } else if (this.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
