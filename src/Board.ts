@@ -2,6 +2,7 @@ import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
 import "pixi.js/math-extras";
 import Qubit from "./Qubit";
 import { range } from "lodash-es";
+import Measurement from "./Measurement";
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
@@ -12,7 +13,7 @@ export default class Board {
   view: Container;
   grid: (Qubit | null)[][];
   // Either a pair of qubit, a gate, or a measurement
-  current: Qubit | null = null;
+  current: Qubit | Measurement | null = null;
   currentPosition = new Point(Math.floor(BOARD_WIDTH / 2), 0);
 
   time: number = 0;
@@ -78,13 +79,19 @@ export default class Board {
     if (this.current instanceof Qubit) {
       this.grid[this.currentPosition.y][this.currentPosition.x] = this.current;
       this.newCurrent();
+    } else if (this.current instanceof Measurement) {
+      // If it's a measurement, trigger the measurement reaction chain.
+      // TODO
     }
     // If it's a gate, trigger the gate.
-    // If it's a measurement, trigger the measurement reaction chain.
   }
 
   newCurrent() {
-    this.current = Qubit.random();
+    if (Math.random() < 1 / 8) {
+      this.current = Measurement.random();
+    } else {
+      this.current = Qubit.random();
+    }
     this.updateCurrent(new Point(Math.min(BOARD_WIDTH / 2), 0));
     this.view.addChild(this.current.sprite);
   }
