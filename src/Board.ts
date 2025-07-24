@@ -6,6 +6,7 @@ import MeasurementPiece from "./MeasurementPiece";
 import { measure } from "./quantum";
 import { DOWN, neighbors } from "./points";
 import { CELL_SIZE } from "./constants";
+import Deck from "./Deck";
 
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
@@ -18,6 +19,7 @@ type State = "game" | "measure";
 export default class Board {
   view: Container;
   grid: (QubitPiece | null)[][];
+  deck: Deck;
   // Either a pair of qubit, a gate, or a measurement
   current: QubitPiece | MeasurementPiece | null = null;
   currentPosition = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
@@ -34,6 +36,7 @@ export default class Board {
   constructor() {
     this.view = new Container();
     this.view.position = { x: 50, y: 50 };
+
     this.view.addChild(
       new Graphics(
         new GraphicsContext()
@@ -41,6 +44,9 @@ export default class Board {
           .stroke("white")
       )
     );
+    this.deck = new Deck();
+    this.view.addChild(this.deck.view);
+
     this.grid = this.initGrid();
     this.newCurrent();
 
@@ -157,11 +163,7 @@ export default class Board {
   }
 
   newCurrent() {
-    if (Math.random() < 1 / 4) {
-      this.current = MeasurementPiece.random();
-    } else {
-      this.current = QubitPiece.random();
-    }
+    this.current = this.deck.pop();
     this.updateCurrent(new Point(Math.min(BOARD_WIDTH / 2 - 1), 0));
     this.view.addChild(this.current.sprite);
   }
