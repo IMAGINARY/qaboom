@@ -57,7 +57,7 @@ export default class Deck {
 }
 
 function getNewItem() {
-  if (Math.random() < 1 / 4) {
+  if (Math.random() < 1 / 8) {
     return MeasurementPiece.random();
   } else {
     return QubitPair.random();

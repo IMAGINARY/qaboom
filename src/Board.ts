@@ -16,7 +16,7 @@ const INIT_FILL_HEIGHT = 0;
 type State = "game" | "measure" | "fall";
 
 const RATES = {
-  game: 750,
+  game: 500,
   measure: 150,
   fall: 150,
 };
