@@ -6,8 +6,8 @@ import MeasurementPiece from "./MeasurementPiece";
 import { measure } from "./quantum";
 import { DOWN, neighbors } from "./points";
 
-const BOARD_WIDTH = 10;
-const BOARD_HEIGHT = 20;
+const BOARD_WIDTH = 6;
+const BOARD_HEIGHT = 12;
 const INIT_FILL_HEIGHT = 5;
 const CELL_SIZE = 25;
 const RATE = 500;
@@ -20,7 +20,7 @@ export default class Board {
   grid: (QubitPiece | null)[][];
   // Either a pair of qubit, a gate, or a measurement
   current: QubitPiece | MeasurementPiece | null = null;
-  currentPosition = new Point(Math.floor(BOARD_WIDTH / 2), 0);
+  currentPosition = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
   currentState: State = "game";
 
   // State relating to measurement
@@ -162,7 +162,7 @@ export default class Board {
     } else {
       this.current = QubitPiece.random();
     }
-    this.updateCurrent(new Point(Math.min(BOARD_WIDTH / 2), 0));
+    this.updateCurrent(new Point(Math.min(BOARD_WIDTH / 2 - 1), 0));
     this.view.addChild(this.current.sprite);
   }
 
