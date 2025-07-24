@@ -1,9 +1,10 @@
-import { Container, Point } from "pixi.js";
+import { Container, Graphics, GraphicsContext, Point } from "pixi.js";
 import Qubit from "./Qubit";
 import { range } from "lodash-es";
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
+const CELL_SIZE = 25;
 // The "game board": the currently existing grid of qubits.
 export default class Board {
   view: Container;
@@ -14,7 +15,14 @@ export default class Board {
 
   constructor() {
     this.view = new Container();
-    this.view.position = { x: 20, y: 20 };
+    this.view.position = { x: 50, y: 50 };
+    this.view.addChild(
+      new Graphics(
+        new GraphicsContext()
+          .rect(0, 0, BOARD_WIDTH * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE)
+          .stroke("white")
+      )
+    );
     this.grid = this.initGrid();
     // Initialize the positions of the qubits based on the level.
   }
@@ -29,7 +37,10 @@ export default class Board {
       const row = [];
       for (let j = 0; j < BOARD_WIDTH; j++) {
         const qubit = Qubit.random();
-        qubit.sprite.position = new Point(j * 25, i * 25);
+        qubit.sprite.position = new Point(
+          (j + 0.5) * CELL_SIZE,
+          (i + 0.5) * CELL_SIZE
+        );
         this.view.addChild(qubit.sprite);
         row.push(qubit);
       }

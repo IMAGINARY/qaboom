@@ -6,7 +6,11 @@ export default class Game {
     const app = new Application();
 
     // Initialize the application
-    await app.init({ background: "#000", width: 500, height: 700 });
+    await app.init({
+      background: "#000",
+      width: 500,
+      height: 700,
+    });
 
     // Append the application canvas to the document body
     document.body.appendChild(app.canvas);
