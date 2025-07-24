@@ -23,8 +23,8 @@ const RATES = {
 
 const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 
-// The "game board": the currently existing grid of qubits.
-export default class Board {
+// The main Qaboom gameplay loop
+export default class Qaboom {
   onGameOver?: () => void;
 
   view: Container;
@@ -62,6 +62,8 @@ export default class Board {
       )
     );
     this.deck = new Deck();
+    this.deck.view.position = { x: 325, y: 0 };
+    this.deck.view.scale = 0.75;
     this.view.addChild(this.deck.view);
 
     this.grid = this.initGrid();
@@ -135,11 +137,11 @@ export default class Board {
         this.current.orientation === "horizontal" &&
         !!this.getPiece(this.currentPosition.add(RIGHT).add(DOWN)));
 
-    if (!occupiedBelow) {
-      this.updateCurrent(this.currentPosition.add(DOWN));
-      return;
+    if (occupiedBelow) {
+      this.resolve();
+    } else {
+      this.setCurrentPosition(this.currentPosition.add(DOWN));
     }
-    this.resolve();
   }
 
   // Resolve the current piece's action when it can't move any more.
@@ -240,12 +242,11 @@ export default class Board {
       return;
     }
     this.current = this.deck.pop();
-    this.updateCurrent(new Point(Math.min(BOARD_WIDTH / 2 - 1), 0));
+    this.setCurrentPosition(new Point(Math.min(BOARD_WIDTH / 2 - 1), 0));
     this.view.addChild(this.current.sprite);
   }
 
-  updateCurrent(p: Point) {
-    // if (!this.current) return;
+  setCurrentPosition(p: Point) {
     this.currentPosition = p;
     this.current!.sprite.position = {
       x: (this.currentPosition.x + 0.5) * CELL_SIZE,
@@ -275,7 +276,7 @@ export default class Board {
           this.containsPoint(left.add(UP))
         )
           break;
-        this.updateCurrent(left);
+        this.setCurrentPosition(left);
         break;
       }
       case "d":
@@ -297,9 +298,10 @@ export default class Board {
           )
             break;
         }
-        this.updateCurrent(right);
+        this.setCurrentPosition(right);
         break;
       }
+      // If the player presses down, speed up the steps
       case "s":
       case "ArrowDown": {
         let obstructed = false;
@@ -317,7 +319,7 @@ export default class Board {
         if (obstructed) {
           this.resolve();
         } else {
-          this.updateCurrent(down);
+          this.setCurrentPosition(down);
         }
         break;
       }
@@ -342,8 +344,6 @@ export default class Board {
         break;
       }
     }
-
-    // If the player presses down, speed up the steps
   };
 }
 

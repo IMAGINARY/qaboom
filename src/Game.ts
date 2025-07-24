@@ -1,5 +1,5 @@
 import { Application } from "pixi.js";
-import Board from "./Board";
+import Qaboom from "./Qaboom";
 import Menu from "./Menu";
 
 export default class Game {
@@ -20,14 +20,14 @@ export default class Game {
     menu.show(app.stage);
     menu.onStart = () => {
       menu.hide();
-      board.initialize();
-      board.show(app.stage);
-      app.ticker.add(board.tick);
+      qaboom.initialize();
+      qaboom.show(app.stage);
+      app.ticker.add(qaboom.tick);
     };
-    const board = new Board();
-    board.onGameOver = () => {
-      board.hide();
-      app.ticker.remove(board.tick);
+    const qaboom = new Qaboom();
+    qaboom.onGameOver = () => {
+      qaboom.hide();
+      app.ticker.remove(qaboom.tick);
       menu.show(app.stage);
     };
   }

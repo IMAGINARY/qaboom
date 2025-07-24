@@ -16,11 +16,10 @@ export default class Deck {
 
   constructor() {
     this.view = new Container();
-    this.view.position = { x: 325, y: 0 };
     this.view.addChild(
       new Graphics()
         .rect(0, 0, DECK_WIDTH, DECK_PIECE_HEIGHT * DECK_SIZE)
-        .stroke("white")
+        .stroke({ color: "white", width: 2 })
     );
     this.initDeck();
     this.setDeckPositions();
