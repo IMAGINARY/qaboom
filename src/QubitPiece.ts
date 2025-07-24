@@ -1,5 +1,6 @@
 import { GraphicsContext, Graphics } from "pixi.js";
 import { getColor, getBlochCoords, randomQubit, type Qubit } from "./quantum";
+import { PIECE_RADIUS } from "./constants";
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
@@ -12,7 +13,7 @@ export default class QubitPiece {
     this.value = value;
     this.sprite = new Graphics(
       new GraphicsContext()
-        .circle(0, 0, 10)
+        .circle(0, 0, PIECE_RADIUS)
         .stroke({ color: "grey", width: 2 })
         .fill(getColor(getBlochCoords(this.value)))
     );
@@ -27,7 +28,7 @@ export default class QubitPiece {
     this.value = value;
     this.sprite
       .clear()
-      .circle(0, 0, 10)
+      .circle(0, 0, PIECE_RADIUS)
       .stroke({ color: "grey", width: 2 })
       .fill(getColor(getBlochCoords(this.value)));
   }

@@ -6,6 +6,7 @@ import {
   randomQubit,
   type Qubit,
 } from "./quantum";
+import { PIECE_RADIUS } from "./constants";
 
 // Represents a measurement along an axis
 export default class MeasurementPiece {
@@ -18,10 +19,10 @@ export default class MeasurementPiece {
     const baseColor = getColor(getBlochCoords(this.base));
     const orthoColor = getColor(getBlochCoords(this.ortho));
     this.sprite = new Graphics()
-      .circle(0, 0, 10)
+      .circle(0, 0, PIECE_RADIUS)
       .stroke({ color: "grey", width: 2 })
       .fill(baseColor)
-      .circle(0, 2.5, 5)
+      .circle(0, PIECE_RADIUS / 2, PIECE_RADIUS / 2)
       .fill(orthoColor);
   }
 

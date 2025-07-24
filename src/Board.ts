@@ -5,11 +5,11 @@ import { range, uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
 import { measure } from "./quantum";
 import { DOWN, neighbors } from "./points";
+import { CELL_SIZE } from "./constants";
 
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
 const INIT_FILL_HEIGHT = 5;
-const CELL_SIZE = 25;
 const RATE = 500;
 const MEASURE_RATE = 250;
 
