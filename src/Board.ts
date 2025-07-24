@@ -7,16 +7,35 @@ const BOARD_HEIGHT = 20;
 // The "game board": the currently existing grid of qubits.
 export default class Board {
   view: Container;
-  grid: (Qubit | null)[][] = range(BOARD_HEIGHT).map(() =>
-    range(BOARD_WIDTH).map(() => null)
-  );
+  grid: (Qubit | null)[][];
   // Either a pair of qubit, a gate, or a measurement
   current: Qubit | null = null;
   currentPosition = new Point(Math.floor(BOARD_WIDTH / 2), 0);
 
   constructor() {
     this.view = new Container();
+    this.view.position = { x: 20, y: 20 };
+    this.grid = this.initGrid();
     // Initialize the positions of the qubits based on the level.
+  }
+
+  initGrid() {
+    const fillHeight = 8;
+    const grid = [];
+    for (let i = 0; i < BOARD_HEIGHT - fillHeight; i++) {
+      grid.push(range(BOARD_WIDTH).map(() => null));
+    }
+    for (let i = BOARD_HEIGHT - fillHeight; i < BOARD_HEIGHT; i++) {
+      const row = [];
+      for (let j = 0; j < BOARD_WIDTH; j++) {
+        const qubit = Qubit.random();
+        qubit.sprite.position = new Point(j * 25, i * 25);
+        this.view.addChild(qubit.sprite);
+        row.push(qubit);
+      }
+      grid.push(row);
+    }
+    return grid;
   }
 
   step() {

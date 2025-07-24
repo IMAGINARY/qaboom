@@ -1,4 +1,5 @@
 import { Application } from "pixi.js";
+import Board from "./Board";
 
 export default class Game {
   async start() {
@@ -11,5 +12,7 @@ export default class Game {
     document.body.appendChild(app.canvas);
 
     // TODO add the Board and Deck
+    const board = new Board();
+    app.stage.addChild(board.view);
   }
 }
