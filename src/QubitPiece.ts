@@ -1,4 +1,4 @@
-import { GraphicsContext, Graphics } from "pixi.js";
+import { Graphics } from "pixi.js";
 import { getColor, getBlochCoords, randomQubit, type Qubit } from "./quantum";
 import { PIECE_RADIUS } from "./constants";
 // A qubit is the basic "piece" that exists in the grid.
@@ -11,12 +11,8 @@ export default class QubitPiece {
 
   constructor(value: Qubit) {
     this.value = value;
-    this.sprite = new Graphics(
-      new GraphicsContext()
-        .circle(0, 0, PIECE_RADIUS)
-        .stroke({ color: "grey", width: 2 })
-        .fill(getColor(getBlochCoords(this.value)))
-    );
+    this.sprite = new Graphics();
+    this.setValue(this.value);
   }
 
   // return a random qubit
@@ -26,10 +22,18 @@ export default class QubitPiece {
 
   setValue(value: Qubit) {
     this.value = value;
+    const { phi, theta } = getBlochCoords(value);
+    const length = Math.sin(theta);
     this.sprite
       .clear()
       .circle(0, 0, PIECE_RADIUS)
       .stroke({ color: "grey", width: 2 })
-      .fill(getColor(getBlochCoords(this.value)));
+      .fill(getColor(getBlochCoords(this.value)))
+      .moveTo(0, 0)
+      .lineTo(
+        Math.cos(phi) * PIECE_RADIUS * length,
+        Math.sin(phi) * PIECE_RADIUS * length
+      )
+      .stroke("grey");
   }
 }
