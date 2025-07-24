@@ -1,5 +1,6 @@
 import { Application } from "pixi.js";
 import Board from "./Board";
+import Menu from "./Menu";
 
 export default class Game {
   async start() {
@@ -15,11 +16,18 @@ export default class Game {
     // Append the application canvas to the document body
     document.body.appendChild(app.canvas);
 
-    // TODO add the Board and Deck
+    const menu = new Menu();
+    menu.show(app.stage);
+    menu.onStart = () => {
+      menu.hide();
+      app.stage.addChild(board.view);
+      app.ticker.add(board.tick);
+    };
     const board = new Board();
-    app.stage.addChild(board.view);
-    app.ticker.add((time) => {
-      board.tick(time);
-    });
+    board.onGameOver = () => {
+      board.hide();
+      app.ticker.remove(board.tick);
+      menu.show(app.stage);
+    };
   }
 }

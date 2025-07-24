@@ -20,14 +20,19 @@ const RATES = {
   measure: 150,
   fall: 150,
 };
+
+const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
+
 // The "game board": the currently existing grid of qubits.
 export default class Board {
+  onGameOver?: () => void;
+
   view: Container;
   grid: (QubitPiece | null)[][];
   deck: Deck;
   // Either a pair of qubit, a gate, or a measurement
   current: QubitPair | MeasurementPiece | null = null;
-  currentPosition = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
+  currentPosition = startingCell;
   currentState: State = "game";
 
   // State relating to measurement
@@ -55,7 +60,17 @@ export default class Board {
     this.grid = this.initGrid();
     this.newCurrent();
 
-    document.addEventListener("keydown", (e) => this.handleKeyInput(e));
+    document.addEventListener("keydown", (e) => this.handleKeyDown(e));
+  }
+
+  show(parent: Container) {
+    parent.addChild(this.view);
+    document.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  hide() {
+    this.view.parent.removeChild(this.view);
+    document.removeEventListener("keydown", this.handleKeyDown);
   }
 
   initGrid() {
@@ -91,7 +106,7 @@ export default class Board {
     }
   }
 
-  tick(time: Ticker) {
+  tick = (time: Ticker) => {
     if (this.time >= this.nextTime) {
       if (this.currentState === "game") {
         this.step();
@@ -103,7 +118,7 @@ export default class Board {
       this.nextTime = this.time + RATES[this.currentState];
     }
     this.time += time.deltaMS;
-  }
+  };
 
   step() {
     // If it doesn't touch the floor or another qubit in the grid,
@@ -135,7 +150,6 @@ export default class Board {
         ),
         this.current.second
       );
-      // this.newCurrent();
       this.currentState = "fall";
     } else if (this.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
@@ -207,6 +221,10 @@ export default class Board {
   }
 
   newCurrent() {
+    if (this.containsPoint(startingCell)) {
+      this.onGameOver?.();
+      return;
+    }
     this.current = this.deck.pop();
     this.updateCurrent(new Point(Math.min(BOARD_WIDTH / 2 - 1), 0));
     this.view.addChild(this.current.sprite);
@@ -226,7 +244,7 @@ export default class Board {
     return !!this.getPiece(p);
   }
 
-  handleKeyInput(e: KeyboardEvent) {
+  handleKeyDown = (e: KeyboardEvent) => {
     if (this.currentState !== "game") {
       return;
     }
@@ -312,7 +330,7 @@ export default class Board {
     }
 
     // If the player presses down, speed up the steps
-  }
+  };
 }
 
 function inBounds(p: Point) {
