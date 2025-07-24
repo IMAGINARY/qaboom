@@ -1,4 +1,5 @@
 import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
+import "pixi.js/math-extras";
 import Qubit from "./Qubit";
 import { range } from "lodash-es";
 
@@ -29,7 +30,8 @@ export default class Board {
     );
     this.grid = this.initGrid();
     this.newCurrent();
-    // Initialize the positions of the qubits based on the level.
+
+    document.addEventListener("keydown", (e) => this.handleKeyInput(e));
   }
 
   initGrid() {
@@ -68,11 +70,7 @@ export default class Board {
     const occupiedBelow =
       !!this.grid[this.currentPosition.y + 1][this.currentPosition.x];
     if (this.currentPosition.y + 1 < BOARD_HEIGHT && !occupiedBelow) {
-      this.currentPosition.y += 1;
-      this.current!.sprite.position = {
-        x: (this.currentPosition.x + 0.5) * CELL_SIZE,
-        y: (this.currentPosition.y + 0.5) * CELL_SIZE,
-      };
+      this.updateCurrent(this.currentPosition.add(new Point(0, 1)));
       return;
     }
 
@@ -87,17 +85,49 @@ export default class Board {
 
   newCurrent() {
     this.current = Qubit.random();
-    this.currentPosition = new Point(Math.min(BOARD_WIDTH / 2), 0);
-    this.current.sprite.position = {
-      x: (this.currentPosition.x + 0.5) * CELL_SIZE,
-      y: (this.currentPosition.y + 0.5) * CELL_SIZE,
-    };
+    this.updateCurrent(new Point(Math.min(BOARD_WIDTH / 2), 0));
     this.view.addChild(this.current.sprite);
   }
 
-  onPlayerInput() {
+  updateCurrent(p: Point) {
+    // if (!this.current) return;
+    this.currentPosition = p;
+    this.current!.sprite.position = {
+      x: (this.currentPosition.x + 0.5) * CELL_SIZE,
+      y: (this.currentPosition.y + 0.5) * CELL_SIZE,
+    };
+  }
+
+  containsPoint(p: Point) {
+    return !!this.grid[p.y][p.x];
+  }
+
+  handleKeyInput(e: KeyboardEvent) {
+    switch (e.key) {
+      // If the player presses left or right, move the current item (if possible)
+      case "ArrowLeft": {
+        const left = this.currentPosition.add(new Point(-1, 0));
+        if (!this.containsPoint(left) && left.x >= 0) {
+          this.updateCurrent(left);
+        }
+        break;
+      }
+      case "ArrowRight": {
+        const right = this.currentPosition.add(new Point(1, 0));
+        if (!this.containsPoint(right) && right.x < BOARD_WIDTH) {
+          this.updateCurrent(right);
+        }
+        break;
+      }
+      case "ArrowDown": {
+        const down = this.currentPosition.add(new Point(0, 1));
+        if (!this.containsPoint(down) && down.y < BOARD_HEIGHT) {
+          this.updateCurrent(down);
+        }
+        break;
+      }
+    }
     // If the player presses the trigger, rotate the qubit (if possible)
-    // If the player presses left or right, move the current item (if possible)
     // If the player presses down, speed up the steps
   }
 }
