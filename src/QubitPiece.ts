@@ -22,4 +22,13 @@ export default class QubitPiece {
   static random() {
     return new QubitPiece(randomQubit());
   }
+
+  setValue(value: Qubit) {
+    this.value = value;
+    this.sprite
+      .clear()
+      .circle(0, 0, 10)
+      .stroke({ color: "grey", width: 2 })
+      .fill(getColor(getBlochCoords(this.value)));
+  }
 }

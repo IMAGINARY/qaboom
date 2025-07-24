@@ -82,3 +82,8 @@ export function randomQubit() {
     phi: 2 * Math.PI * Math.random(),
   });
 }
+
+export function measure(qubit: Qubit, base: Qubit) {
+  const prob = (math.dot(base, qubit) as any).toPolar().r ** 2;
+  return Math.random() < prob;
+}
