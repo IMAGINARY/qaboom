@@ -75,12 +75,13 @@ export function getOrtho(qubit: Qubit) {
   ]);
 }
 
-// TODO this biases black and white
 export function randomQubit() {
-  return qubitFromSpherical({
-    theta: Math.PI * Math.random(),
-    phi: 2 * Math.PI * Math.random(),
-  });
+  // https://mathworld.wolfram.com/SpherePointPicking.html
+  const u = Math.random();
+  const v = Math.random();
+  const theta = 2 * Math.PI * u;
+  const phi = Math.acos(2 * v - 1);
+  return qubitFromSpherical({ theta, phi });
 }
 
 export function measure(qubit: Qubit, base: Qubit) {
