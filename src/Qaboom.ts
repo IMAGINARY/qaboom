@@ -1,4 +1,11 @@
-import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
+import {
+  Container,
+  Graphics,
+  GraphicsContext,
+  HTMLText,
+  Point,
+  Ticker,
+} from "pixi.js";
 import "pixi.js/math-extras";
 import QubitPiece from "./QubitPiece";
 import { range, uniqWith } from "lodash-es";
@@ -30,10 +37,12 @@ export default class Qaboom {
   view: Container;
   grid: (QubitPiece | null)[][];
   deck: Deck;
+  scoreboard: HTMLText;
   // Either a pair of qubit, a gate, or a measurement
   current: QubitPair | MeasurementPiece | null = null;
   currentPosition = startingCell;
   currentState: State = "game";
+  #score: number = 0;
 
   // State relating to measurement
   measureQueue: Point[] = [];
@@ -47,13 +56,26 @@ export default class Qaboom {
     this.view = new Container();
     this.deck = new Deck();
     this.grid = this.initGrid();
+    this.scoreboard = new HTMLText({
+      text: "" + this.score,
+      style: {
+        align: "center",
+        fill: "white",
+        fontFamily: "monospace",
+        fontSize: 32,
+      },
+    });
+    this.scoreboard.position = { x: 0, y: -35 };
+
     this.initialize();
   }
 
   initialize() {
+    this.score = 0;
     this.view.removeChildren();
     this.view.position = { x: 50, y: 50 };
 
+    this.view.addChild(this.scoreboard);
     this.view.addChild(
       new Graphics(
         new GraphicsContext()
@@ -68,6 +90,15 @@ export default class Qaboom {
 
     this.grid = this.initGrid();
     this.newCurrent();
+  }
+
+  get score() {
+    return this.#score;
+  }
+
+  set score(value: number) {
+    this.#score = value;
+    this.scoreboard.text = `${this.#score * 100}`;
   }
 
   show(parent: Container) {
@@ -206,7 +237,9 @@ export default class Qaboom {
   }
 
   resolveMeasurement() {
-    for (const point of uniqWith(this.measured, (a, b) => a.equals(b))) {
+    const uniqMeasured = uniqWith(this.measured, (a, b) => a.equals(b));
+    this.score += triangular(uniqMeasured.length);
+    for (const point of uniqMeasured) {
       this.view.removeChild(this.getPiece(point)!.sprite);
       this.setPiece(point, null);
     }
@@ -349,4 +382,8 @@ export default class Qaboom {
 
 function inBounds(p: Point) {
   return p.x >= 0 && p.x < BOARD_WIDTH && p.y >= 0 && p.y < BOARD_HEIGHT;
+}
+
+function triangular(n: number) {
+  return (n * (n - 1)) / 2;
 }
