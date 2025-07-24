@@ -54,7 +54,11 @@ export default class Qaboom {
 
   constructor() {
     this.view = new Container();
+
     this.deck = new Deck();
+    this.deck.view.position = { x: 325, y: 0 };
+    this.deck.view.scale = 0.75;
+
     this.grid = this.initGrid();
     this.scoreboard = new HTMLText({
       text: "" + this.score,
@@ -83,9 +87,6 @@ export default class Qaboom {
           .stroke("white")
       )
     );
-    this.deck = new Deck();
-    this.deck.view.position = { x: 325, y: 0 };
-    this.deck.view.scale = 0.75;
     this.view.addChild(this.deck.view);
 
     this.grid = this.initGrid();

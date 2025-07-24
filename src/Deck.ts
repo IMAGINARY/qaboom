@@ -2,9 +2,10 @@ import { Graphics, Container } from "pixi.js";
 import MeasurementPiece from "./MeasurementPiece";
 import { CELL_SIZE } from "./constants";
 import QubitPair from "./QubitPair";
+import { range, shuffle } from "lodash-es";
 
 type Piece = QubitPair | MeasurementPiece;
-const DECK_SIZE = 3;
+const DECK_SIZE = 4;
 
 const DECK_WIDTH = CELL_SIZE * 2;
 const DECK_PIECE_HEIGHT = CELL_SIZE * 2.5;
@@ -13,25 +14,29 @@ const DECK_PIECE_HEIGHT = CELL_SIZE * 2.5;
 export default class Deck {
   view: Container;
   deck: Piece[] = [];
+  buffer: Piece[] = [];
 
   constructor() {
     this.view = new Container();
+    this.initDeck();
+  }
+
+  initDeck() {
+    this.view.removeChildren();
     this.view.addChild(
       new Graphics()
         .rect(0, 0, DECK_WIDTH, DECK_PIECE_HEIGHT * DECK_SIZE)
         .stroke({ color: "white", width: 2 })
     );
-    this.initDeck();
-    this.setDeckPositions();
-  }
-
-  initDeck() {
     for (let i = 0; i < DECK_SIZE; i++) {
-      this.deck.push(getNewItem());
+      // The first items in the deck should be qubit pairs.
+      this.deck.push(QubitPair.random());
     }
     for (let piece of this.deck) {
       this.view.addChild(piece.sprite);
     }
+    this.buffer = newBuffer();
+    this.setDeckPositions();
   }
 
   setDeckPositions() {
@@ -47,7 +52,10 @@ export default class Deck {
   pop() {
     const popped = this.deck.shift()!;
     this.view.removeChild(popped.sprite);
-    const newItem = getNewItem();
+    const newItem = this.buffer.shift()!;
+    if (this.buffer.length === 0) {
+      this.buffer = newBuffer();
+    }
     this.deck.push(newItem);
     this.view.addChild(newItem.sprite);
     this.setDeckPositions();
@@ -55,10 +63,11 @@ export default class Deck {
   }
 }
 
-function getNewItem() {
-  if (Math.random() < 1 / 8) {
-    return MeasurementPiece.random();
-  } else {
-    return QubitPair.random();
+function newBuffer() {
+  let buffer = [];
+  for (let _i of range(5)) {
+    buffer.push(QubitPair.random());
   }
+  buffer.push(MeasurementPiece.random());
+  return shuffle(buffer);
 }
