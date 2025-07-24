@@ -8,8 +8,9 @@ import { DOWN, neighbors } from "./points";
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
+const INIT_FILL_HEIGHT = 5;
 const CELL_SIZE = 25;
-const RATE = 1000;
+const RATE = 500;
 const MEASURE_RATE = 250;
 
 type State = "game" | "measure";
@@ -47,12 +48,11 @@ export default class Board {
   }
 
   initGrid() {
-    const fillHeight = 0;
     const grid = [];
-    for (let i = 0; i < BOARD_HEIGHT - fillHeight; i++) {
+    for (let i = 0; i < BOARD_HEIGHT - INIT_FILL_HEIGHT; i++) {
       grid.push(range(BOARD_WIDTH).map(() => null));
     }
-    for (let i = BOARD_HEIGHT - fillHeight; i < BOARD_HEIGHT; i++) {
+    for (let i = BOARD_HEIGHT - INIT_FILL_HEIGHT; i < BOARD_HEIGHT; i++) {
       const row = [];
       for (let j = 0; j < BOARD_WIDTH; j++) {
         const qubit = QubitPiece.random();
