@@ -8,6 +8,7 @@ export default class Game {
 
     // Initialize the application
     await app.init({
+      antialias: true,
       background: "#000",
       width: 500,
       height: 700,
