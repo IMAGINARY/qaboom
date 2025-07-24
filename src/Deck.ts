@@ -1,13 +1,13 @@
 import { Graphics, Container } from "pixi.js";
-import QubitPiece from "./QubitPiece";
 import MeasurementPiece from "./MeasurementPiece";
 import { CELL_SIZE } from "./constants";
+import QubitPair from "./QubitPair";
 
-type Piece = QubitPiece | MeasurementPiece;
-const DECK_SIZE = 5;
+type Piece = QubitPair | MeasurementPiece;
+const DECK_SIZE = 3;
 
 const DECK_WIDTH = CELL_SIZE * 2;
-const DECK_PIECE_HEIGHT = CELL_SIZE * 1.5;
+const DECK_PIECE_HEIGHT = CELL_SIZE * 2.5;
 
 // The deck of upcoming pieces to drop
 export default class Deck {
@@ -37,9 +37,10 @@ export default class Deck {
 
   setDeckPositions() {
     for (let [i, piece] of this.deck.entries()) {
+      const offset = piece instanceof QubitPair ? 0.75 : 0.5;
       piece.sprite.position = {
         x: DECK_WIDTH / 2,
-        y: (i + 0.5) * DECK_PIECE_HEIGHT,
+        y: (i + offset) * DECK_PIECE_HEIGHT,
       };
     }
   }
@@ -59,6 +60,6 @@ function getNewItem() {
   if (Math.random() < 1 / 4) {
     return MeasurementPiece.random();
   } else {
-    return QubitPiece.random();
+    return QubitPair.random();
   }
 }

@@ -4,9 +4,10 @@ import QubitPiece from "./QubitPiece";
 import { range, uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
 import { measure } from "./quantum";
-import { DOWN, neighbors } from "./points";
+import { DOWN, neighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE } from "./constants";
 import Deck from "./Deck";
+import QubitPair from "./QubitPair";
 
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
@@ -21,7 +22,7 @@ export default class Board {
   grid: (QubitPiece | null)[][];
   deck: Deck;
   // Either a pair of qubit, a gate, or a measurement
-  current: QubitPiece | MeasurementPiece | null = null;
+  current: QubitPair | MeasurementPiece | null = null;
   currentPosition = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
   currentState: State = "game";
 
@@ -80,6 +81,10 @@ export default class Board {
 
   setPiece(point: Point, value: QubitPiece | null) {
     this.grid[point.y][point.x] = value;
+    if (value) {
+      value.sprite.position.x = (point.x + 0.5) * CELL_SIZE;
+      value.sprite.position.y = (point.y + 0.5) * CELL_SIZE;
+    }
   }
 
   tick(time: Ticker) {
@@ -100,15 +105,26 @@ export default class Board {
     // move it down.
     const occupiedBelow =
       this.currentPosition.y + 1 === BOARD_HEIGHT ||
-      !!this.getPiece(this.currentPosition.add(DOWN));
+      !!this.getPiece(this.currentPosition.add(DOWN)) ||
+      (this.current instanceof QubitPair &&
+        this.current.orientation === "horizontal" &&
+        !!this.getPiece(this.currentPosition.add(RIGHT).add(DOWN)));
     if (!occupiedBelow) {
-      this.updateCurrent(this.currentPosition.add(new Point(0, 1)));
+      this.updateCurrent(this.currentPosition.add(DOWN));
       return;
     }
 
     // If it's a pair of qubits, just add it to the grid.
-    if (this.current instanceof QubitPiece) {
-      this.grid[this.currentPosition.y][this.currentPosition.x] = this.current;
+    if (this.current instanceof QubitPair) {
+      this.view.addChild(this.current.first.sprite);
+      this.view.addChild(this.current.second.sprite);
+      this.setPiece(this.currentPosition, this.current.first);
+      this.setPiece(
+        this.currentPosition.add(
+          this.current.orientation === "vertical" ? UP : RIGHT
+        ),
+        this.current.second
+      );
       this.newCurrent();
     } else if (this.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
@@ -189,20 +205,43 @@ export default class Board {
     }
     switch (e.key) {
       // If the player presses left or right, move the current item (if possible)
+      case "a":
       case "ArrowLeft": {
         const left = this.currentPosition.add(new Point(-1, 0));
-        if (!this.containsPoint(left) && left.x >= 0) {
-          this.updateCurrent(left);
-        }
+        if (this.containsPoint(left)) break;
+        if (left.x < 0) break;
+        if (
+          this.current instanceof QubitPair &&
+          this.current.orientation === "vertical" &&
+          this.containsPoint(left.add(UP))
+        )
+          break;
+        this.updateCurrent(left);
         break;
       }
+      case "d":
       case "ArrowRight": {
-        const right = this.currentPosition.add(new Point(1, 0));
-        if (!this.containsPoint(right) && right.x < BOARD_WIDTH) {
-          this.updateCurrent(right);
+        const right = this.currentPosition.add(RIGHT);
+        if (this.containsPoint(right)) break;
+        if (right.x >= BOARD_WIDTH) break;
+        if (this.current instanceof QubitPair) {
+          if (
+            this.current.orientation === "vertical" &&
+            this.containsPoint(right.add(UP))
+          ) {
+            break;
+          }
+          const right2 = right.add(RIGHT);
+          if (
+            this.current.orientation === "horizontal" &&
+            (this.containsPoint(right2) || right2.x >= BOARD_WIDTH)
+          )
+            break;
         }
+        this.updateCurrent(right);
         break;
       }
+      case "s":
       case "ArrowDown": {
         const down = this.currentPosition.add(new Point(0, 1));
         if (!this.containsPoint(down) && down.y < BOARD_HEIGHT) {
@@ -210,8 +249,23 @@ export default class Board {
         }
         break;
       }
+      // If the player presses the trigger, rotate the qubit (if possible)
+      case " ": {
+        if (!(this.current instanceof QubitPair)) {
+          break;
+        }
+        const canRotate =
+          (this.current.orientation === "vertical" &&
+            !this.containsPoint(this.currentPosition.add(RIGHT))) ||
+          (this.current.orientation === "horizontal" &&
+            !this.containsPoint(this.currentPosition.add(UP)));
+        if (canRotate) {
+          this.current.rotate();
+        }
+        break;
+      }
     }
-    // If the player presses the trigger, rotate the qubit (if possible)
+
     // If the player presses down, speed up the steps
   }
 }
