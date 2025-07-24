@@ -11,11 +11,12 @@ import QubitPair from "./QubitPair";
 
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
-const INIT_FILL_HEIGHT = 5;
+const INIT_FILL_HEIGHT = 0;
 const RATE = 750;
 const MEASURE_RATE = 150;
+const FALL_RATE = 150;
 
-type State = "game" | "measure";
+type State = "game" | "measure" | "fall";
 // The "game board": the currently existing grid of qubits.
 export default class Board {
   view: Container;
@@ -92,9 +93,12 @@ export default class Board {
       if (this.currentState === "game") {
         this.step();
         this.nextTime = this.time + RATE;
-      } else {
+      } else if (this.currentState === "measure") {
         this.measureStep();
-        this.nextTime += MEASURE_RATE;
+        this.nextTime = this.time + MEASURE_RATE;
+      } else {
+        this.fallStep();
+        this.nextTime = this.time + FALL_RATE;
       }
     }
     this.time += time.deltaMS;
@@ -125,7 +129,8 @@ export default class Board {
         ),
         this.current.second
       );
-      this.newCurrent();
+      // this.newCurrent();
+      this.currentState = "fall";
     } else if (this.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
       this.currentState = "measure";
@@ -140,7 +145,7 @@ export default class Board {
 
   measureStep() {
     if (this.measureQueue.length === 0) {
-      this.fall();
+      this.resolveMeasurement();
       return;
     }
     let newQueue: Point[] = [];
@@ -166,7 +171,7 @@ export default class Board {
     this.measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
   }
 
-  fall() {
+  resolveMeasurement() {
     for (const point of uniqWith(this.measured, (a, b) => a.equals(b))) {
       this.view.removeChild(this.getPiece(point)!.sprite);
       this.setPiece(point, null);
@@ -174,9 +179,27 @@ export default class Board {
     this.measured = [];
     this.measureQueue = [];
     this.visited = [];
-    this.currentState = "game";
     this.view.removeChild(this.current!.sprite);
-    this.newCurrent();
+    this.currentState = "fall";
+  }
+
+  fallStep() {
+    let anyFalling = false;
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      for (let y = BOARD_HEIGHT - 2; y >= 0; y--) {
+        const point = new Point(x, y);
+        if (this.containsPoint(point) && !this.containsPoint(point.add(DOWN))) {
+          const piece = this.getPiece(point);
+          this.setPiece(point, null);
+          this.setPiece(point.add(DOWN), piece);
+          anyFalling = true;
+        }
+      }
+    }
+    if (!anyFalling) {
+      this.currentState = "game";
+      this.newCurrent();
+    }
   }
 
   newCurrent() {
