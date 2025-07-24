@@ -24,16 +24,17 @@ export default class QubitPiece {
     this.value = value;
     const { phi, theta } = getBlochCoords(value);
     const length = Math.sin(theta);
+    const secondaryColor = theta > Math.PI / 2 ? "black" : "white";
     this.sprite
       .clear()
       .circle(0, 0, PIECE_RADIUS)
-      .stroke({ color: "grey", width: 2 })
+      .stroke({ color: secondaryColor, width: 2 })
       .fill(getColor(getBlochCoords(this.value)))
       .moveTo(0, 0)
       .lineTo(
         Math.cos(phi) * PIECE_RADIUS * length,
         Math.sin(phi) * PIECE_RADIUS * length
       )
-      .stroke("grey");
+      .stroke({ color: secondaryColor, width: 2 });
   }
 }

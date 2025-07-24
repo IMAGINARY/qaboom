@@ -22,7 +22,7 @@ export default class MeasurementPiece {
       .circle(0, 0, PIECE_RADIUS)
       .stroke({ color: "grey", width: 2 })
       .fill(baseColor)
-      .circle(0, PIECE_RADIUS / 2, PIECE_RADIUS / 2)
+      .circle(0, 0, PIECE_RADIUS / 2)
       .fill(orthoColor);
   }
 
