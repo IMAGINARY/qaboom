@@ -18,5 +18,8 @@ export default class Game {
     // TODO add the Board and Deck
     const board = new Board();
     app.stage.addChild(board.view);
+    app.ticker.add((time) => {
+      board.tick(time);
+    });
   }
 }

@@ -1,10 +1,11 @@
-import { Container, Graphics, GraphicsContext, Point } from "pixi.js";
+import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
 import Qubit from "./Qubit";
 import { range } from "lodash-es";
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
 const CELL_SIZE = 25;
+const RATE = 1000;
 // The "game board": the currently existing grid of qubits.
 export default class Board {
   view: Container;
@@ -12,6 +13,9 @@ export default class Board {
   // Either a pair of qubit, a gate, or a measurement
   current: Qubit | null = null;
   currentPosition = new Point(Math.floor(BOARD_WIDTH / 2), 0);
+
+  time: number = 0;
+  nextTime: number = 0;
 
   constructor() {
     this.view = new Container();
@@ -24,6 +28,7 @@ export default class Board {
       )
     );
     this.grid = this.initGrid();
+    this.newCurrent();
     // Initialize the positions of the qubits based on the level.
   }
 
@@ -49,24 +54,45 @@ export default class Board {
     return grid;
   }
 
-  step() {
-    // If no currnet piece present, deal from the deck.
+  tick(time: Ticker) {
+    if (this.time >= this.nextTime) {
+      this.step();
+      this.nextTime += RATE;
+    }
+    this.time += time.deltaMS;
+  }
 
+  step() {
     // If it doesn't touch the floor or another qubit in the grid,
     // move it down.
     const occupiedBelow =
       !!this.grid[this.currentPosition.y + 1][this.currentPosition.x];
     if (this.currentPosition.y + 1 < BOARD_HEIGHT && !occupiedBelow) {
       this.currentPosition.y += 1;
+      this.current!.sprite.position = {
+        x: (this.currentPosition.x + 0.5) * CELL_SIZE,
+        y: (this.currentPosition.y + 0.5) * CELL_SIZE,
+      };
       return;
     }
 
     // If it's a pair of qubits, just add it to the grid.
     if (this.current instanceof Qubit) {
       this.grid[this.currentPosition.y][this.currentPosition.x] = this.current;
+      this.newCurrent();
     }
     // If it's a gate, trigger the gate.
     // If it's a measurement, trigger the measurement reaction chain.
+  }
+
+  newCurrent() {
+    this.current = Qubit.random();
+    this.currentPosition = new Point(Math.min(BOARD_WIDTH / 2), 0);
+    this.current.sprite.position = {
+      x: (this.currentPosition.x + 0.5) * CELL_SIZE,
+      y: (this.currentPosition.y + 0.5) * CELL_SIZE,
+    };
+    this.view.addChild(this.current.sprite);
   }
 
   onPlayerInput() {
