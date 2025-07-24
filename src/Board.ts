@@ -46,6 +46,23 @@ export default class Board {
   constructor() {
     this.view = new Container();
     this.view.position = { x: 50, y: 50 };
+    this.view.addChild(
+      new Graphics(
+        new GraphicsContext()
+          .rect(0, 0, BOARD_WIDTH * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE)
+          .stroke("white")
+      )
+    );
+    this.deck = new Deck();
+    this.view.addChild(this.deck.view);
+
+    this.grid = this.initGrid();
+    this.newCurrent();
+  }
+
+  initialize() {
+    this.view.removeChildren();
+    this.view.position = { x: 50, y: 50 };
 
     this.view.addChild(
       new Graphics(
@@ -59,8 +76,6 @@ export default class Board {
 
     this.grid = this.initGrid();
     this.newCurrent();
-
-    document.addEventListener("keydown", (e) => this.handleKeyDown(e));
   }
 
   show(parent: Container) {

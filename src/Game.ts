@@ -20,7 +20,8 @@ export default class Game {
     menu.show(app.stage);
     menu.onStart = () => {
       menu.hide();
-      app.stage.addChild(board.view);
+      board.initialize();
+      board.show(app.stage);
       app.ticker.add(board.tick);
     };
     const board = new Board();
