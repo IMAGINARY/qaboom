@@ -12,11 +12,14 @@ import QubitPair from "./QubitPair";
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
 const INIT_FILL_HEIGHT = 0;
-const RATE = 750;
-const MEASURE_RATE = 150;
-const FALL_RATE = 150;
 
 type State = "game" | "measure" | "fall";
+
+const RATES = {
+  game: 750,
+  measure: 150,
+  fall: 150,
+};
 // The "game board": the currently existing grid of qubits.
 export default class Board {
   view: Container;
@@ -92,14 +95,12 @@ export default class Board {
     if (this.time >= this.nextTime) {
       if (this.currentState === "game") {
         this.step();
-        this.nextTime = this.time + RATE;
       } else if (this.currentState === "measure") {
         this.measureStep();
-        this.nextTime = this.time + MEASURE_RATE;
       } else {
         this.fallStep();
-        this.nextTime = this.time + FALL_RATE;
       }
+      this.nextTime = this.time + RATES[this.currentState];
     }
     this.time += time.deltaMS;
   }
@@ -113,11 +114,16 @@ export default class Board {
       (this.current instanceof QubitPair &&
         this.current.orientation === "horizontal" &&
         !!this.getPiece(this.currentPosition.add(RIGHT).add(DOWN)));
+
     if (!occupiedBelow) {
       this.updateCurrent(this.currentPosition.add(DOWN));
       return;
     }
+    this.resolve();
+  }
 
+  // Resolve the current piece's action when it can't move any more.
+  resolve() {
     // If it's a pair of qubits, just add it to the grid.
     if (this.current instanceof QubitPair) {
       this.view.addChild(this.current.first.sprite);
@@ -137,8 +143,6 @@ export default class Board {
       this.measureQueue = neighbors(this.currentPosition).filter((p) =>
         this.containsPoint(p)
       );
-      this.nextTime = 0;
-      // this.measureStep();
     }
     // If it's a gate, trigger the gate.
   }
@@ -266,16 +270,23 @@ export default class Board {
       }
       case "s":
       case "ArrowDown": {
-        const down = this.currentPosition.add(new Point(0, 1));
-        if (this.containsPoint(down)) break;
-        if (down.y >= BOARD_HEIGHT) break;
+        let obstructed = false;
+        const down = this.currentPosition.add(DOWN);
+        if (this.containsPoint(down)) obstructed = true;
+        if (down.y >= BOARD_HEIGHT) obstructed = true;
         if (
           this.current instanceof QubitPair &&
           this.current.orientation === "horizontal" &&
           this.containsPoint(down.add(RIGHT))
-        )
-          break;
-        this.updateCurrent(down);
+        ) {
+          obstructed = true;
+        }
+
+        if (obstructed) {
+          this.resolve();
+        } else {
+          this.updateCurrent(down);
+        }
         break;
       }
       // If the player presses the trigger, rotate the qubit (if possible)
