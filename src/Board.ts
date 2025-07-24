@@ -267,24 +267,35 @@ export default class Board {
       case "s":
       case "ArrowDown": {
         const down = this.currentPosition.add(new Point(0, 1));
-        if (!this.containsPoint(down) && down.y < BOARD_HEIGHT) {
-          this.updateCurrent(down);
-        }
+        if (this.containsPoint(down)) break;
+        if (down.y >= BOARD_HEIGHT) break;
+        if (
+          this.current instanceof QubitPair &&
+          this.current.orientation === "horizontal" &&
+          this.containsPoint(down.add(RIGHT))
+        )
+          break;
+        this.updateCurrent(down);
         break;
       }
       // If the player presses the trigger, rotate the qubit (if possible)
       case " ": {
+        // Can only rotate qubit pairs
         if (!(this.current instanceof QubitPair)) {
           break;
         }
-        const canRotate =
-          (this.current.orientation === "vertical" &&
-            !this.containsPoint(this.currentPosition.add(RIGHT))) ||
-          (this.current.orientation === "horizontal" &&
-            !this.containsPoint(this.currentPosition.add(UP)));
-        if (canRotate) {
-          this.current.rotate();
+        if (this.current.orientation === "vertical") {
+          const right = this.currentPosition.add(RIGHT);
+          if (this.containsPoint(right) || !inBounds(right)) {
+            break;
+          }
         }
+        if (this.current.orientation === "horizontal") {
+          if (this.containsPoint(this.currentPosition.add(UP))) {
+            break;
+          }
+        }
+        this.current.rotate();
         break;
       }
     }
