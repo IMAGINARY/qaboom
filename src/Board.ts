@@ -11,8 +11,8 @@ import Deck from "./Deck";
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
 const INIT_FILL_HEIGHT = 5;
-const RATE = 500;
-const MEASURE_RATE = 250;
+const RATE = 750;
+const MEASURE_RATE = 150;
 
 type State = "game" | "measure";
 // The "game board": the currently existing grid of qubits.
@@ -86,7 +86,7 @@ export default class Board {
     if (this.time >= this.nextTime) {
       if (this.currentState === "game") {
         this.step();
-        this.nextTime += RATE;
+        this.nextTime = this.time + RATE;
       } else {
         this.measureStep();
         this.nextTime += MEASURE_RATE;
@@ -116,7 +116,8 @@ export default class Board {
       this.measureQueue = neighbors(this.currentPosition).filter((p) =>
         this.containsPoint(p)
       );
-      this.measureStep();
+      this.nextTime = 0;
+      // this.measureStep();
     }
     // If it's a gate, trigger the gate.
   }
