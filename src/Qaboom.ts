@@ -3,7 +3,7 @@ import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
 import { measure } from "./quantum";
-import { DOWN, neighbors, RIGHT, UP } from "./points";
+import { DOWN, LEFT, neighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck from "./Deck";
 import QubitPair from "./QubitPair";
@@ -225,12 +225,8 @@ export default class Qaboom {
   }
 
   newCurrent() {
-    if (this.board.containsPoint(startingCell)) {
-      this.onGameOver?.();
-      return;
-    }
     this.current = this.deck.pop();
-    this.setCurrentPosition(new Point(Math.min(BOARD_WIDTH / 2 - 1), 0));
+    this.setCurrentPosition(startingCell);
     this.view.addChild(this.current.sprite);
   }
 
@@ -250,7 +246,7 @@ export default class Qaboom {
       // If the player presses left or right, move the current item (if possible)
       case "a":
       case "ArrowLeft": {
-        const left = this.currentPosition.add(new Point(-1, 0));
+        const left = this.currentPosition.add(LEFT);
         if (this.board.containsPoint(left)) break;
         if (left.x < 0) break;
         if (
