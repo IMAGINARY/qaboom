@@ -15,6 +15,10 @@ export default class Board {
   constructor() {
     this.view = new Container();
     this.grid = this.initGrid();
+  }
+
+  initialize() {
+    this.view.removeChildren();
     this.view.addChild(
       new Graphics(
         new GraphicsContext()
@@ -22,9 +26,6 @@ export default class Board {
           .stroke("white")
       )
     );
-  }
-
-  initialize() {
     this.grid = this.initGrid();
   }
 
