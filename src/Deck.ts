@@ -3,8 +3,9 @@ import MeasurementPiece from "./MeasurementPiece";
 import { CELL_SIZE } from "./constants";
 import QubitPair from "./QubitPair";
 import { range, shuffle } from "lodash-es";
+import GatePiece from "./GatePiece";
 
-type Piece = QubitPair | MeasurementPiece;
+type Piece = QubitPair | MeasurementPiece | GatePiece;
 const DECK_SIZE = 4;
 
 const DECK_WIDTH = CELL_SIZE * 2;
@@ -67,6 +68,9 @@ function newBuffer() {
   let buffer = [];
   for (let _i of range(5)) {
     buffer.push(QubitPair.random());
+  }
+  for (let _i of range(2)) {
+    buffer.push(GatePiece.random());
   }
   buffer.push(MeasurementPiece.random());
   return shuffle(buffer);
