@@ -4,7 +4,7 @@ import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
 import { measure, type Qubit } from "./quantum";
-import { DOWN, LEFT, neighbors, RIGHT, UP } from "./points";
+import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck from "./Deck";
 import QubitPair from "./QubitPair";
@@ -156,7 +156,7 @@ export default class Qaboom {
     } else if (this.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
       this.currentState = "measure";
-      this.measureQueue = neighbors(this.currentPosition).filter((p) =>
+      this.measureQueue = orthoNeighbors(this.currentPosition).filter((p) =>
         this.board.containsPoint(p)
       );
     } else if (this.current instanceof GatePiece) {
@@ -181,7 +181,7 @@ export default class Qaboom {
         qubit.setValue(current.base);
         this.measured.push(point);
         // Add unvisited neighbors to the new queue.
-        for (const nbr of neighbors(point)) {
+        for (const nbr of orthoNeighbors(point)) {
           if (inBounds(nbr) && !this.visited.some((p) => p.equals(nbr))) {
             newQueue.push(nbr);
           }
@@ -230,13 +230,24 @@ export default class Qaboom {
 
   triggerGate() {
     // Apply the gate on everything in the gate's column
-    const x = this.currentPosition.x;
-    for (let y = this.currentPosition.y + 1; y < BOARD_HEIGHT; y++) {
-      const p = new Point(x, y);
-      const piece = this.board.getPiece(p);
-      piece?.setValue(
-        math.multiply((this.current as GatePiece).matrix, piece.value) as Qubit
-      );
+    // const x = this.currentPosition.x;
+    // for (let y = this.currentPosition.y + 1; y < BOARD_HEIGHT; y++) {
+    //   const p = new Point(x, y);
+    //   const piece = this.board.getPiece(p);
+    //   piece?.setValue(
+    //     math.multiply((this.current as GatePiece).matrix, piece.value) as Qubit
+    //   );
+    // }
+    for (let p of neighbors(this.currentPosition)) {
+      let piece = this.board.getPiece(p);
+      if (piece) {
+        piece.setValue(
+          math.multiply(
+            (this.current as GatePiece).matrix,
+            piece.value
+          ) as Qubit
+        );
+      }
     }
     this.currentState = "game";
     this.view.removeChild(this.current?.sprite!);

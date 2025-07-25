@@ -50,30 +50,30 @@ const gates = [
       [math.complex(0, 1), math.complex(0)],
     ]),
   },
-  {
-    name: "H",
-    matrix: math.multiply(
-      math.matrix([
-        [math.complex(1), math.complex(1)],
-        [math.complex(1), math.complex(-1)],
-      ]),
-      1 / Math.sqrt(2)
-    ),
-  },
-  {
-    name: "S",
-    matrix: math.matrix([
-      [math.complex(1), math.complex(0)],
-      [math.complex(0), math.complex(0, 1)],
-    ]),
-  },
-  {
-    name: "T",
-    matrix: math.matrix([
-      [1, 0],
-      [0, (math as any).Complex.fromPolar(1, Math.PI / 4)],
-    ]),
-  },
+  // {
+  //   name: "H",
+  //   matrix: math.multiply(
+  //     math.matrix([
+  //       [math.complex(1), math.complex(1)],
+  //       [math.complex(1), math.complex(-1)],
+  //     ]),
+  //     1 / Math.sqrt(2)
+  //   ),
+  // },
+  // {
+  //   name: "S",
+  //   matrix: math.matrix([
+  //     [math.complex(1), math.complex(0)],
+  //     [math.complex(0), math.complex(0, 1)],
+  //   ]),
+  // },
+  // {
+  //   name: "T",
+  //   matrix: math.matrix([
+  //     [1, 0],
+  //     [0, (math as any).Complex.fromPolar(1, Math.PI / 4)],
+  //   ]),
+  // },
   // {
   //   name: "√NOT",
   //   matrix: math.matrix([

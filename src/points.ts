@@ -1,8 +1,21 @@
 import { Point } from "pixi.js";
 import "pixi.js/math-extras";
 
-export function neighbors(p: Point) {
+export function orthoNeighbors(p: Point) {
   return [p.add(UP), p.add(DOWN), p.add(LEFT), p.add(RIGHT)];
+}
+
+export function neighbors(p: Point) {
+  return [
+    p.add(UP),
+    p.add(UP).add(RIGHT),
+    p.add(RIGHT),
+    p.add(RIGHT).add(DOWN),
+    p.add(DOWN),
+    p.add(DOWN).add(LEFT),
+    p.add(LEFT),
+    p.add(LEFT).add(UP),
+  ];
 }
 
 export const UP = new Point(0, -1);
