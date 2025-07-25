@@ -1,24 +1,13 @@
-import {
-  Container,
-  Graphics,
-  GraphicsContext,
-  HTMLText,
-  Point,
-  Ticker,
-} from "pixi.js";
+import { Container, HTMLText, Point, Ticker } from "pixi.js";
 import "pixi.js/math-extras";
-import QubitPiece from "./QubitPiece";
-import { range, uniqWith } from "lodash-es";
+import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
 import { measure } from "./quantum";
 import { DOWN, neighbors, RIGHT, UP } from "./points";
-import { CELL_SIZE } from "./constants";
+import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck from "./Deck";
 import QubitPair from "./QubitPair";
-
-const BOARD_WIDTH = 6;
-const BOARD_HEIGHT = 12;
-const INIT_FILL_HEIGHT = 0;
+import Board, { inBounds } from "./Board";
 
 type State = "game" | "measure" | "fall";
 
@@ -35,7 +24,7 @@ export default class Qaboom {
   onGameOver?: () => void;
 
   view: Container;
-  grid: (QubitPiece | null)[][];
+  board: Board;
   deck: Deck;
   scoreboard: HTMLText;
   // Either a pair of qubit, a gate, or a measurement
@@ -54,12 +43,17 @@ export default class Qaboom {
 
   constructor() {
     this.view = new Container();
+    // TODO be able to reference the "current" position based on the board.
+    this.view.position = { x: 50, y: 50 };
+
+    this.board = new Board();
+    // this.board.view.position = { x: 50, y: 50 };
 
     this.deck = new Deck();
     this.deck.view.position = { x: 325, y: 0 };
     this.deck.view.scale = 0.75;
 
-    this.grid = this.initGrid();
+    // this.grid = this.initGrid();
     this.scoreboard = new HTMLText({
       text: "" + this.score,
       style: {
@@ -77,19 +71,12 @@ export default class Qaboom {
   initialize() {
     this.score = 0;
     this.view.removeChildren();
-    this.view.position = { x: 50, y: 50 };
 
     this.view.addChild(this.scoreboard);
-    this.view.addChild(
-      new Graphics(
-        new GraphicsContext()
-          .rect(0, 0, BOARD_WIDTH * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE)
-          .stroke("white")
-      )
-    );
+    this.view.addChild(this.board.view);
     this.view.addChild(this.deck.view);
 
-    this.grid = this.initGrid();
+    this.board.initialize();
     this.newCurrent();
   }
 
@@ -112,39 +99,6 @@ export default class Qaboom {
     document.removeEventListener("keydown", this.handleKeyDown);
   }
 
-  initGrid() {
-    const grid = [];
-    for (let i = 0; i < BOARD_HEIGHT - INIT_FILL_HEIGHT; i++) {
-      grid.push(range(BOARD_WIDTH).map(() => null));
-    }
-    for (let i = BOARD_HEIGHT - INIT_FILL_HEIGHT; i < BOARD_HEIGHT; i++) {
-      const row = [];
-      for (let j = 0; j < BOARD_WIDTH; j++) {
-        const qubit = QubitPiece.random();
-        qubit.sprite.position = new Point(
-          (j + 0.5) * CELL_SIZE,
-          (i + 0.5) * CELL_SIZE
-        );
-        this.view.addChild(qubit.sprite);
-        row.push(qubit);
-      }
-      grid.push(row);
-    }
-    return grid;
-  }
-
-  getPiece(point: Point) {
-    return this.grid[point.y][point.x];
-  }
-
-  setPiece(point: Point, value: QubitPiece | null) {
-    this.grid[point.y][point.x] = value;
-    if (value) {
-      value.sprite.position.x = (point.x + 0.5) * CELL_SIZE;
-      value.sprite.position.y = (point.y + 0.5) * CELL_SIZE;
-    }
-  }
-
   tick = (time: Ticker) => {
     if (this.time >= this.nextTime) {
       if (this.currentState === "game") {
@@ -164,10 +118,10 @@ export default class Qaboom {
     // move it down.
     const occupiedBelow =
       this.currentPosition.y + 1 === BOARD_HEIGHT ||
-      !!this.getPiece(this.currentPosition.add(DOWN)) ||
+      !!this.board.getPiece(this.currentPosition.add(DOWN)) ||
       (this.current instanceof QubitPair &&
         this.current.orientation === "horizontal" &&
-        !!this.getPiece(this.currentPosition.add(RIGHT).add(DOWN)));
+        !!this.board.getPiece(this.currentPosition.add(RIGHT).add(DOWN)));
 
     if (occupiedBelow) {
       this.resolve();
@@ -189,12 +143,10 @@ export default class Qaboom {
         this.onGameOver?.();
         return;
       }
-      this.view.addChild(this.current.first.sprite);
-      this.view.addChild(this.current.second.sprite);
-      this.setPiece(this.currentPosition, this.current.first);
-      this.setPiece(secondPosition, this.current.second);
+      this.board.setPiece(this.currentPosition, this.current.first);
+      this.board.setPiece(secondPosition, this.current.second);
       // If the starting cell is occupied, it's game over.
-      if (this.containsPoint(startingCell)) {
+      if (this.board.containsPoint(startingCell)) {
         this.onGameOver?.();
         return;
       }
@@ -203,7 +155,7 @@ export default class Qaboom {
       // If it's a measurement, trigger the measurement reaction chain.
       this.currentState = "measure";
       this.measureQueue = neighbors(this.currentPosition).filter((p) =>
-        this.containsPoint(p)
+        this.board.containsPoint(p)
       );
     }
     // If it's a gate, trigger the gate.
@@ -218,7 +170,7 @@ export default class Qaboom {
     const current = this.current as MeasurementPiece;
     this.visited = this.visited.concat(this.measureQueue);
     for (const point of this.measureQueue) {
-      const qubit = this.getPiece(point);
+      const qubit = this.board.getPiece(point);
       if (!qubit) continue;
       const measured = measure(qubit.value, current.base);
       if (measured) {
@@ -241,8 +193,7 @@ export default class Qaboom {
     const uniqMeasured = uniqWith(this.measured, (a, b) => a.equals(b));
     this.score += triangular(uniqMeasured.length);
     for (const point of uniqMeasured) {
-      this.view.removeChild(this.getPiece(point)!.sprite);
-      this.setPiece(point, null);
+      this.board.setPiece(point, null);
     }
     this.measured = [];
     this.measureQueue = [];
@@ -256,10 +207,13 @@ export default class Qaboom {
     for (let x = 0; x < BOARD_WIDTH; x++) {
       for (let y = BOARD_HEIGHT - 2; y >= 0; y--) {
         const point = new Point(x, y);
-        if (this.containsPoint(point) && !this.containsPoint(point.add(DOWN))) {
-          const piece = this.getPiece(point);
-          this.setPiece(point, null);
-          this.setPiece(point.add(DOWN), piece);
+        if (
+          this.board.containsPoint(point) &&
+          !this.board.containsPoint(point.add(DOWN))
+        ) {
+          const piece = this.board.getPiece(point);
+          this.board.setPiece(point, null);
+          this.board.setPiece(point.add(DOWN), piece);
           anyFalling = true;
         }
       }
@@ -271,7 +225,7 @@ export default class Qaboom {
   }
 
   newCurrent() {
-    if (this.containsPoint(startingCell)) {
+    if (this.board.containsPoint(startingCell)) {
       this.onGameOver?.();
       return;
     }
@@ -288,11 +242,6 @@ export default class Qaboom {
     };
   }
 
-  containsPoint(p: Point) {
-    if (!inBounds(p)) return false;
-    return !!this.getPiece(p);
-  }
-
   handleKeyDown = (e: KeyboardEvent) => {
     if (this.currentState !== "game") {
       return;
@@ -302,12 +251,12 @@ export default class Qaboom {
       case "a":
       case "ArrowLeft": {
         const left = this.currentPosition.add(new Point(-1, 0));
-        if (this.containsPoint(left)) break;
+        if (this.board.containsPoint(left)) break;
         if (left.x < 0) break;
         if (
           this.current instanceof QubitPair &&
           this.current.orientation === "vertical" &&
-          this.containsPoint(left.add(UP))
+          this.board.containsPoint(left.add(UP))
         )
           break;
         this.setCurrentPosition(left);
@@ -316,19 +265,19 @@ export default class Qaboom {
       case "d":
       case "ArrowRight": {
         const right = this.currentPosition.add(RIGHT);
-        if (this.containsPoint(right)) break;
+        if (this.board.containsPoint(right)) break;
         if (right.x >= BOARD_WIDTH) break;
         if (this.current instanceof QubitPair) {
           if (
             this.current.orientation === "vertical" &&
-            this.containsPoint(right.add(UP))
+            this.board.containsPoint(right.add(UP))
           ) {
             break;
           }
           const right2 = right.add(RIGHT);
           if (
             this.current.orientation === "horizontal" &&
-            (this.containsPoint(right2) || right2.x >= BOARD_WIDTH)
+            (this.board.containsPoint(right2) || right2.x >= BOARD_WIDTH)
           )
             break;
         }
@@ -340,12 +289,12 @@ export default class Qaboom {
       case "ArrowDown": {
         let obstructed = false;
         const down = this.currentPosition.add(DOWN);
-        if (this.containsPoint(down)) obstructed = true;
+        if (this.board.containsPoint(down)) obstructed = true;
         if (down.y >= BOARD_HEIGHT) obstructed = true;
         if (
           this.current instanceof QubitPair &&
           this.current.orientation === "horizontal" &&
-          this.containsPoint(down.add(RIGHT))
+          this.board.containsPoint(down.add(RIGHT))
         ) {
           obstructed = true;
         }
@@ -365,12 +314,12 @@ export default class Qaboom {
         }
         if (this.current.orientation === "vertical") {
           const right = this.currentPosition.add(RIGHT);
-          if (this.containsPoint(right) || !inBounds(right)) {
+          if (this.board.containsPoint(right) || !inBounds(right)) {
             break;
           }
         }
         if (this.current.orientation === "horizontal") {
-          if (this.containsPoint(this.currentPosition.add(UP))) {
+          if (this.board.containsPoint(this.currentPosition.add(UP))) {
             break;
           }
         }
@@ -379,10 +328,6 @@ export default class Qaboom {
       }
     }
   };
-}
-
-function inBounds(p: Point) {
-  return p.x >= 0 && p.x < BOARD_WIDTH && p.y >= 0 && p.y < BOARD_HEIGHT;
 }
 
 function triangular(n: number) {
