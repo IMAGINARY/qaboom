@@ -32,6 +32,10 @@ export default class Qaboom {
   // Either a pair of qubit, a gate, or a measurement
   current: QubitPair | MeasurementPiece | GatePiece | null = null;
   currentPosition = startingCell;
+
+  hold: QubitPair | MeasurementPiece | GatePiece | null = null;
+  canSwap = true;
+
   currentState: State = "game";
   #score: number = 0;
 
@@ -256,6 +260,7 @@ export default class Qaboom {
   }
 
   newCurrent() {
+    this.canSwap = true;
     this.current = this.deck.pop();
     this.setCurrentPosition(startingCell);
     this.view.addChild(this.current.sprite);
@@ -267,6 +272,18 @@ export default class Qaboom {
       x: (this.currentPosition.x + 0.5) * CELL_SIZE,
       y: (this.currentPosition.y + 0.5) * CELL_SIZE,
     };
+  }
+
+  swap() {
+    this.canSwap = false;
+    [this.current, this.hold] = [this.hold, this.current];
+    if (!this.current) {
+      this.newCurrent();
+    }
+    this.setCurrentPosition(startingCell);
+    if (this.hold) {
+      this.hold.sprite.position = { x: 400, y: 500 };
+    }
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
@@ -330,6 +347,13 @@ export default class Qaboom {
           this.resolve();
         } else {
           this.setCurrentPosition(down);
+        }
+        break;
+      }
+      case "w":
+      case "ArrowUp": {
+        if (this.canSwap) {
+          this.swap();
         }
         break;
       }

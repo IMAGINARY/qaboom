@@ -76,6 +76,7 @@ export function getOrtho(qubit: Qubit) {
 }
 
 export function randomQubit() {
+  // return choice([ZERO, ONE, PLUS, MINUS]);
   // https://mathworld.wolfram.com/SpherePointPicking.html
   const u = Math.random();
   const v = Math.random();
