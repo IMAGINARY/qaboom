@@ -1,4 +1,4 @@
-import { Container, HTMLText, Point, Ticker } from "pixi.js";
+import { Container, Graphics, HTMLText, Point, Ticker } from "pixi.js";
 import * as math from "mathjs";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
@@ -29,6 +29,7 @@ export default class Qaboom {
   board: Board;
   deck: Deck;
   scoreboard: HTMLText;
+  lines: Container;
   // Either a pair of qubit, a gate, or a measurement
   current: QubitPair | MeasurementPiece | GatePiece | null = null;
   currentPosition = startingCell;
@@ -53,6 +54,7 @@ export default class Qaboom {
     this.view.position = { x: 50, y: 50 };
 
     this.board = new Board();
+    this.lines = new Container();
     // this.board.view.position = { x: 50, y: 50 };
 
     this.deck = new Deck();
@@ -79,6 +81,7 @@ export default class Qaboom {
     this.view.removeChildren();
 
     this.view.addChild(this.scoreboard);
+    this.view.addChild(this.lines);
     this.view.addChild(this.board.view);
     this.view.addChild(this.deck.view);
 
@@ -163,6 +166,9 @@ export default class Qaboom {
       this.measureQueue = orthoNeighbors(this.currentPosition).filter((p) =>
         this.board.containsPoint(p)
       );
+      for (let nbr of this.measureQueue) {
+        this.drawLine(this.currentPosition, nbr);
+      }
     } else if (this.current instanceof GatePiece) {
       // If it's a gate, trigger the gate.
       this.triggerGate();
@@ -186,8 +192,13 @@ export default class Qaboom {
         this.measured.push(point);
         // Add unvisited neighbors to the new queue.
         for (const nbr of orthoNeighbors(point)) {
-          if (inBounds(nbr) && !this.visited.some((p) => p.equals(nbr))) {
+          if (
+            inBounds(nbr) &&
+            this.board.containsPoint(nbr) &&
+            !this.visited.some((p) => p.equals(nbr))
+          ) {
             newQueue.push(nbr);
+            this.drawLine(point, nbr);
           }
         }
       } else {
@@ -208,6 +219,7 @@ export default class Qaboom {
     this.visited = [];
     this.view.removeChild(this.current!.sprite);
     this.currentState = "fall";
+    this.lines.removeChildren();
   }
 
   fallStep() {
@@ -268,9 +280,24 @@ export default class Qaboom {
 
   setCurrentPosition(p: Point) {
     this.currentPosition = p;
-    this.current!.sprite.position = {
-      x: (this.currentPosition.x + 0.5) * CELL_SIZE,
-      y: (this.currentPosition.y + 0.5) * CELL_SIZE,
+    this.current!.sprite.position = this.gridToLocal(this.currentPosition);
+  }
+
+  drawLine(p1: Point, p2: Point) {
+    const pos1 = this.gridToLocal(p1);
+    const pos2 = this.gridToLocal(p2);
+    this.lines.addChild(
+      new Graphics()
+        .moveTo(pos1.x, pos1.y)
+        .lineTo(pos2.x, pos2.y)
+        .stroke({ color: "white", width: 3 })
+    );
+  }
+
+  gridToLocal(p: Point) {
+    return {
+      x: (p.x + 0.5) * CELL_SIZE,
+      y: (p.y + 0.5) * CELL_SIZE,
     };
   }
 
