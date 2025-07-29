@@ -238,6 +238,7 @@ export default class Qaboom {
     //     math.multiply((this.current as GatePiece).matrix, piece.value) as Qubit
     //   );
     // }
+    // Apply the gate on the surrounding pieces
     for (let p of neighbors(this.currentPosition)) {
       let piece = this.board.getPiece(p);
       if (piece) {
