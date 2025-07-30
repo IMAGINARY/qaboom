@@ -1,6 +1,7 @@
 import { Application } from "pixi.js";
 import Qaboom from "./Qaboom";
 import Menu from "./Menu";
+import { HEIGHT, WIDTH } from "./constants";
 
 export default class Game {
   async start() {
@@ -10,8 +11,8 @@ export default class Game {
     await app.init({
       antialias: true,
       background: "#000",
-      width: 500,
-      height: 700,
+      width: WIDTH,
+      height: HEIGHT,
     });
 
     // Append the application canvas to the document body

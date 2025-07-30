@@ -1,4 +1,5 @@
 import { Container, HTMLText } from "pixi.js";
+import { HEIGHT, WIDTH } from "./constants";
 
 export default class Menu {
   view: Container;
@@ -15,9 +16,9 @@ export default class Menu {
         fontSize: 48,
       },
     });
-    titleText.position.x = 500 / 2;
-    titleText.position.y = 250;
-    titleText.anchor.x = 0.5;
+    this.view.position.x = WIDTH / 2;
+    this.view.position.y = HEIGHT / 2;
+    titleText.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(titleText);
 
     const startText = new HTMLText({
@@ -29,8 +30,8 @@ export default class Menu {
         fontSize: 24,
       },
     });
-    startText.position.x = 500 / 2;
-    startText.position.y = 350;
+    startText.position.x = 0;
+    startText.position.y = 50;
     startText.anchor.x = 0.5;
     this.view.addChild(startText);
   }

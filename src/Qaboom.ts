@@ -57,13 +57,11 @@ export default class Qaboom {
 
     this.board = new Board();
     this.lines = new Container();
-    // this.board.view.position = { x: 50, y: 50 };
 
     this.deck = new Deck();
-    this.deck.view.position = { x: 325, y: 0 };
+    this.deck.view.position = { x: BOARD_WIDTH * CELL_SIZE + 20, y: 0 };
     this.deck.view.scale = 0.75;
 
-    // this.grid = this.initGrid();
     this.scoreboard = new HTMLText({
       text: "" + this.score,
       style: {
@@ -328,7 +326,7 @@ export default class Qaboom {
     }
     this.setCurrentPosition(startingCell);
     if (this.hold) {
-      this.hold.sprite.position = { x: 400, y: 500 };
+      this.hold.sprite.position = { x: 400, y: 600 };
     }
   }
 
