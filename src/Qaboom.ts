@@ -10,13 +10,14 @@ import Deck from "./Deck";
 import QubitPair from "./QubitPair";
 import Board, { inBounds } from "./Board";
 import GatePiece from "./GatePiece";
+import { sounds } from "./audio";
 
 type State = "game" | "measure" | "fall";
 
 const RATES = {
   game: 500,
-  measure: 150,
-  fall: 150,
+  measure: 350,
+  fall: 250,
 };
 
 const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
@@ -43,6 +44,7 @@ export default class Qaboom {
   // State relating to measurement
   measureQueue: Point[] = [];
   measured: Point[] = [];
+  measureCount = 0;
   visited: Point[] = [];
 
   time: number = 0;
@@ -143,6 +145,9 @@ export default class Qaboom {
   resolve() {
     // If it's a pair of qubits, just add it to the grid.
     if (this.current instanceof QubitPair) {
+      sounds.set.load();
+      sounds.set.volume = 0.5;
+      sounds.set.play();
       const secondPosition = this.currentPosition.add(
         this.current.orientation === "vertical" ? UP : RIGHT
       );
@@ -183,6 +188,10 @@ export default class Qaboom {
     let newQueue: Point[] = [];
     const current = this.current as MeasurementPiece;
     this.visited = this.visited.concat(this.measureQueue);
+    const scoreSound =
+      sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
+    scoreSound.load();
+    scoreSound.play();
     for (const point of this.measureQueue) {
       const qubit = this.board.getPiece(point);
       if (!qubit) continue;
@@ -205,11 +214,16 @@ export default class Qaboom {
         qubit.setValue(current.ortho);
       }
     }
+    this.measureCount++;
     this.measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
   }
 
   resolveMeasurement() {
     const uniqMeasured = uniqWith(this.measured, (a, b) => a.equals(b));
+    if (uniqMeasured.length > 0) {
+      sounds.clear.load();
+      sounds.clear.play();
+    }
     this.score += triangular(uniqMeasured.length);
     for (const point of uniqMeasured) {
       this.board.setPiece(point, null);
@@ -217,6 +231,7 @@ export default class Qaboom {
     this.measured = [];
     this.measureQueue = [];
     this.visited = [];
+    this.measureCount = 0;
     this.view.removeChild(this.current!.sprite);
     this.currentState = "fall";
     this.lines.removeChildren();
@@ -245,6 +260,8 @@ export default class Qaboom {
   }
 
   triggerGate() {
+    sounds.gate.load();
+    sounds.gate.play();
     // Apply the gate on everything in the gate's column
     // const x = this.currentPosition.x;
     // for (let y = this.currentPosition.y + 1; y < BOARD_HEIGHT; y++) {
@@ -303,6 +320,8 @@ export default class Qaboom {
 
   swap() {
     this.canSwap = false;
+    sounds.swap.load();
+    sounds.swap.play();
     [this.current, this.hold] = [this.hold, this.current];
     if (!this.current) {
       this.newCurrent();
@@ -331,6 +350,8 @@ export default class Qaboom {
         )
           break;
         this.setCurrentPosition(left);
+        sounds.move.load();
+        sounds.move.play();
         break;
       }
       case "d":
@@ -353,6 +374,8 @@ export default class Qaboom {
             break;
         }
         this.setCurrentPosition(right);
+        sounds.move.load();
+        sounds.move.play();
         break;
       }
       // If the player presses down, speed up the steps
@@ -373,6 +396,8 @@ export default class Qaboom {
         if (obstructed) {
           this.resolve();
         } else {
+          sounds.move.load();
+          sounds.move.play();
           this.setCurrentPosition(down);
         }
         break;
@@ -402,6 +427,8 @@ export default class Qaboom {
           }
         }
         this.current.rotate();
+        sounds.turn.load();
+        sounds.turn.play();
         break;
       }
     }
