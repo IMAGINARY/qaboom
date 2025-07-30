@@ -414,9 +414,9 @@ export default class Qaboom {
       }
       case "w":
       case "ArrowUp": {
-        if (this.canSwap) {
-          this.swap();
-        }
+        // if (this.canSwap) {
+        //   this.swap();
+        // }
         break;
       }
       // If the player presses the trigger, rotate the qubit (if possible)
@@ -424,6 +424,9 @@ export default class Qaboom {
         // Can only rotate qubit pairs
         if (this.current instanceof MeasurementPiece) {
           this.current.flip();
+          sounds.turn.load();
+          sounds.turn.play();
+          break;
         } else if (this.current instanceof QubitPair) {
           if (this.current.orientation === "vertical") {
             const right = this.currentPosition.add(RIGHT);
