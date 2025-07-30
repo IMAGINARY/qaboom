@@ -1,11 +1,6 @@
 import { Graphics } from "pixi.js";
-import {
-  getBlochCoords,
-  getColor,
-  getOrtho,
-  randomQubit,
-  type Qubit,
-} from "./quantum";
+import { getBlochCoords, getOrtho, randomQubit, type Qubit } from "./quantum";
+import { getColor } from "./colors";
 import { PIECE_RADIUS } from "./constants";
 
 // Represents a measurement along an axis

@@ -1,6 +1,7 @@
 import { Graphics } from "pixi.js";
-import { getColor, getBlochCoords, randomQubit, type Qubit } from "./quantum";
+import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
 import { PIECE_RADIUS } from "./constants";
+import { getColor } from "./colors";
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
