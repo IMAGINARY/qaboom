@@ -36,20 +36,20 @@ const gates = [
       [math.complex(1), math.complex(0)],
     ]),
   },
-  // {
-  //   name: "Z",
-  //   matrix: math.matrix([
-  //     [math.complex(1), math.complex(0)],
-  //     [math.complex(0), math.complex(-1)],
-  //   ]),
-  // },
-  // {
-  //   name: "Y",
-  //   matrix: math.matrix([
-  //     [math.complex(0), math.complex(0, -1)],
-  //     [math.complex(0, 1), math.complex(0)],
-  //   ]),
-  // },
+  {
+    name: "Y",
+    matrix: math.matrix([
+      [math.complex(0), math.complex(0, -1)],
+      [math.complex(0, 1), math.complex(0)],
+    ]),
+  },
+  {
+    name: "Z",
+    matrix: math.matrix([
+      [math.complex(1), math.complex(0)],
+      [math.complex(0), math.complex(-1)],
+    ]),
+  },
   {
     name: "H",
     matrix: math.multiply(
