@@ -396,8 +396,8 @@ export default class Qaboom {
         if (obstructed) {
           this.resolve();
         } else {
-          sounds.move.load();
-          sounds.move.play();
+          // sounds.move.load();
+          // sounds.move.play();
           this.setCurrentPosition(down);
         }
         break;

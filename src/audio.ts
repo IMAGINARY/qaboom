@@ -21,4 +21,5 @@ export const sounds = {
     (s) => new Audio(s)
   ),
 };
+sounds.turn.volume = 0.5;
 sounds.move.volume = 0.25;
