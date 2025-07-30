@@ -66,13 +66,13 @@ export default class Deck {
 
 function newBuffer() {
   let buffer = [];
-  for (let _i of range(5)) {
+  for (let _i of range(4)) {
     buffer.push(QubitPair.random());
   }
-  for (let _i of range(1)) {
+  if (Math.random() < 1 / 2) {
     buffer.push(GatePiece.random());
   }
-  for (let _i of range(2)) {
+  for (let _i of range(1)) {
     buffer.push(MeasurementPiece.random());
   }
   return shuffle(buffer);

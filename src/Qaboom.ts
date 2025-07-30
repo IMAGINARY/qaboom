@@ -20,6 +20,9 @@ const RATES = {
   fall: 250,
 };
 
+const rateMultiplier = 0.95;
+const levelCount = 10;
+
 const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 
 // The main Qaboom gameplay loop
@@ -40,6 +43,9 @@ export default class Qaboom {
 
   currentState: State = "game";
   #score: number = 0;
+
+  rateMultiplier = 1;
+  pieceCount = 0;
 
   // State relating to measurement
   measureQueue: Point[] = [];
@@ -117,7 +123,8 @@ export default class Qaboom {
       } else {
         this.fallStep();
       }
-      this.nextTime = this.time + RATES[this.currentState];
+      const multiplier = this.currentState === "game" ? this.rateMultiplier : 1;
+      this.nextTime = this.time + RATES[this.currentState] * multiplier;
     }
     this.time += time.deltaMS;
   };
@@ -287,6 +294,11 @@ export default class Qaboom {
   }
 
   newCurrent() {
+    this.pieceCount++;
+    if (this.pieceCount > levelCount) {
+      this.pieceCount = 0;
+      this.rateMultiplier *= rateMultiplier;
+    }
     this.canSwap = true;
     this.current = this.deck.pop();
     this.setCurrentPosition(startingCell);
