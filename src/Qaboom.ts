@@ -20,7 +20,7 @@ const RATES = {
   fall: 250,
 };
 
-const rateMultiplier = 0.95;
+const rateMultiplier = 0.9;
 const levelCount = 10;
 
 const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
@@ -422,32 +422,35 @@ export default class Qaboom {
       // If the player presses the trigger, rotate the qubit (if possible)
       case " ": {
         // Can only rotate qubit pairs
-        if (!(this.current instanceof QubitPair)) {
-          break;
-        }
-        if (this.current.orientation === "vertical") {
-          const right = this.currentPosition.add(RIGHT);
-          if (this.board.containsPoint(right) || !inBounds(right)) {
-            // "Kick back" if we're against the wall
-            if (!this.board.containsPoint(this.currentPosition.add(LEFT))) {
-              this.setCurrentPosition(this.currentPosition.add(LEFT));
-            } else if (
-              !this.board.containsPoint(this.currentPosition.add(LEFT).add(UP))
-            ) {
-              this.setCurrentPosition(this.currentPosition.add(LEFT).add(UP));
-            } else {
+        if (this.current instanceof MeasurementPiece) {
+          this.current.flip();
+        } else if (this.current instanceof QubitPair) {
+          if (this.current.orientation === "vertical") {
+            const right = this.currentPosition.add(RIGHT);
+            if (this.board.containsPoint(right) || !inBounds(right)) {
+              // "Kick back" if we're against the wall
+              if (!this.board.containsPoint(this.currentPosition.add(LEFT))) {
+                this.setCurrentPosition(this.currentPosition.add(LEFT));
+              } else if (
+                !this.board.containsPoint(
+                  this.currentPosition.add(LEFT).add(UP)
+                )
+              ) {
+                this.setCurrentPosition(this.currentPosition.add(LEFT).add(UP));
+              } else {
+                break;
+              }
+            }
+          }
+          if (this.current.orientation === "horizontal") {
+            if (this.board.containsPoint(this.currentPosition.add(UP))) {
               break;
             }
           }
+          this.current.rotate();
+          sounds.turn.load();
+          sounds.turn.play();
         }
-        if (this.current.orientation === "horizontal") {
-          if (this.board.containsPoint(this.currentPosition.add(UP))) {
-            break;
-          }
-        }
-        this.current.rotate();
-        sounds.turn.load();
-        sounds.turn.play();
         break;
       }
     }
