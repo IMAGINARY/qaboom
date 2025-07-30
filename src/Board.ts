@@ -51,6 +51,9 @@ export default class Board {
   }
 
   getPiece(point: Point) {
+    if (!inBounds(point)) {
+      return null;
+    }
     return this.grid[point.y][point.x];
   }
 
