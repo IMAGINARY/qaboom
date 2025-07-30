@@ -418,7 +418,16 @@ export default class Qaboom {
         if (this.current.orientation === "vertical") {
           const right = this.currentPosition.add(RIGHT);
           if (this.board.containsPoint(right) || !inBounds(right)) {
-            break;
+            // "Kick back" if we're against the wall
+            if (!this.board.containsPoint(this.currentPosition.add(LEFT))) {
+              this.setCurrentPosition(this.currentPosition.add(LEFT));
+            } else if (
+              !this.board.containsPoint(this.currentPosition.add(LEFT).add(UP))
+            ) {
+              this.setCurrentPosition(this.currentPosition.add(LEFT).add(UP));
+            } else {
+              break;
+            }
           }
         }
         if (this.current.orientation === "horizontal") {
