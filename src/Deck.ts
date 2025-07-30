@@ -72,6 +72,8 @@ function newBuffer() {
   for (let _i of range(1)) {
     buffer.push(GatePiece.random());
   }
-  buffer.push(MeasurementPiece.random());
+  for (let _i of range(2)) {
+    buffer.push(MeasurementPiece.random());
+  }
   return shuffle(buffer);
 }
