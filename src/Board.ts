@@ -7,14 +7,25 @@ import {
   INIT_FILL_HEIGHT,
 } from "./constants";
 import { range } from "lodash-es";
+import type QubitPair from "./QubitPair";
+import type MeasurementPiece from "./MeasurementPiece";
+import type GatePiece from "./GatePiece";
+
+export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 
 export default class Board {
   view: Container;
   grid: (QubitPiece | null)[][] = [];
+  lines: Container;
+
+  // Either a pair of qubit, a gate, or a measurement
+  current: QubitPair | MeasurementPiece | GatePiece | null = null;
+  currentPosition = startingCell;
 
   constructor() {
     this.view = new Container();
     this.grid = this.initGrid();
+    this.lines = new Container();
   }
 
   initialize() {
@@ -26,6 +37,7 @@ export default class Board {
           .stroke("white")
       )
     );
+    this.view.addChild(this.lines);
     this.grid = this.initGrid();
   }
 
@@ -69,8 +81,7 @@ export default class Board {
       if (value.sprite.parent !== this.view) {
         this.view.addChild(value.sprite);
       }
-      value.sprite.position.x = (point.x + 0.5) * CELL_SIZE;
-      value.sprite.position.y = (point.y + 0.5) * CELL_SIZE;
+      value.sprite.position = this.gridToLocal(point)
     }
   }
 
@@ -78,6 +89,30 @@ export default class Board {
     if (!inBounds(p)) return false;
     return !!this.getPiece(p);
   }
+
+  setCurrentPosition(p: Point) {
+    this.currentPosition = p;
+    this.current!.sprite.position = this.gridToLocal(this.currentPosition);
+  }
+
+  gridToLocal(p: Point) {
+    return {
+      x: (p.x + 0.5) * CELL_SIZE,
+      y: (p.y + 0.5) * CELL_SIZE,
+    };
+  }
+
+  drawLine(p1: Point, p2: Point) {
+    const pos1 = this.gridToLocal(p1);
+    const pos2 = this.gridToLocal(p2);
+    this.lines.addChild(
+      new Graphics()
+        .moveTo(pos1.x, pos1.y)
+        .lineTo(pos2.x, pos2.y)
+        .stroke({ color: "white", width: 3 })
+    );
+  }
+
 }
 
 export function inBounds(p: Point) {

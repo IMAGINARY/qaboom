@@ -1,4 +1,4 @@
-import { Container, Graphics, HTMLText, Point, Ticker } from "pixi.js";
+import { Container, HTMLText, Point, Ticker } from "pixi.js";
 import * as math from "mathjs";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
@@ -8,7 +8,7 @@ import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck from "./Deck";
 import QubitPair from "./QubitPair";
-import Board, { inBounds } from "./Board";
+import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
 import { sounds } from "./audio";
 
@@ -23,8 +23,6 @@ const RATES = {
 const rateMultiplier = 0.9;
 const levelCount = 10;
 
-const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
-
 // The main Qaboom gameplay loop
 export default class Qaboom {
   onGameOver?: () => void;
@@ -33,10 +31,6 @@ export default class Qaboom {
   board: Board;
   deck: Deck;
   scoreboard: HTMLText;
-  lines: Container;
-  // Either a pair of qubit, a gate, or a measurement
-  current: QubitPair | MeasurementPiece | GatePiece | null = null;
-  currentPosition = startingCell;
 
   hold: QubitPair | MeasurementPiece | GatePiece | null = null;
   canSwap = true;
@@ -59,13 +53,13 @@ export default class Qaboom {
   constructor() {
     this.view = new Container();
     // TODO be able to reference the "current" position based on the board.
-    this.view.position = { x: 50, y: 50 };
+    this.view.position = { x: 0, y: 0 }
 
     this.board = new Board();
-    this.lines = new Container();
+    this.board.view.position = { x: 50, y: 50 }
 
     this.deck = new Deck();
-    this.deck.view.position = { x: BOARD_WIDTH * CELL_SIZE + 20, y: 0 };
+    this.deck.view.position = { x: 50 + BOARD_WIDTH * CELL_SIZE + 20, y: 50 };
     this.deck.view.scale = 0.75;
 
     this.scoreboard = new HTMLText({
@@ -87,7 +81,6 @@ export default class Qaboom {
     this.view.removeChildren();
 
     this.view.addChild(this.scoreboard);
-    this.view.addChild(this.lines);
     this.view.addChild(this.board.view);
     this.view.addChild(this.deck.view);
 
@@ -133,28 +126,28 @@ export default class Qaboom {
     // If it doesn't touch the floor or another qubit in the grid,
     // move it down.
     const occupiedBelow =
-      this.currentPosition.y + 1 === BOARD_HEIGHT ||
-      !!this.board.getPiece(this.currentPosition.add(DOWN)) ||
-      (this.current instanceof QubitPair &&
-        this.current.orientation === "horizontal" &&
-        !!this.board.getPiece(this.currentPosition.add(RIGHT).add(DOWN)));
+      this.board.currentPosition.y + 1 === BOARD_HEIGHT ||
+      !!this.board.getPiece(this.board.currentPosition.add(DOWN)) ||
+      (this.board.current instanceof QubitPair &&
+        this.board.current.orientation === "horizontal" &&
+        !!this.board.getPiece(this.board.currentPosition.add(RIGHT).add(DOWN)));
 
     if (occupiedBelow) {
       this.resolve();
     } else {
-      this.setCurrentPosition(this.currentPosition.add(DOWN));
+      this.board.setCurrentPosition(this.board.currentPosition.add(DOWN));
     }
   }
 
   // Resolve the current piece's action when it can't move any more.
   resolve() {
     // If it's a pair of qubits, just add it to the grid.
-    if (this.current instanceof QubitPair) {
+    if (this.board.current instanceof QubitPair) {
       sounds.set.load();
       sounds.set.volume = 0.5;
       sounds.set.play();
-      const secondPosition = this.currentPosition.add(
-        this.current.orientation === "vertical" ? UP : RIGHT
+      const secondPosition = this.board.currentPosition.add(
+        this.board.current.orientation === "vertical" ? UP : RIGHT
       );
       // If the second position of the qubit is higher than the initial position,
       // it's game over.
@@ -162,24 +155,24 @@ export default class Qaboom {
         this.onGameOver?.();
         return;
       }
-      this.board.setPiece(this.currentPosition, this.current.first);
-      this.board.setPiece(secondPosition, this.current.second);
+      this.board.setPiece(this.board.currentPosition, this.board.current.first);
+      this.board.setPiece(secondPosition, this.board.current.second);
       // If the starting cell is occupied, it's game over.
       if (this.board.containsPoint(startingCell)) {
         this.onGameOver?.();
         return;
       }
       this.currentState = "fall";
-    } else if (this.current instanceof MeasurementPiece) {
+    } else if (this.board.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
       this.currentState = "measure";
-      this.measureQueue = orthoNeighbors(this.currentPosition).filter((p) =>
+      this.measureQueue = orthoNeighbors(this.board.currentPosition).filter((p) =>
         this.board.containsPoint(p)
       );
       for (let nbr of this.measureQueue) {
-        this.drawLine(this.currentPosition, nbr);
+        this.board.drawLine(this.board.currentPosition, nbr);
       }
-    } else if (this.current instanceof GatePiece) {
+    } else if (this.board.current instanceof GatePiece) {
       // If it's a gate, trigger the gate.
       this.triggerGate();
     }
@@ -191,7 +184,7 @@ export default class Qaboom {
       return;
     }
     let newQueue: Point[] = [];
-    const current = this.current as MeasurementPiece;
+    const current = this.board.current as MeasurementPiece;
     this.visited = this.visited.concat(this.measureQueue);
     const scoreSound =
       sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
@@ -212,7 +205,7 @@ export default class Qaboom {
             !this.visited.some((p) => p.equals(nbr))
           ) {
             newQueue.push(nbr);
-            this.drawLine(point, nbr);
+            this.board.drawLine(point, nbr);
           }
         }
       } else {
@@ -237,9 +230,9 @@ export default class Qaboom {
     this.measureQueue = [];
     this.visited = [];
     this.measureCount = 0;
-    this.view.removeChild(this.current!.sprite);
+    this.board.view.removeChild(this.board.current!.sprite);
     this.currentState = "fall";
-    this.lines.removeChildren();
+    this.board.lines.removeChildren();
   }
 
   fallStep() {
@@ -277,19 +270,19 @@ export default class Qaboom {
     //   );
     // }
     // Apply the gate on the surrounding pieces
-    for (let p of neighbors(this.currentPosition)) {
+    for (let p of neighbors(this.board.currentPosition)) {
       let piece = this.board.getPiece(p);
       if (piece) {
         piece.setValue(
           math.multiply(
-            (this.current as GatePiece).matrix,
+            (this.board.current as GatePiece).matrix,
             piece.value
           ) as Qubit
         );
       }
     }
     this.currentState = "game";
-    this.view.removeChild(this.current?.sprite!);
+    this.board.view.removeChild(this.board.current?.sprite!);
     this.newCurrent();
   }
 
@@ -300,43 +293,20 @@ export default class Qaboom {
       this.rateMultiplier *= rateMultiplier;
     }
     this.canSwap = true;
-    this.current = this.deck.pop();
-    this.setCurrentPosition(startingCell);
-    this.view.addChild(this.current.sprite);
-  }
-
-  setCurrentPosition(p: Point) {
-    this.currentPosition = p;
-    this.current!.sprite.position = this.gridToLocal(this.currentPosition);
-  }
-
-  drawLine(p1: Point, p2: Point) {
-    const pos1 = this.gridToLocal(p1);
-    const pos2 = this.gridToLocal(p2);
-    this.lines.addChild(
-      new Graphics()
-        .moveTo(pos1.x, pos1.y)
-        .lineTo(pos2.x, pos2.y)
-        .stroke({ color: "white", width: 3 })
-    );
-  }
-
-  gridToLocal(p: Point) {
-    return {
-      x: (p.x + 0.5) * CELL_SIZE,
-      y: (p.y + 0.5) * CELL_SIZE,
-    };
+    this.board.current = this.deck.pop();
+    this.board.setCurrentPosition(startingCell);
+    this.board.view.addChild(this.board.current.sprite);
   }
 
   swap() {
     this.canSwap = false;
     sounds.swap.load();
     sounds.swap.play();
-    [this.current, this.hold] = [this.hold, this.current];
-    if (!this.current) {
+    [this.board.current, this.hold] = [this.hold, this.board.current];
+    if (!this.board.current) {
       this.newCurrent();
     }
-    this.setCurrentPosition(startingCell);
+    this.board.setCurrentPosition(startingCell);
     if (this.hold) {
       this.hold.sprite.position = { x: 400, y: 600 };
     }
@@ -350,40 +320,40 @@ export default class Qaboom {
       // If the player presses left or right, move the current item (if possible)
       case "a":
       case "ArrowLeft": {
-        const left = this.currentPosition.add(LEFT);
+        const left = this.board.currentPosition.add(LEFT);
         if (this.board.containsPoint(left)) break;
         if (left.x < 0) break;
         if (
-          this.current instanceof QubitPair &&
-          this.current.orientation === "vertical" &&
+          this.board.current instanceof QubitPair &&
+          this.board.current.orientation === "vertical" &&
           this.board.containsPoint(left.add(UP))
         )
           break;
-        this.setCurrentPosition(left);
+        this.board.setCurrentPosition(left);
         sounds.move.load();
         sounds.move.play();
         break;
       }
       case "d":
       case "ArrowRight": {
-        const right = this.currentPosition.add(RIGHT);
+        const right = this.board.currentPosition.add(RIGHT);
         if (this.board.containsPoint(right)) break;
         if (right.x >= BOARD_WIDTH) break;
-        if (this.current instanceof QubitPair) {
+        if (this.board.current instanceof QubitPair) {
           if (
-            this.current.orientation === "vertical" &&
+            this.board.current.orientation === "vertical" &&
             this.board.containsPoint(right.add(UP))
           ) {
             break;
           }
           const right2 = right.add(RIGHT);
           if (
-            this.current.orientation === "horizontal" &&
+            this.board.current.orientation === "horizontal" &&
             (this.board.containsPoint(right2) || right2.x >= BOARD_WIDTH)
           )
             break;
         }
-        this.setCurrentPosition(right);
+        this.board.setCurrentPosition(right);
         sounds.move.load();
         sounds.move.play();
         break;
@@ -392,12 +362,12 @@ export default class Qaboom {
       case "s":
       case "ArrowDown": {
         let obstructed = false;
-        const down = this.currentPosition.add(DOWN);
+        const down = this.board.currentPosition.add(DOWN);
         if (this.board.containsPoint(down)) obstructed = true;
         if (down.y >= BOARD_HEIGHT) obstructed = true;
         if (
-          this.current instanceof QubitPair &&
-          this.current.orientation === "horizontal" &&
+          this.board.current instanceof QubitPair &&
+          this.board.current.orientation === "horizontal" &&
           this.board.containsPoint(down.add(RIGHT))
         ) {
           obstructed = true;
@@ -408,7 +378,7 @@ export default class Qaboom {
         } else {
           // sounds.move.load();
           // sounds.move.play();
-          this.setCurrentPosition(down);
+          this.board.setCurrentPosition(down);
         }
         break;
       }
@@ -422,35 +392,35 @@ export default class Qaboom {
       // If the player presses the trigger, rotate the qubit (if possible)
       case " ": {
         // Can only rotate qubit pairs
-        if (this.current instanceof MeasurementPiece) {
-          this.current.flip();
+        if (this.board.current instanceof MeasurementPiece) {
+          this.board.current.flip();
           sounds.turn.load();
           sounds.turn.play();
           break;
-        } else if (this.current instanceof QubitPair) {
-          if (this.current.orientation === "vertical") {
-            const right = this.currentPosition.add(RIGHT);
+        } else if (this.board.current instanceof QubitPair) {
+          if (this.board.current.orientation === "vertical") {
+            const right = this.board.currentPosition.add(RIGHT);
             if (this.board.containsPoint(right) || !inBounds(right)) {
               // "Kick back" if we're against the wall
-              if (!this.board.containsPoint(this.currentPosition.add(LEFT))) {
-                this.setCurrentPosition(this.currentPosition.add(LEFT));
+              if (!this.board.containsPoint(this.board.currentPosition.add(LEFT))) {
+                this.board.setCurrentPosition(this.board.currentPosition.add(LEFT));
               } else if (
                 !this.board.containsPoint(
-                  this.currentPosition.add(LEFT).add(UP)
+                  this.board.currentPosition.add(LEFT).add(UP)
                 )
               ) {
-                this.setCurrentPosition(this.currentPosition.add(LEFT).add(UP));
+                this.board.setCurrentPosition(this.board.currentPosition.add(LEFT).add(UP));
               } else {
                 break;
               }
             }
           }
-          if (this.current.orientation === "horizontal") {
-            if (this.board.containsPoint(this.currentPosition.add(UP))) {
+          if (this.board.current.orientation === "horizontal") {
+            if (this.board.containsPoint(this.board.currentPosition.add(UP))) {
               break;
             }
           }
-          this.current.rotate();
+          this.board.current.rotate();
           sounds.turn.load();
           sounds.turn.play();
         }
