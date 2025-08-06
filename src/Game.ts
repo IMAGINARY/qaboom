@@ -26,7 +26,15 @@ export default class Game {
       qaboom.show(app.stage);
       app.ticker.add(qaboom.tick);
     };
-    const qaboom = new Qaboom();
+    const qaboom = new Qaboom({
+      position: { x: 0, y: 0 },
+      inputMap: {
+        a: "left",
+        d: "right",
+        s: "down",
+        e: "rotate",
+      },
+    });
     qaboom.onGameOver = () => {
       qaboom.hide();
       app.ticker.remove(qaboom.tick);

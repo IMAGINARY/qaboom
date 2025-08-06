@@ -1,4 +1,4 @@
-import { Container, HTMLText, Point, Ticker } from "pixi.js";
+import { Container, HTMLText, Point, Ticker, type PointData } from "pixi.js";
 import * as math from "mathjs";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
@@ -13,6 +13,8 @@ import GatePiece from "./GatePiece";
 import { sounds } from "./audio";
 
 type State = "game" | "measure" | "fall";
+type Input = "left" | "right" | "down" | "rotate";
+type InputMap = Record<string, Input>;
 
 const RATES = {
   game: 500,
@@ -22,6 +24,11 @@ const RATES = {
 
 const rateMultiplier = 0.9;
 const levelCount = 10;
+
+interface Options {
+  position: PointData;
+  inputMap: InputMap;
+}
 
 // The main Qaboom gameplay loop
 export default class Qaboom {
@@ -49,14 +56,16 @@ export default class Qaboom {
 
   time: number = 0;
   nextTime: number = 0;
+  inputMap: InputMap;
 
-  constructor() {
+  constructor({ position, inputMap }: Options) {
     this.view = new Container();
     // TODO be able to reference the "current" position based on the board.
-    this.view.position = { x: 0, y: 0 }
+    this.view.position = position;
+    this.inputMap = inputMap;
 
     this.board = new Board();
-    this.board.view.position = { x: 50, y: 50 }
+    this.board.view.position = { x: 50, y: 50 };
 
     this.deck = new Deck();
     this.deck.view.position = { x: 50 + BOARD_WIDTH * CELL_SIZE + 20, y: 50 };
@@ -166,8 +175,8 @@ export default class Qaboom {
     } else if (this.board.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
       this.currentState = "measure";
-      this.measureQueue = orthoNeighbors(this.board.currentPosition).filter((p) =>
-        this.board.containsPoint(p)
+      this.measureQueue = orthoNeighbors(this.board.currentPosition).filter(
+        (p) => this.board.containsPoint(p)
       );
       for (let nbr of this.measureQueue) {
         this.board.drawLine(this.board.currentPosition, nbr);
@@ -316,10 +325,9 @@ export default class Qaboom {
     if (this.currentState !== "game") {
       return;
     }
-    switch (e.key) {
+    switch (this.inputMap[e.key]) {
       // If the player presses left or right, move the current item (if possible)
-      case "a":
-      case "ArrowLeft": {
+      case "left": {
         const left = this.board.currentPosition.add(LEFT);
         if (this.board.containsPoint(left)) break;
         if (left.x < 0) break;
@@ -334,8 +342,7 @@ export default class Qaboom {
         sounds.move.play();
         break;
       }
-      case "d":
-      case "ArrowRight": {
+      case "right": {
         const right = this.board.currentPosition.add(RIGHT);
         if (this.board.containsPoint(right)) break;
         if (right.x >= BOARD_WIDTH) break;
@@ -359,8 +366,7 @@ export default class Qaboom {
         break;
       }
       // If the player presses down, speed up the steps
-      case "s":
-      case "ArrowDown": {
+      case "down": {
         let obstructed = false;
         const down = this.board.currentPosition.add(DOWN);
         if (this.board.containsPoint(down)) obstructed = true;
@@ -382,15 +388,15 @@ export default class Qaboom {
         }
         break;
       }
-      case "w":
-      case "ArrowUp": {
-        // if (this.canSwap) {
-        //   this.swap();
-        // }
-        break;
-      }
+      // case "w":
+      // case "ArrowUp": {
+      //   // if (this.canSwap) {
+      //   //   this.swap();
+      //   // }
+      //   break;
+      // }
       // If the player presses the trigger, rotate the qubit (if possible)
-      case " ": {
+      case "rotate": {
         // Can only rotate qubit pairs
         if (this.board.current instanceof MeasurementPiece) {
           this.board.current.flip();
@@ -402,14 +408,20 @@ export default class Qaboom {
             const right = this.board.currentPosition.add(RIGHT);
             if (this.board.containsPoint(right) || !inBounds(right)) {
               // "Kick back" if we're against the wall
-              if (!this.board.containsPoint(this.board.currentPosition.add(LEFT))) {
-                this.board.setCurrentPosition(this.board.currentPosition.add(LEFT));
+              if (
+                !this.board.containsPoint(this.board.currentPosition.add(LEFT))
+              ) {
+                this.board.setCurrentPosition(
+                  this.board.currentPosition.add(LEFT)
+                );
               } else if (
                 !this.board.containsPoint(
                   this.board.currentPosition.add(LEFT).add(UP)
                 )
               ) {
-                this.board.setCurrentPosition(this.board.currentPosition.add(LEFT).add(UP));
+                this.board.setCurrentPosition(
+                  this.board.currentPosition.add(LEFT).add(UP)
+                );
               } else {
                 break;
               }
