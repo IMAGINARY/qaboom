@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 import Qaboom from "./Qaboom";
 import Menu from "./Menu";
-import { HEIGHT, WIDTH } from "./constants";
+import { BOARD_WIDTH, HEIGHT, WIDTH } from "./constants";
 
 export default class Game {
   async start() {
@@ -22,11 +22,14 @@ export default class Game {
     menu.show(app.stage);
     menu.onStart = () => {
       menu.hide();
-      qaboom.initialize();
-      qaboom.show(app.stage);
-      app.ticker.add(qaboom.tick);
+      player1.initialize();
+      player1.show(app.stage);
+      player2.initialize();
+      player2.show(app.stage);
+      app.ticker.add(player1.tick);
+      app.ticker.add(player2.tick);
     };
-    const qaboom = new Qaboom({
+    const player1 = new Qaboom({
       position: { x: 0, y: 0 },
       inputMap: {
         a: "left",
@@ -35,9 +38,28 @@ export default class Game {
         e: "rotate",
       },
     });
-    qaboom.onGameOver = () => {
-      qaboom.hide();
-      app.ticker.remove(qaboom.tick);
+
+    const player2 = new Qaboom({
+      position: { x: WIDTH / 2, y: 0 },
+      inputMap: {
+        j: "left",
+        l: "right",
+        k: "down",
+        o: "rotate",
+      },
+    });
+    player1.onGameOver = () => {
+      player1.hide();
+      player2.hide();
+      app.ticker.remove(player1.tick);
+      app.ticker.remove(player2.tick);
+      menu.show(app.stage);
+    };
+    player2.onGameOver = () => {
+      player1.hide();
+      player2.hide();
+      app.ticker.remove(player1.tick);
+      app.ticker.remove(player2.tick);
       menu.show(app.stage);
     };
   }
