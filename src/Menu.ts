@@ -3,7 +3,10 @@ import { HEIGHT, WIDTH } from "./constants";
 
 export default class Menu {
   view: Container;
-  onStart?: () => void;
+  onStart?: (numPlayers: number) => void;
+  numPlayers = 1;
+  player1Text: HTMLText;
+  player2Text: HTMLText;
 
   constructor() {
     this.view = new Container();
@@ -21,8 +24,8 @@ export default class Menu {
     titleText.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(titleText);
 
-    const startText = new HTMLText({
-      text: "-- Start --",
+    this.player1Text = new HTMLText({
+      text: "< 1 Player >",
       style: {
         align: "center",
         fill: "white",
@@ -30,16 +33,47 @@ export default class Menu {
         fontSize: 24,
       },
     });
-    startText.position.x = 0;
-    startText.position.y = 50;
-    startText.anchor.x = 0.5;
-    this.view.addChild(startText);
+    this.player1Text.position.x = 0;
+    this.player1Text.position.y = 50;
+    this.player1Text.anchor.x = 0.5;
+    this.view.addChild(this.player1Text);
+    this.player2Text = new HTMLText({
+      text: "2 Players",
+      style: {
+        align: "center",
+        fill: "white",
+        fontFamily: "monospace",
+        fontSize: 24,
+      },
+    });
+    this.player2Text.position.x = 0;
+    this.player2Text.position.y = 100;
+    this.player2Text.anchor.x = 0.5;
+    this.view.addChild(this.player2Text);
+  }
+
+  toggleNumPlayers() {
+    if (this.numPlayers === 1) {
+      this.player1Text.text = "1 Player";
+      this.player2Text.text = "< 2 Players >";
+      this.numPlayers = 2;
+    } else {
+      this.player1Text.text = "< 1 Player >";
+      this.player2Text.text = "2 Players";
+      this.numPlayers = 1;
+    }
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
       case " ": {
-        this.onStart?.();
+        this.onStart?.(this.numPlayers);
+        break;
+      }
+      case "ArrowUp":
+      case "ArrowDown": {
+        this.toggleNumPlayers();
+        break;
       }
     }
   };
