@@ -80,7 +80,7 @@ export default class Qaboom {
         fontSize: 32,
       },
     });
-    this.scoreboard.position = { x: 0, y: -35 };
+    this.scoreboard.position = { x: 50, y: 0 };
 
     this.initialize();
   }
