@@ -1,4 +1,4 @@
-export const WIDTH = 600;
+export const WIDTH = 1200;
 export const HEIGHT = 850;
 export const CELL_SIZE = 60;
 export const PIECE_RADIUS = (CELL_SIZE / 2) * 0.875;

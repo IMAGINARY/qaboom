@@ -20,25 +20,56 @@ export default class Game {
 
     const menu = new Menu();
     menu.show(app.stage);
-    menu.onStart = () => {
+    menu.onStart = (numPlayers) => {
       menu.hide();
-      qaboom.initialize();
-      qaboom.show(app.stage);
-      app.ticker.add(qaboom.tick);
-    };
-    const qaboom = new Qaboom({
-      position: { x: 0, y: 0 },
-      inputMap: {
-        a: "left",
-        d: "right",
-        s: "down",
-        e: "rotate",
-      },
-    });
-    qaboom.onGameOver = () => {
-      qaboom.hide();
-      app.ticker.remove(qaboom.tick);
-      menu.show(app.stage);
+      let players: Qaboom[];
+      if (numPlayers === 1) {
+        players = [
+          new Qaboom({
+            position: { x: WIDTH / 2 - 250, y: 0 },
+            inputMap: {
+              a: "left",
+              d: "right",
+              s: "down",
+              e: "rotate",
+            },
+          }),
+        ];
+      } else {
+        players = [
+          new Qaboom({
+            position: { x: 0, y: 0 },
+            inputMap: {
+              a: "left",
+              d: "right",
+              s: "down",
+              e: "rotate",
+            },
+          }),
+
+          new Qaboom({
+            position: { x: WIDTH / 2, y: 0 },
+            inputMap: {
+              j: "left",
+              l: "right",
+              k: "down",
+              o: "rotate",
+            },
+          }),
+        ];
+      }
+      for (let player of players) {
+        player.onGameOver = () => {
+          for (let p2 of players) {
+            p2.hide();
+            app.ticker.remove(p2.tick);
+          }
+          menu.show(app.stage);
+        };
+        player.initialize();
+        player.show(app.stage);
+        app.ticker.add(player.tick);
+      }
     };
   }
 }
