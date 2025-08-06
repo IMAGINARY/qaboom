@@ -16,6 +16,8 @@ type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
 type InputMap = Record<string, Input>;
 
+const MAX_MULTIPLIER = 1 / 5;
+
 const RATES = {
   game: 500,
   measure: 350,
@@ -300,6 +302,7 @@ export default class Qaboom {
     if (this.pieceCount > levelCount) {
       this.pieceCount = 0;
       this.rateMultiplier *= rateMultiplier;
+      this.rateMultiplier = Math.max(this.rateMultiplier, MAX_MULTIPLIER);
     }
     this.canSwap = true;
     this.board.current = this.deck.pop();
