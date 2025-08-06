@@ -329,8 +329,7 @@ export default class Qaboom {
       // If the player presses left or right, move the current item (if possible)
       case "left": {
         const left = this.board.currentPosition.add(LEFT);
-        if (this.board.containsPoint(left)) break;
-        if (left.x < 0) break;
+        if (!this.board.isEmptyCell(left)) break;
         if (
           this.board.current instanceof QubitPair &&
           this.board.current.orientation === "vertical" &&
@@ -344,8 +343,7 @@ export default class Qaboom {
       }
       case "right": {
         const right = this.board.currentPosition.add(RIGHT);
-        if (this.board.containsPoint(right)) break;
-        if (right.x >= BOARD_WIDTH) break;
+        if (!this.board.isEmptyCell(right)) break;
         if (this.board.current instanceof QubitPair) {
           if (
             this.board.current.orientation === "vertical" &&
@@ -409,13 +407,13 @@ export default class Qaboom {
             if (this.board.containsPoint(right) || !inBounds(right)) {
               // "Kick back" if we're against the wall
               if (
-                !this.board.containsPoint(this.board.currentPosition.add(LEFT))
+                this.board.isEmptyCell(this.board.currentPosition.add(LEFT))
               ) {
                 this.board.setCurrentPosition(
                   this.board.currentPosition.add(LEFT)
                 );
               } else if (
-                !this.board.containsPoint(
+                this.board.isEmptyCell(
                   this.board.currentPosition.add(LEFT).add(UP)
                 )
               ) {

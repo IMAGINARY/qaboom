@@ -81,13 +81,18 @@ export default class Board {
       if (value.sprite.parent !== this.view) {
         this.view.addChild(value.sprite);
       }
-      value.sprite.position = this.gridToLocal(point)
+      value.sprite.position = this.gridToLocal(point);
     }
   }
 
   containsPoint(p: Point) {
     if (!inBounds(p)) return false;
     return !!this.getPiece(p);
+  }
+
+  // Whether the cell is a valid empty cell in the grid
+  isEmptyCell(p: Point) {
+    return inBounds(p) && !this.getPiece(p);
   }
 
   setCurrentPosition(p: Point) {
@@ -112,7 +117,6 @@ export default class Board {
         .stroke({ color: "white", width: 3 })
     );
   }
-
 }
 
 export function inBounds(p: Point) {
