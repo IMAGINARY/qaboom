@@ -1,4 +1,4 @@
-import { Graphics } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import { PIECE_RADIUS } from "./constants";
 import { choice } from "./random";
 import { getColor } from "./colors";
@@ -10,15 +10,18 @@ type Axis = "X" | "Y" | "Z";
 export default class GatePiece {
   angle: number;
   axis: Axis;
-  sprite: Graphics;
+  sprite: Container;
+  angleMarker: Graphics;
 
   constructor(axis: Axis, angle: number) {
     this.axis = axis;
     this.angle = angle;
-    this.sprite = new Graphics();
+    this.sprite = new Container();
+    this.angleMarker = new Graphics();
+    const background = new Graphics();
     for (let i = 0; i < 8; i++) {
       let angle = (i / 8) * 2 * Math.PI - Math.PI / 2;
-      this.sprite
+      background
         .moveTo(0, 0)
         .arc(
           0,
@@ -30,11 +33,9 @@ export default class GatePiece {
         )
         .fill(colorMap[this.axis][i]);
     }
-
-    this.sprite
-      .arc(0, 0, PIECE_RADIUS, -Math.PI / 2, -Math.PI / 2 + angle, angle < 0)
-      .lineTo(0, 0)
-      .stroke({ color: "white", width: 2 });
+    this.sprite.addChild(background);
+    this.sprite.addChild(this.angleMarker);
+    this.drawAngle();
   }
 
   get matrix() {
@@ -46,6 +47,26 @@ export default class GatePiece {
       choice<Axis>(["Z"]),
       choice([Math.PI / 2, Math.PI, (Math.PI * 3) / 2])
     );
+  }
+
+  rotate() {
+    this.angle = (this.angle + Math.PI / 2) % (2 * Math.PI);
+    this.drawAngle();
+  }
+
+  drawAngle() {
+    this.angleMarker
+      .clear()
+      .arc(
+        0,
+        0,
+        PIECE_RADIUS,
+        -Math.PI / 2,
+        -Math.PI / 2 + this.angle,
+        this.angle < 0
+      )
+      .lineTo(0, 0)
+      .stroke({ color: "white", width: 2 });
   }
 }
 

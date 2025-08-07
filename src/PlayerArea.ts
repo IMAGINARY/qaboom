@@ -407,6 +407,11 @@ export default class PlayerArea {
           sounds.turn.load();
           sounds.turn.play();
           break;
+        } else if (this.board.current instanceof GatePiece) {
+          this.board.current.rotate();
+          sounds.turn.load();
+          sounds.turn.play();
+          break;
         } else if (this.board.current instanceof QubitPair) {
           if (this.board.current.orientation === "vertical") {
             const right = this.board.currentPosition.add(RIGHT);
