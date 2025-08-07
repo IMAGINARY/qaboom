@@ -122,6 +122,7 @@ export default class PlayerArea {
 
   tick = (time: Ticker) => {
     this.board.tick(time);
+    this.deck.tick(time);
     if (this.time >= this.nextTime) {
       if (this.currentState === "game") {
         this.step();

@@ -1,4 +1,4 @@
-import { Graphics, Container } from "pixi.js";
+import { Graphics, Container, Ticker } from "pixi.js";
 import MeasurementPiece from "./MeasurementPiece";
 import { CELL_SIZE } from "./constants";
 import QubitPair from "./QubitPair";
@@ -38,6 +38,12 @@ export default class Deck {
     }
     this.buffer = newBuffer();
     this.setDeckPositions();
+  }
+
+  tick(time: Ticker) {
+    for (let piece of this.deck) {
+      piece.tick(time);
+    }
   }
 
   setDeckPositions() {

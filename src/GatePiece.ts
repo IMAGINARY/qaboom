@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Container, Graphics, Ticker } from "pixi.js";
 import { PIECE_RADIUS } from "./constants";
 import { choice } from "./random";
 import { getColor } from "./colors";
@@ -6,11 +6,14 @@ import { rotateXGate, rotateYGate, rotateZGate } from "./quantum";
 
 type Axis = "X" | "Y" | "Z";
 
+const rotationSpeed = Math.PI / 16;
+
 // A piece representing a (1-qubit) gate
 export default class GatePiece {
   angle: number;
   axis: Axis;
   sprite: Container;
+  background: Graphics;
   angleMarker: Graphics;
 
   constructor(axis: Axis, angle: number) {
@@ -18,10 +21,10 @@ export default class GatePiece {
     this.angle = angle;
     this.sprite = new Container();
     this.angleMarker = new Graphics();
-    const background = new Graphics();
+    this.background = new Graphics();
     for (let i = 0; i < 8; i++) {
       let angle = (i / 8) * 2 * Math.PI - Math.PI / 2;
-      background
+      this.background
         .moveTo(0, 0)
         .arc(
           0,
@@ -33,7 +36,7 @@ export default class GatePiece {
         )
         .fill(colorMap[this.axis][i]);
     }
-    this.sprite.addChild(background);
+    this.sprite.addChild(this.background);
     this.sprite.addChild(this.angleMarker);
     this.drawAngle();
   }
@@ -47,6 +50,10 @@ export default class GatePiece {
       choice<Axis>(["X", "Y", "Z"]),
       choice([Math.PI / 2, Math.PI, (Math.PI * 3) / 2])
     );
+  }
+
+  tick(time: Ticker) {
+    this.background.rotation += (time.deltaMS * rotationSpeed) / 1000;
   }
 
   rotate() {

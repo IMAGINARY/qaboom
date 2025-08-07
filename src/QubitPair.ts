@@ -1,4 +1,4 @@
-import { Container } from "pixi.js";
+import { Container, Ticker } from "pixi.js";
 import { CELL_SIZE } from "./constants";
 import { randomQubit, type Qubit } from "./quantum";
 import QubitPiece from "./QubitPiece";
@@ -38,6 +38,8 @@ export default class QubitPair {
       this.second.sprite.position = { x: CELL_SIZE, y: 0 };
     }
   }
+
+  tick(_time: Ticker) {}
 
   static random() {
     return new QubitPair(randomQubit(), randomQubit());

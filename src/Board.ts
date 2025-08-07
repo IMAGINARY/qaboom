@@ -42,6 +42,7 @@ export default class Board {
   }
 
   tick(time: Ticker) {
+    this.current?.tick(time);
     for (const row of this.grid) {
       for (const piece of row) {
         if (piece) {

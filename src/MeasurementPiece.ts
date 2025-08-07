@@ -1,4 +1,4 @@
-import { Graphics } from "pixi.js";
+import { Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, getOrtho, randomQubit, type Qubit } from "./quantum";
 import { getColor } from "./colors";
 import { PIECE_RADIUS } from "./constants";
@@ -31,6 +31,8 @@ export default class MeasurementPiece {
     [this.base, this.ortho] = [this.ortho, this.base];
     this.draw();
   }
+
+  tick(_time: Ticker) {}
 
   static random() {
     return new MeasurementPiece(randomQubit());
