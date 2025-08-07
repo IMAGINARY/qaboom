@@ -1,5 +1,5 @@
 import { Application } from "pixi.js";
-import Qaboom from "./Qaboom";
+import PlayerArea from "./PlayerArea";
 import Menu from "./Menu";
 import { HEIGHT, WIDTH } from "./constants";
 
@@ -22,10 +22,10 @@ export default class Game {
     menu.show(app.stage);
     menu.onStart = (numPlayers) => {
       menu.hide();
-      let players: Qaboom[];
+      let players: PlayerArea[];
       if (numPlayers === 1) {
         players = [
-          new Qaboom({
+          new PlayerArea({
             position: { x: WIDTH / 2 - 250, y: 0 },
             inputMap: {
               a: "left",
@@ -37,7 +37,7 @@ export default class Game {
         ];
       } else {
         players = [
-          new Qaboom({
+          new PlayerArea({
             position: { x: 0, y: 0 },
             inputMap: {
               a: "left",
@@ -47,7 +47,7 @@ export default class Game {
             },
           }),
 
-          new Qaboom({
+          new PlayerArea({
             position: { x: WIDTH / 2, y: 0 },
             inputMap: {
               j: "left",

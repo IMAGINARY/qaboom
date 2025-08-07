@@ -32,8 +32,10 @@ interface Options {
   inputMap: InputMap;
 }
 
-// The main Qaboom gameplay loop
-export default class Qaboom {
+/**
+ * The board and deck for a single player.
+ */
+export default class PlayerArea {
   onGameOver?: () => void;
 
   view: Container;
