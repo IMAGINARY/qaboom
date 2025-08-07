@@ -2,7 +2,7 @@ import { Container, Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
 import { PIECE_RADIUS } from "./constants";
 import { getColor } from "./colors";
-import { floatGreaterThan } from "./math";
+import { floatEquals, floatGreaterThan } from "./math";
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
@@ -59,12 +59,26 @@ export default class QubitPiece {
   setValue(value: Qubit) {
     this.value = value;
     this.#goal = getBlochCoords(value);
+    // Make sure the angle moves in the shortest route
     if (Math.abs(this.#current.phi - this.#goal.phi) > Math.PI) {
       if (this.#current.phi > Math.PI) {
         this.#current.phi -= 2 * Math.PI;
       } else {
         this.#current.phi += 2 * Math.PI;
       }
+    }
+    // Handle black/white edge cases
+    if (
+      floatEquals(this.#goal.theta, 0) ||
+      floatEquals(this.#goal.theta, Math.PI)
+    ) {
+      this.#goal.phi = this.#current.phi;
+    }
+    if (
+      floatEquals(this.#current.theta, 0) ||
+      floatEquals(this.#current.theta, Math.PI)
+    ) {
+      this.#current.phi = this.#goal.phi;
     }
     this.#alpha = 0;
   }
