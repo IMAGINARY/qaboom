@@ -9,7 +9,6 @@ export default class QubitPiece {
   // The qubit value
   value: Qubit;
   sprite: Container;
-  // sprite: Graphics;
   circle: Graphics;
   rod: Graphics;
   outline: Graphics;
