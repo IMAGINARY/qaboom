@@ -5,6 +5,7 @@ import { getColor } from "./colors";
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
+const rate = 500;
 export default class QubitPiece {
   // The qubit value
   value: Qubit;
@@ -12,6 +13,10 @@ export default class QubitPiece {
   circle: Graphics;
   rod: Graphics;
   outline: Graphics;
+
+  #goal: { theta: number; phi: number };
+  #current: { theta: number; phi: number };
+  #alpha = 0;
 
   constructor(value: Qubit) {
     this.value = value;
@@ -27,7 +32,9 @@ export default class QubitPiece {
     this.sprite.addChild(this.circle);
     this.sprite.addChild(this.rod);
     this.sprite.addChild(this.outline);
-    this.setValue(value);
+    this.#current = getBlochCoords(value);
+    this.#goal = this.#current;
+    this.setSprite(this.#current);
   }
 
   // return a random qubit
@@ -35,11 +42,33 @@ export default class QubitPiece {
     return new QubitPiece(randomQubit());
   }
 
-  tick(time: Ticker) {}
+  tick(time: Ticker) {
+    this.#alpha = Math.min(1, this.#alpha + time.deltaMS / rate);
+    if (this.#alpha >= 1) {
+      return;
+    }
+    this.#current.phi =
+      this.#current.phi * (1 - this.#alpha) + this.#goal.phi * this.#alpha;
+    this.#current.theta =
+      this.#current.theta * (1 - this.#alpha) + this.#goal.theta * this.#alpha;
+
+    this.setSprite(this.#current);
+  }
 
   setValue(value: Qubit) {
     this.value = value;
-    const { phi, theta } = getBlochCoords(value);
+    this.#goal = getBlochCoords(value);
+    if (Math.abs(this.#current.phi - this.#goal.phi) > Math.PI) {
+      if (this.#current.phi > Math.PI) {
+        this.#current.phi -= 2 * Math.PI;
+      } else {
+        this.#current.phi += 2 * Math.PI;
+      }
+    }
+    this.#alpha = 0;
+  }
+
+  setSprite({ phi, theta }: { phi: number; theta: number }) {
     const length = Math.sin(theta);
     const secondaryColor = theta > Math.PI / 2 ? "black" : "white";
     this.circle.tint = getColor({ phi, theta });
