@@ -1,15 +1,20 @@
-import * as math from "mathjs";
 import { Graphics } from "pixi.js";
 import { PIECE_RADIUS } from "./constants";
 import { choice } from "./random";
 import { getColor } from "./colors";
+import { rotateXGate, rotateYGate, rotateZGate } from "./quantum";
+
+type Axis = "X" | "Y" | "Z";
+
 // A piece representing a (1-qubit) gate
 export default class GatePiece {
-  matrix: math.Matrix;
+  angle: number;
+  axis: Axis;
   sprite: Graphics;
 
-  constructor({ matrix, colors, angle }: any) {
-    this.matrix = matrix;
+  constructor(axis: Axis, angle: number) {
+    this.axis = axis;
+    this.angle = angle;
     this.sprite = new Graphics();
     for (let i = 0; i < 8; i++) {
       let angle = (i / 8) * 2 * Math.PI - Math.PI / 2;
@@ -23,7 +28,7 @@ export default class GatePiece {
           angle + Math.PI / 8
           // true
         )
-        .fill(colors[i]);
+        .fill(colorMap[this.axis][i]);
     }
 
     this.sprite
@@ -32,8 +37,15 @@ export default class GatePiece {
       .stroke({ color: "white", width: 2 });
   }
 
+  get matrix() {
+    return matrices[this.axis](this.angle);
+  }
+
   static random() {
-    return new GatePiece(choice(gates));
+    return new GatePiece(
+      choice<Axis>(["Z"]),
+      choice([Math.PI / 2, Math.PI, (Math.PI * 3) / 2])
+    );
   }
 }
 
@@ -62,122 +74,41 @@ const colors = {
   light_blue: getColor({ phi: (3 * Math.PI) / 2, theta: (3 / 4) * Math.PI }),
 };
 
-const colorsX = [
-  colors.white,
-  colors.light_yellow,
-  colors.yellow,
-  colors.dark_yellow,
-  colors.black,
-  colors.dark_blue,
-  colors.blue,
-  colors.light_blue,
-];
+const colorMap = {
+  X: [
+    colors.black,
+    colors.dark_yellow,
+    colors.yellow,
+    colors.light_yellow,
+    colors.white,
+    colors.light_blue,
+    colors.blue,
+    colors.dark_blue,
+  ],
+  Y: [
+    colors.black,
+    colors.dark_red,
+    colors.red,
+    colors.light_red,
+    colors.white,
+    colors.light_green,
+    colors.green,
+    colors.dark_green,
+  ],
+  Z: [
+    colors.red,
+    colors.orange,
+    colors.yellow,
+    colors.lime,
+    colors.green,
+    colors.teal,
+    colors.blue,
+    colors.purple,
+  ],
+};
 
-const colorsY = [
-  colors.white,
-  colors.light_red,
-  colors.red,
-  colors.dark_red,
-  colors.black,
-  colors.dark_green,
-  colors.green,
-  colors.light_green,
-];
-
-const colorsZ = [
-  colors.red,
-  colors.orange,
-  colors.yellow,
-  colors.lime,
-  colors.green,
-  colors.teal,
-  colors.blue,
-  colors.purple,
-];
-
-const gates = [
-  {
-    name: "X",
-    matrix: math.matrix([
-      [math.complex(0), math.complex(1)],
-      [math.complex(1), math.complex(0)],
-    ]),
-    angle: Math.PI,
-    colors: colorsX,
-  },
-  {
-    name: "Y",
-    matrix: math.matrix([
-      [math.complex(0), math.complex(0, -1)],
-      [math.complex(0, 1), math.complex(0)],
-    ]),
-    angle: Math.PI,
-    colors: colorsY,
-  },
-  {
-    name: "Z",
-    matrix: math.matrix([
-      [math.complex(1), math.complex(0)],
-      [math.complex(0), math.complex(-1)],
-    ]),
-    angle: Math.PI,
-    colors: colorsZ,
-  },
-  // {
-  //   name: "√X",
-  //   matrix: math.multiply(
-  //     math.matrix([
-  //       [math.complex(1, 1), math.complex(1, -1)],
-  //       [math.complex(1, -1), math.complex(1, 1)],
-  //     ]),
-  //     1 / 2
-  //   ),
-  //   angle: Math.PI / 2,
-  //   colors: colorsX,
-  // },
-  // {
-  //   name: "√X^-1",
-  //   matrix: math.inv(
-  //     math.multiply(
-  //       math.matrix([
-  //         [math.complex(1, 1), math.complex(1, -1)],
-  //         [math.complex(1, -1), math.complex(1, 1)],
-  //       ]),
-  //       1 / 2
-  //     )
-  //   ),
-  //   angle: -Math.PI / 2,
-  //   colors: colorsX,
-  // },
-  // {
-  //   name: "√Z",
-  //   matrix: math.matrix([
-  //     [math.complex(1), math.complex(0)],
-  //     [math.complex(0), math.complex(0, 1)],
-  //   ]),
-  //   angle: Math.PI / 2,
-  //   colors: colorsZ,
-  // },
-  // {
-  //   name: "√Z^-1",
-  //   matrix: math.inv(
-  //     math.matrix([
-  //       [math.complex(1), math.complex(0)],
-  //       [math.complex(0), math.complex(0, 1)],
-  //     ])
-  //   ),
-  //   angle: -Math.PI / 2,
-  //   colors: colorsZ,
-  // },
-  // {
-  //   name: "H",
-  //   matrix: math.multiply(
-  //     math.matrix([
-  //       [math.complex(1), math.complex(1)],
-  //       [math.complex(1), math.complex(-1)],
-  //     ]),
-  //     1 / Math.sqrt(2)
-  //   ),
-  // },
-  // {
-];
+const matrices = {
+  X: rotateXGate,
+  Y: rotateYGate,
+  Z: rotateZGate,
+};

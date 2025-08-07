@@ -1,5 +1,5 @@
 import * as math from "mathjs";
-import { interpolate, formatCss, formatHex } from "culori";
+// import { choice } from "./random";
 
 export type Qubit = math.Matrix<math.Complex>;
 // Common bases
@@ -66,13 +66,37 @@ export function getOrtho(qubit: Qubit) {
 }
 
 export function randomQubit() {
-  // return choice([ZERO, ONE, PLUS, MINUS]);
+  // return choice([ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I]);
   // https://mathworld.wolfram.com/SpherePointPicking.html
   const u = Math.random();
   const v = Math.random();
   const phi = 2 * Math.PI * u;
   const theta = Math.acos(2 * v - 1);
   return qubitFromSpherical({ theta, phi });
+}
+
+// A matrix representing a turn of theta over the x axis
+export function rotateXGate(theta: number) {
+  return math.matrix([
+    [math.complex(Math.cos(theta / 2)), math.complex(0, -Math.sin(theta / 2))],
+    [math.complex(0, -Math.sin(theta / 2)), math.complex(Math.cos(theta / 2))],
+  ]);
+}
+
+// A matrix representing a turn of theta over the y axis
+export function rotateYGate(theta: number) {
+  return math.matrix([
+    [math.complex(Math.cos(theta / 2)), math.complex(-Math.sin(theta / 2))],
+    [math.complex(Math.sin(theta / 2)), math.complex(Math.cos(theta / 2))],
+  ]);
+}
+
+// A matrix representing a turn of theta over the z axis
+export function rotateZGate(theta: number) {
+  return math.matrix([
+    [math.exp(math.complex(0, -theta / 2)), 0],
+    [0, math.exp(math.complex(0, theta / 2))],
+  ]);
 }
 
 export function measure(qubit: Qubit, base: Qubit) {
