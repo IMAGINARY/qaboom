@@ -2,6 +2,7 @@ import { Container, Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
 import { PIECE_RADIUS } from "./constants";
 import { getColor } from "./colors";
+import { floatGreaterThan } from "./math";
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
@@ -70,7 +71,9 @@ export default class QubitPiece {
 
   setSprite({ phi, theta }: { phi: number; theta: number }) {
     const length = Math.sin(theta);
-    const secondaryColor = theta > Math.PI / 2 ? "black" : "white";
+    const secondaryColor = floatGreaterThan(theta, Math.PI / 2)
+      ? "black"
+      : "white";
     this.circle.tint = getColor({ phi, theta });
     this.rod.rotation = phi;
     this.rod.tint = secondaryColor;

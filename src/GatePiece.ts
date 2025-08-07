@@ -44,7 +44,7 @@ export default class GatePiece {
 
   static random() {
     return new GatePiece(
-      choice<Axis>(["Z"]),
+      choice<Axis>(["X", "Y", "Z"]),
       choice([Math.PI / 2, Math.PI, (Math.PI * 3) / 2])
     );
   }
