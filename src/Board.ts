@@ -1,4 +1,4 @@
-import { Container, Graphics, GraphicsContext, Point } from "pixi.js";
+import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
 import QubitPiece from "./QubitPiece";
 import {
   BOARD_HEIGHT,
@@ -39,6 +39,16 @@ export default class Board {
     );
     this.view.addChild(this.lines);
     this.grid = this.initGrid();
+  }
+
+  tick(time: Ticker) {
+    for (const row of this.grid) {
+      for (const piece of row) {
+        if (piece) {
+          piece.tick(time);
+        }
+      }
+    }
   }
 
   initGrid() {
