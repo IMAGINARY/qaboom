@@ -69,9 +69,7 @@ function newBuffer() {
   for (let _i of range(4)) {
     buffer.push(QubitPair.random());
   }
-  if (Math.random() < 1 / 2) {
-    buffer.push(GatePiece.random());
-  }
+  buffer.push(GatePiece.random());
   for (let _i of range(1)) {
     buffer.push(MeasurementPiece.random());
   }
