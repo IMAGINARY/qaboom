@@ -1,5 +1,5 @@
 import * as math from "mathjs";
-// import { choice } from "./random";
+import { choice } from "./random";
 
 export type Qubit = math.Matrix<math.Complex>;
 // Common bases
@@ -66,7 +66,7 @@ export function getOrtho(qubit: Qubit) {
 }
 
 export function randomQubit() {
-  // return choice([ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I]);
+  return choice([ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I]);
   // https://mathworld.wolfram.com/SpherePointPicking.html
   const u = Math.random();
   const v = Math.random();

@@ -16,7 +16,8 @@ export default class EntangledQubit implements BaseQubit {
   tick() {}
 
   measure() {
-    return true;
+    // We're assuming completely entangled states, which always have a 50/50 chance
+    return Math.random() < 1 / 2;
   }
 
   applyGate(gate: GatePiece): void {

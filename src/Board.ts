@@ -78,11 +78,22 @@ export default class Board {
     return grid;
   }
 
+  getPosition(value: BaseQubit) {
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      for (let y = 0; y < BOARD_HEIGHT; y++) {
+        let p = new Point(x, y);
+        if (this.getPiece(new Point(x, y)) === value) {
+          return p;
+        }
+      }
+    }
+  }
+
   getPiece(point: Point) {
     if (!inBounds(point)) {
       return null;
     }
-    return this.grid[point.y][point.x];
+    return this.grid[point.y]?.[point.x];
   }
 
   setPiece(point: Point, value: BaseQubit | null) {

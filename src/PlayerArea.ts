@@ -1,3 +1,4 @@
+import * as math from "mathjs";
 import { Container, HTMLText, Point, Ticker, type PointData } from "pixi.js";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
@@ -12,6 +13,8 @@ import { sounds } from "./audio";
 import EntanglerPiece from "./EntanglerPiece";
 import { choice } from "./random";
 import EntangledPair from "./EntangledPair";
+import EntangledQubit from "./EntangledQubit";
+import SingleQubit from "./SingleQubit";
 
 type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
@@ -216,7 +219,8 @@ export default class PlayerArea {
     for (const point of this.measureQueue) {
       const qubit = this.board.getPiece(point);
       if (!qubit) continue;
-      if (qubit.measure(current)) {
+      const measured = qubit.measure(current);
+      if (measured) {
         this.measured.push(point);
         // Add unvisited neighbors to the new queue.
         for (const nbr of orthoNeighbors(point)) {
@@ -229,6 +233,29 @@ export default class PlayerArea {
             this.board.drawLine(point, nbr);
           }
         }
+      }
+      if (qubit instanceof EntangledQubit) {
+        const value = measured ? current.base : current.ortho;
+        const newPiece = new SingleQubit(value);
+        this.board.setPiece(point, newPiece);
+        // Set the paired qubit
+        const isFirst = qubit === qubit.parent!.first;
+        const pairPoint = this.board.getPosition(
+          value ? qubit.parent!.second : qubit.parent!.first
+        )!;
+        const matrix = isFirst
+          ? math.kron(
+              (math as any).ctranspose(value),
+              math.identity(2) as math.Matrix
+            )
+          : math.kron(
+              math.identity(2) as math.Matrix,
+              (math as any).ctranspose(value)
+            );
+        const newPairPiece = new SingleQubit(
+          math.multiply(matrix as any, qubit.parent!.value) as any
+        );
+        this.board.setPiece(pairPoint, newPairPiece);
       }
     }
     this.measureCount++;

@@ -4,7 +4,7 @@ import EntangledQubit from "./EntangledQubit";
 export default class EntangledPair {
   first: EntangledQubit;
   second: EntangledQubit;
-  value: math.Matrix;
+  value: math.Matrix<math.Complex>;
 
   constructor() {
     this.first = new EntangledQubit();
@@ -16,6 +16,6 @@ export default class EntangledPair {
       math.complex(0),
       math.complex(0),
       math.complex(1),
-    ]);
+    ]) as any;
   }
 }
