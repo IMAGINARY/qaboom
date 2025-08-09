@@ -25,7 +25,7 @@ const RATES = {
 };
 
 const rateMultiplier = 0.9;
-const levelCount = 10;
+const levelCount = 20;
 
 interface Options {
   position: PointData;
