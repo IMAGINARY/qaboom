@@ -1,20 +1,20 @@
 import { Container, Ticker } from "pixi.js";
 import { CELL_SIZE } from "./constants";
 import { randomQubit, type Qubit } from "./quantum";
-import QubitPiece from "./QubitPiece";
+import SingleQubit from "./SingleQubit";
 
 type Orientation = "vertical" | "horizontal";
 // A pair of qubits
 export default class QubitPair {
   sprite: Container;
-  first: QubitPiece;
-  second: QubitPiece;
+  first: SingleQubit;
+  second: SingleQubit;
   orientation: Orientation = "vertical";
 
   constructor(first: Qubit, second: Qubit) {
     this.sprite = new Container();
-    this.first = new QubitPiece(first);
-    this.second = new QubitPiece(second);
+    this.first = new SingleQubit(first);
+    this.second = new SingleQubit(second);
     this.sprite.addChild(this.first.sprite);
     this.sprite.addChild(this.second.sprite);
     this.setPositions();

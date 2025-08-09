@@ -1,13 +1,19 @@
+import * as math from "mathjs";
 import { Container, Graphics, Ticker } from "pixi.js";
-import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
+import { getBlochCoords, measure, randomQubit, type Qubit } from "./quantum";
 import { PIECE_RADIUS } from "./constants";
 import { getColor } from "./colors";
 import { floatEquals, floatGreaterThan } from "./math";
+import type MeasurementPiece from "./MeasurementPiece";
+import type GatePiece from "./GatePiece";
+
+// Animation rate
+const rate = 500;
+
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
-const rate = 500;
-export default class QubitPiece {
+export default class SingleQubit {
   // The qubit value
   value: Qubit;
   sprite: Container;
@@ -40,7 +46,7 @@ export default class QubitPiece {
 
   // return a random qubit
   static random() {
-    return new QubitPiece(randomQubit());
+    return new SingleQubit(randomQubit());
   }
 
   tick(time: Ticker) {
@@ -54,6 +60,20 @@ export default class QubitPiece {
       this.#current.theta * (1 - this.#alpha) + this.#goal.theta * this.#alpha;
 
     this.setSprite(this.#current);
+  }
+
+  measure(measurement: MeasurementPiece) {
+    const measured = measure(this.value, measurement.base);
+    if (measured) {
+      this.setValue(measurement.base);
+    } else {
+      this.setValue(measurement.ortho);
+    }
+    return measured;
+  }
+
+  applyGate(gate: GatePiece) {
+    this.setValue(math.multiply(gate.matrix, this.value) as Qubit);
   }
 
   setValue(value: Qubit) {

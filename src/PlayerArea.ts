@@ -1,9 +1,7 @@
 import { Container, HTMLText, Point, Ticker, type PointData } from "pixi.js";
-import * as math from "mathjs";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
-import { measure, type Qubit } from "./quantum";
 import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck, { type Piece } from "./Deck";
@@ -212,9 +210,7 @@ export default class PlayerArea {
     for (const point of this.measureQueue) {
       const qubit = this.board.getPiece(point);
       if (!qubit) continue;
-      const measured = measure(qubit.value, current.base);
-      if (measured) {
-        qubit.setValue(current.base);
+      if (qubit.measure(current)) {
         this.measured.push(point);
         // Add unvisited neighbors to the new queue.
         for (const nbr of orthoNeighbors(point)) {
@@ -227,8 +223,6 @@ export default class PlayerArea {
             this.board.drawLine(point, nbr);
           }
         }
-      } else {
-        qubit.setValue(current.ortho);
       }
     }
     this.measureCount++;
@@ -292,12 +286,7 @@ export default class PlayerArea {
     for (let p of neighbors(this.board.currentPosition)) {
       let piece = this.board.getPiece(p);
       if (piece) {
-        piece.setValue(
-          math.multiply(
-            (this.board.current as GatePiece).matrix,
-            piece.value
-          ) as Qubit
-        );
+        piece.applyGate(this.board.current as GatePiece);
       }
     }
     this.currentState = "game";

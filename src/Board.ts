@@ -1,5 +1,5 @@
 import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
-import QubitPiece from "./QubitPiece";
+import SingleQubit from "./SingleQubit";
 import {
   BOARD_HEIGHT,
   BOARD_WIDTH,
@@ -14,7 +14,7 @@ export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 
 export default class Board {
   view: Container;
-  grid: (QubitPiece | null)[][] = [];
+  grid: (SingleQubit | null)[][] = [];
   lines: Container;
   validCells: Point[] = [];
 
@@ -63,7 +63,7 @@ export default class Board {
     for (let i = BOARD_HEIGHT - INIT_FILL_HEIGHT; i < BOARD_HEIGHT; i++) {
       const row = [];
       for (let j = 0; j < BOARD_WIDTH; j++) {
-        const qubit = QubitPiece.random();
+        const qubit = SingleQubit.random();
         qubit.sprite.position = new Point(
           (j + 0.5) * CELL_SIZE,
           (i + 0.5) * CELL_SIZE
@@ -83,7 +83,7 @@ export default class Board {
     return this.grid[point.y][point.x];
   }
 
-  setPiece(point: Point, value: QubitPiece | null) {
+  setPiece(point: Point, value: SingleQubit | null) {
     // remove the previous item from the grid.
     const prevValue = this.grid[point.y][point.x];
     if (prevValue) {
