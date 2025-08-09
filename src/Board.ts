@@ -7,9 +7,7 @@ import {
   INIT_FILL_HEIGHT,
 } from "./constants";
 import { range } from "lodash-es";
-import type QubitPair from "./QubitPair";
-import type MeasurementPiece from "./MeasurementPiece";
-import type GatePiece from "./GatePiece";
+import type { Piece } from "./Deck";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 
@@ -19,7 +17,7 @@ export default class Board {
   lines: Container;
 
   // Either a pair of qubit, a gate, or a measurement
-  current: QubitPair | MeasurementPiece | GatePiece | null = null;
+  current: Piece | null = null;
   currentPosition = startingCell;
 
   constructor() {

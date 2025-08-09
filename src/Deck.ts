@@ -5,7 +5,7 @@ import QubitPair from "./QubitPair";
 import { range, shuffle } from "lodash-es";
 import GatePiece from "./GatePiece";
 
-type Piece = QubitPair | MeasurementPiece | GatePiece;
+export type Piece = QubitPair | MeasurementPiece | GatePiece;
 const DECK_SIZE = 4;
 
 const DECK_WIDTH = CELL_SIZE * 2;
