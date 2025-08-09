@@ -9,12 +9,14 @@ import {
 import { range } from "lodash-es";
 import type { Piece } from "./Deck";
 import EntanglerPiece from "./EntanglerPiece";
+import type { BaseQubit } from "./types";
+import EntangledQubit from "./EntangledQubit";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 
 export default class Board {
   view: Container;
-  grid: (SingleQubit | null)[][] = [];
+  grid: (BaseQubit | null)[][] = [];
   lines: Container;
   validCells: Point[] = [];
 
@@ -83,7 +85,7 @@ export default class Board {
     return this.grid[point.y][point.x];
   }
 
-  setPiece(point: Point, value: SingleQubit | null) {
+  setPiece(point: Point, value: BaseQubit | null) {
     // remove the previous item from the grid.
     const prevValue = this.grid[point.y][point.x];
     if (prevValue) {
@@ -99,7 +101,7 @@ export default class Board {
     }
 
     // Update the list of valid cells
-    if (value) {
+    if (value && !(value instanceof EntangledQubit)) {
       this.validCells.push(point);
     } else {
       const index = this.validCells.findIndex((p) => p.equals(point));

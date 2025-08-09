@@ -11,6 +11,7 @@ import GatePiece from "./GatePiece";
 import { sounds } from "./audio";
 import EntanglerPiece from "./EntanglerPiece";
 import { choice } from "./random";
+import EntangledPair from "./EntangledPair";
 
 type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
@@ -192,6 +193,11 @@ export default class PlayerArea {
       this.triggerGate();
     } else if (this.board.current instanceof EntanglerPiece) {
       // Create the entangled pair and place them in the right areas.
+      const pair = new EntangledPair();
+      this.board.setPiece(this.board.currentPosition, pair.first);
+      this.board.setPiece(this.board.current.target, pair.second);
+      this.board.view.removeChild(this.board.current?.sprite!);
+      this.newCurrent();
     }
   }
 

@@ -6,6 +6,7 @@ import { getColor } from "./colors";
 import { floatEquals, floatGreaterThan } from "./math";
 import type MeasurementPiece from "./MeasurementPiece";
 import type GatePiece from "./GatePiece";
+import type { BaseQubit } from "./types";
 
 // Animation rate
 const rate = 500;
@@ -13,7 +14,7 @@ const rate = 500;
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
-export default class SingleQubit {
+export default class SingleQubit implements BaseQubit {
   // The qubit value
   value: Qubit;
   sprite: Container;
