@@ -11,6 +11,8 @@ import QubitPair from "./QubitPair";
 import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
 import { sounds } from "./audio";
+import EntanglerPiece from "./EntanglerPiece";
+import { choice } from "./random";
 
 type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
@@ -190,6 +192,8 @@ export default class PlayerArea {
     } else if (this.board.current instanceof GatePiece) {
       // If it's a gate, trigger the gate.
       this.triggerGate();
+    } else if (this.board.current instanceof EntanglerPiece) {
+      // Create the entangled pair and place them in the right areas.
     }
   }
 
@@ -310,6 +314,10 @@ export default class PlayerArea {
     }
     this.canSwap = true;
     this.board.current = this.deck.pop();
+    if (this.board.current instanceof EntanglerPiece) {
+      this.board.current.target = choice(this.board.validCells);
+    }
+
     this.board.setCurrentPosition(startingCell);
     this.board.view.addChild(this.board.current.sprite);
   }

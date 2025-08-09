@@ -4,8 +4,9 @@ import { CELL_SIZE } from "./constants";
 import QubitPair from "./QubitPair";
 import { range, shuffle } from "lodash-es";
 import GatePiece from "./GatePiece";
+import EntanglerPiece from "./EntanglerPiece";
 
-export type Piece = QubitPair | MeasurementPiece | GatePiece;
+export type Piece = QubitPair | MeasurementPiece | GatePiece | EntanglerPiece;
 const DECK_SIZE = 4;
 
 const DECK_WIDTH = CELL_SIZE * 2;
@@ -76,6 +77,7 @@ function newBuffer() {
     buffer.push(QubitPair.random());
   }
   buffer.push(GatePiece.random());
+  buffer.push(new EntanglerPiece());
   for (let _i of range(1)) {
     buffer.push(MeasurementPiece.random());
   }
