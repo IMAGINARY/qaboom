@@ -6,7 +6,7 @@ import MeasurementPiece from "./MeasurementPiece";
 import { measure, type Qubit } from "./quantum";
 import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
-import Deck from "./Deck";
+import Deck, { type Piece } from "./Deck";
 import QubitPair from "./QubitPair";
 import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
@@ -43,7 +43,7 @@ export default class PlayerArea {
   deck: Deck;
   scoreboard: HTMLText;
 
-  hold: QubitPair | MeasurementPiece | GatePiece | null = null;
+  hold: Piece | null = null;
   canSwap = true;
 
   currentState: State = "game";
