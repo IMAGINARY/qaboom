@@ -17,12 +17,22 @@ export default class Deck {
   view: Container;
   deck: Piece[] = [];
   buffer: Piece[] = [];
-  deal: DealFn;
+  #deal: DealFn;
 
   constructor(dealer: DealFn) {
     this.view = new Container();
-    this.deal = dealer;
+    this.#deal = dealer;
     this.initDeck();
+  }
+
+  get deal() {
+    return this.#deal;
+  }
+
+  set deal(value: DealFn) {
+    this.#deal = value;
+    // Replace the buffer whenever we reset the deck.
+    this.buffer = this.#deal();
   }
 
   initDeck() {
@@ -40,7 +50,7 @@ export default class Deck {
     for (let piece of this.deck) {
       this.view.addChild(piece.sprite);
     }
-    this.buffer = this.deal();
+    this.buffer = this.#deal();
     this.setDeckPositions();
   }
 
@@ -65,7 +75,7 @@ export default class Deck {
     this.view.removeChild(popped.sprite);
     const newItem = this.buffer.shift()!;
     if (this.buffer.length === 0) {
-      this.buffer = this.deal();
+      this.buffer = this.#deal();
     }
     this.deck.push(newItem);
     this.view.addChild(newItem.sprite);
