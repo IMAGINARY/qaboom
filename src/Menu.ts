@@ -1,15 +1,15 @@
 import { Container, HTMLText } from "pixi.js";
 import { HEIGHT, WIDTH } from "./constants";
+import GameNode from "./GameNode";
 
-export default class Menu {
-  view: Container;
+export default class Menu extends GameNode {
   onStart?: (numPlayers: number) => void;
   numPlayers = 1;
   player1Text: HTMLText;
   player2Text: HTMLText;
 
   constructor() {
-    this.view = new Container();
+    super();
     const titleText = new HTMLText({
       text: "<strong>Qaboom!</strong>",
       style: {

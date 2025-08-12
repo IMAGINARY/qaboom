@@ -1,16 +1,16 @@
-import { Container, Graphics, Ticker } from "pixi.js";
+import { Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
 import { PIECE_RADIUS } from "./constants";
 import { getColor } from "./colors";
 import { floatEquals, floatGreaterThan } from "./math";
+import GameNode from "./GameNode";
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
 const rate = 500;
-export default class QubitPiece {
+export default class QubitPiece extends GameNode {
   // The qubit value
   value: Qubit;
-  view: Container;
   circle: Graphics;
   rod: Graphics;
   outline: Graphics;
@@ -20,8 +20,8 @@ export default class QubitPiece {
   #alpha = 0;
 
   constructor(value: Qubit) {
+    super();
     this.value = value;
-    this.view = new Graphics();
     this.circle = new Graphics().circle(0, 0, PIECE_RADIUS).fill("white");
     this.rod = new Graphics()
       .moveTo(0, 0)

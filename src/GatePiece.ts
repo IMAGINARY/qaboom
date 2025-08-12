@@ -3,20 +3,21 @@ import { PIECE_RADIUS } from "./constants";
 import { choice } from "./random";
 import { getColor } from "./colors";
 import { rotateXGate, rotateYGate, rotateZGate } from "./quantum";
+import GameNode from "./GameNode";
 
 type Axis = "X" | "Y" | "Z";
 
 const rotationSpeed = Math.PI / 16;
 
 // A piece representing a (1-qubit) gate
-export default class GatePiece {
+export default class GatePiece extends GameNode {
   angle: number;
   axis: Axis;
-  view: Container;
   background: Graphics;
   angleMarker: Graphics;
 
   constructor(axis: Axis, angle: number) {
+    super();
     this.axis = axis;
     this.angle = angle;
     this.view = new Container();

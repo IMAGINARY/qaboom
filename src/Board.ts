@@ -8,11 +8,11 @@ import {
 } from "./constants";
 import { range } from "lodash-es";
 import type { Piece } from "./Deck";
+import GameNode from "./GameNode";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 
-export default class Board {
-  view: Container;
+export default class Board extends GameNode {
   grid: (QubitPiece | null)[][] = [];
   lines: Container;
 
@@ -21,7 +21,7 @@ export default class Board {
   currentPosition = startingCell;
 
   constructor() {
-    this.view = new Container();
+    super();
     this.grid = this.initGrid();
     this.lines = new Container();
   }

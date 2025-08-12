@@ -11,6 +11,7 @@ import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
 import { sounds } from "./audio";
 import levels from "./levels";
+import GameNode from "./GameNode";
 
 type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
@@ -35,10 +36,9 @@ interface Options {
 /**
  * The board and deck for a single player.
  */
-export default class Player {
+export default class Player extends GameNode {
   onGameOver?: () => void;
 
-  view: Container;
   board: Board;
   deck: Deck;
   scoreboard: HTMLText;
@@ -66,7 +66,7 @@ export default class Player {
   inputMap: InputMap;
 
   constructor({ position, inputMap }: Options) {
-    this.view = new Container();
+    super();
     // TODO be able to reference the "current" position based on the board.
     this.view.position = position;
     this.inputMap = inputMap;

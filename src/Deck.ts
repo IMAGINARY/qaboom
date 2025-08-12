@@ -1,10 +1,11 @@
-import { Graphics, Container, Ticker } from "pixi.js";
+import { Graphics, Ticker } from "pixi.js";
 import MeasurementPiece from "./MeasurementPiece";
 import { CELL_SIZE } from "./constants";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 import { choice } from "./random";
 import { ONE, ZERO } from "./quantum";
+import GameNode from "./GameNode";
 
 export type Piece = QubitPair | MeasurementPiece | GatePiece;
 const DECK_SIZE = 4;
@@ -15,14 +16,13 @@ const DECK_PIECE_HEIGHT = CELL_SIZE * 2.5;
 type DealFn = () => Piece[];
 
 // The deck of upcoming pieces to drop
-export default class Deck {
-  view: Container;
+export default class Deck extends GameNode {
   deck: Piece[] = [];
   buffer: Piece[] = [];
   #deal: DealFn;
 
   constructor(dealer: DealFn) {
-    this.view = new Container();
+    super();
     this.#deal = dealer;
     this.initDeck();
   }
