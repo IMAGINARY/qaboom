@@ -3,6 +3,8 @@ import MeasurementPiece from "./MeasurementPiece";
 import { CELL_SIZE } from "./constants";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
+import { choice } from "./random";
+import { ONE, ZERO } from "./quantum";
 
 export type Piece = QubitPair | MeasurementPiece | GatePiece;
 const DECK_SIZE = 4;
@@ -42,10 +44,11 @@ export default class Deck {
         .rect(0, 0, DECK_WIDTH, DECK_PIECE_HEIGHT * DECK_SIZE)
         .stroke({ color: "white", width: 2 })
     );
-    // FIXME pick from the deck.
     for (let i = 0; i < DECK_SIZE; i++) {
-      // The first items in the deck should be qubit pairs.
-      this.deck.push(QubitPair.random());
+      // TODO make this generic across levels.
+      // For now, for the campaign, just assume we're black and white.
+      const random = () => choice([ZERO, ONE]);
+      this.deck.push(new QubitPair(random(), random()));
     }
     for (let piece of this.deck) {
       this.view.addChild(piece.sprite);
