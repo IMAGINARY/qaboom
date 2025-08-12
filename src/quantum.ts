@@ -1,33 +1,37 @@
-import * as math from "mathjs";
+import {
+  matrix,
+  complex,
+  divide,
+  multiply,
+  conj,
+  exp,
+  dot,
+  type Matrix,
+  Complex,
+} from "mathjs";
 // import { choice } from "./random";
 
-export type Qubit = math.Matrix<math.Complex>;
+export type Qubit = Matrix<Complex>;
 // A 2x2 matrix
-export type Gate = math.Matrix<math.Complex>;
+export type Gate = Matrix<Complex>;
 // Common bases
-export const ZERO = math.matrix<math.Complex>([
-  math.complex(1),
-  math.complex(0),
+export const ZERO = matrix<Complex>([complex(1), complex(0)]);
+export const ONE = matrix<Complex>([complex(0), complex(1)]);
+export const PLUS = matrix<Complex>([
+  complex(1 / Math.sqrt(2)),
+  complex(1 / Math.sqrt(2)),
 ]);
-export const ONE = math.matrix<math.Complex>([
-  math.complex(0),
-  math.complex(1),
+export const MINUS = matrix<Complex>([
+  complex(1 / Math.sqrt(2)),
+  complex(-1 / Math.sqrt(2)),
 ]);
-export const PLUS = math.matrix<math.Complex>([
-  math.complex(1 / Math.sqrt(2)),
-  math.complex(1 / Math.sqrt(2)),
+export const PLUS_I = matrix<Complex>([
+  complex(1 / Math.sqrt(2)),
+  complex(0, 1 / Math.sqrt(2)),
 ]);
-export const MINUS = math.matrix<math.Complex>([
-  math.complex(1 / Math.sqrt(2)),
-  math.complex(-1 / Math.sqrt(2)),
-]);
-export const PLUS_I = math.matrix<math.Complex>([
-  math.complex(1 / Math.sqrt(2)),
-  math.complex(0, 1 / Math.sqrt(2)),
-]);
-export const MINUS_I = math.matrix<math.Complex>([
-  math.complex(1 / Math.sqrt(2)),
-  math.complex(0, -1 / Math.sqrt(2)),
+export const MINUS_I = matrix<Complex>([
+  complex(1 / Math.sqrt(2)),
+  complex(0, -1 / Math.sqrt(2)),
 ]);
 
 export function qubitFromSpherical({
@@ -37,21 +41,21 @@ export function qubitFromSpherical({
   theta: number;
   phi: number;
 }): Qubit {
-  return math.matrix([
-    math.complex(Math.cos(theta / 2)),
-    (math as any).Complex.fromPolar(Math.sin(theta / 2), phi),
+  return matrix<Complex>([
+    complex(Math.cos(theta / 2)),
+    Complex.fromPolar(Math.sin(theta / 2), phi),
   ]);
 }
 
 export function getBlochCoords(qubit: Qubit) {
-  let alpha = math.complex(qubit.get([0]));
+  let alpha = complex(qubit.get([0]));
   let beta = qubit.get([1]);
   let theta = 2 * Math.acos(alpha.toPolar().r);
   let phi = (
-    math.divide(
-      math.multiply(beta, math.conj(alpha)),
+    divide(
+      multiply(beta, conj(alpha)),
       alpha.toPolar().r * beta.toPolar().r
-    ) as math.Complex
+    ) as Complex
   ).toPolar().phi;
   if (isNaN(phi)) phi = 0;
   if (phi < 0) phi += 2 * Math.PI;
@@ -64,11 +68,11 @@ export function getOrtho(qubit: Qubit) {
   const { phi, theta } = getBlochCoords(qubit);
   const phi2 = phi + Math.PI;
   const theta2 = Math.PI - theta;
-  return math.matrix([
+  return matrix([
     Math.cos(theta2 / 2),
-    math.multiply(
-      math.complex(Math.sin(theta2 / 2)),
-      math.exp(math.multiply(math.complex(0, 1), phi2) as any)
+    multiply(
+      complex(Math.sin(theta2 / 2)),
+      exp(multiply(complex(0, 1), phi2) as any)
     ) as any,
   ]);
 }
@@ -85,33 +89,33 @@ export function randomQubit() {
 
 // A matrix representing a turn of theta over the x axis
 export function rotateXGate(theta: number) {
-  return math.matrix<math.Complex>([
-    [math.complex(Math.cos(theta / 2)), math.complex(0, -Math.sin(theta / 2))],
-    [math.complex(0, -Math.sin(theta / 2)), math.complex(Math.cos(theta / 2))],
+  return matrix<Complex>([
+    [complex(Math.cos(theta / 2)), complex(0, -Math.sin(theta / 2))],
+    [complex(0, -Math.sin(theta / 2)), complex(Math.cos(theta / 2))],
   ]);
 }
 
 // A matrix representing a turn of theta over the y axis
 export function rotateYGate(theta: number) {
-  return math.matrix<math.Complex>([
-    [math.complex(Math.cos(theta / 2)), math.complex(-Math.sin(theta / 2))],
-    [math.complex(Math.sin(theta / 2)), math.complex(Math.cos(theta / 2))],
+  return matrix<Complex>([
+    [complex(Math.cos(theta / 2)), complex(-Math.sin(theta / 2))],
+    [complex(Math.sin(theta / 2)), complex(Math.cos(theta / 2))],
   ]);
 }
 
 // A matrix representing a turn of theta over the z axis
 export function rotateZGate(theta: number) {
-  return math.matrix<math.Complex>([
-    [math.exp(math.complex(0, -theta / 2)), math.complex(0)],
-    [math.complex(0), math.exp(math.complex(0, theta / 2))],
+  return matrix<Complex>([
+    [exp(complex(0, -theta / 2)), complex(0)],
+    [complex(0), exp(complex(0, theta / 2))],
   ]);
 }
 
 export function applyGate(gate: Gate, qubit: Qubit) {
-  return math.multiply(gate, qubit) as Qubit;
+  return multiply(gate, qubit) as Qubit;
 }
 
 export function measure(qubit: Qubit, base: Qubit) {
-  const prob = (math.dot(base, qubit) as any).toPolar().r ** 2;
+  const prob = (dot(base, qubit) as any).toPolar().r ** 2;
   return Math.random() < prob;
 }
