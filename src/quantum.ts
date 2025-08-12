@@ -3,21 +3,27 @@ import * as math from "mathjs";
 
 export type Qubit = math.Matrix<math.Complex>;
 // Common bases
-export const ZERO = math.matrix([math.complex(1), math.complex(0)]);
-export const ONE = math.matrix([math.complex(0), math.complex(1)]);
-export const PLUS = math.matrix([
+export const ZERO = math.matrix<math.Complex>([
+  math.complex(1),
+  math.complex(0),
+]);
+export const ONE = math.matrix<math.Complex>([
+  math.complex(0),
+  math.complex(1),
+]);
+export const PLUS = math.matrix<math.Complex>([
   math.complex(1 / Math.sqrt(2)),
   math.complex(1 / Math.sqrt(2)),
 ]);
-export const MINUS = math.matrix([
+export const MINUS = math.matrix<math.Complex>([
   math.complex(1 / Math.sqrt(2)),
   math.complex(-1 / Math.sqrt(2)),
 ]);
-export const PLUS_I = math.matrix([
+export const PLUS_I = math.matrix<math.Complex>([
   math.complex(1 / Math.sqrt(2)),
   math.complex(0, 1 / Math.sqrt(2)),
 ]);
-export const MINUS_I = math.matrix([
+export const MINUS_I = math.matrix<math.Complex>([
   math.complex(1 / Math.sqrt(2)),
   math.complex(0, -1 / Math.sqrt(2)),
 ]);

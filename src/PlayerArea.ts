@@ -11,6 +11,7 @@ import QubitPair from "./QubitPair";
 import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
 import { sounds } from "./audio";
+import levels from "./levels";
 
 type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
@@ -49,6 +50,8 @@ export default class PlayerArea {
   currentState: State = "game";
   #score: number = 0;
 
+  // Level related
+  level = 0;
   rateMultiplier = 1;
   pieceCount = 0;
 
@@ -71,7 +74,7 @@ export default class PlayerArea {
     this.board = new Board();
     this.board.view.position = { x: 50, y: 50 };
 
-    this.deck = new Deck();
+    this.deck = new Deck(levels[0].deal);
     this.deck.view.position = { x: 50 + BOARD_WIDTH * CELL_SIZE + 20, y: 50 };
     this.deck.view.scale = 0.75;
 
@@ -303,10 +306,16 @@ export default class PlayerArea {
 
   newCurrent() {
     this.pieceCount++;
-    if (this.pieceCount > levelCount) {
+    // Increase level
+    if (this.pieceCount >= levelCount - 1) {
       this.pieceCount = 0;
-      this.rateMultiplier *= rateMultiplier;
-      this.rateMultiplier = Math.max(this.rateMultiplier, MAX_MULTIPLIER);
+      if (this.level >= levels.length) {
+        this.rateMultiplier *= rateMultiplier;
+        this.rateMultiplier = Math.max(this.rateMultiplier, MAX_MULTIPLIER);
+      } else {
+        this.level++;
+        this.deck.deal = levels[this.level].deal;
+      }
     }
     this.canSwap = true;
     this.board.current = this.deck.pop();
