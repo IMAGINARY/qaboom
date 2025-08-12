@@ -66,7 +66,6 @@ export default class Game {
           }
           menu.show(app.stage);
         };
-        player.initialize();
         player.show(app.stage);
         app.ticker.add(player.tick);
       }

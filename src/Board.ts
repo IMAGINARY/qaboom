@@ -1,11 +1,6 @@
 import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
 import QubitPiece from "./QubitPiece";
-import {
-  BOARD_HEIGHT,
-  BOARD_WIDTH,
-  CELL_SIZE,
-  INIT_FILL_HEIGHT,
-} from "./constants";
+import { BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE } from "./constants";
 import { range } from "lodash-es";
 import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
@@ -23,11 +18,6 @@ export default class Board extends GameNode {
   constructor() {
     super();
     this.grid = this.initGrid();
-    this.lines = new Container();
-  }
-
-  initialize() {
-    this.view.removeChildren();
     this.view.addChild(
       new Graphics(
         new GraphicsContext()
@@ -35,8 +25,8 @@ export default class Board extends GameNode {
           .stroke("white")
       )
     );
+    this.lines = new Container();
     this.view.addChild(this.lines);
-    this.grid = this.initGrid();
   }
 
   tick(time: Ticker) {
@@ -52,21 +42,8 @@ export default class Board extends GameNode {
 
   initGrid() {
     const grid = [];
-    for (let i = 0; i < BOARD_HEIGHT - INIT_FILL_HEIGHT; i++) {
+    for (let i = 0; i < BOARD_HEIGHT; i++) {
       grid.push(range(BOARD_WIDTH).map(() => null));
-    }
-    for (let i = BOARD_HEIGHT - INIT_FILL_HEIGHT; i < BOARD_HEIGHT; i++) {
-      const row = [];
-      for (let j = 0; j < BOARD_WIDTH; j++) {
-        const qubit = QubitPiece.random();
-        qubit.view.position = new Point(
-          (j + 0.5) * CELL_SIZE,
-          (i + 0.5) * CELL_SIZE
-        );
-        this.view.addChild(qubit.view);
-        row.push(qubit);
-      }
-      grid.push(row);
     }
     return grid;
   }
