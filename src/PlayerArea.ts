@@ -26,7 +26,7 @@ const RATES = {
 };
 
 const rateMultiplier = 0.9;
-const levelCount = 20;
+const levelCount = 10;
 
 interface Options {
   position: PointData;
@@ -329,9 +329,11 @@ export default class PlayerArea {
   newCurrent() {
     this.pieceCount++;
     // Increase level
-    if (this.pieceCount >= levelCount - 1) {
+    if (this.pieceCount > levelCount) {
+      sounds.levelUp.load();
+      sounds.levelUp.play();
       this.pieceCount = 0;
-      if (this.level >= levels.length) {
+      if (this.level >= levels.length - 1) {
         this.rateMultiplier *= rateMultiplier;
         this.rateMultiplier = Math.max(this.rateMultiplier, MAX_MULTIPLIER);
       } else {

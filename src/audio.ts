@@ -9,6 +9,7 @@ import score3Sound from "./assets/audio/score3.ogg";
 import score4Sound from "./assets/audio/score4.ogg";
 import score5Sound from "./assets/audio/score5.ogg";
 import clearSound from "./assets/audio/clear.ogg";
+import levelUpSound from "./assets/audio/levelUp.ogg";
 
 export const sounds = {
   move: new Audio(moveSound),
@@ -20,6 +21,7 @@ export const sounds = {
   score: [score1Sound, score2Sound, score3Sound, score4Sound, score5Sound].map(
     (s) => new Audio(s)
   ),
+  levelUp: new Audio(levelUpSound),
 };
 sounds.turn.volume = 0.125;
 sounds.move.volume = 0.25;
