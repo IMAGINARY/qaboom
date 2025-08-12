@@ -330,14 +330,14 @@ export default class PlayerArea {
     this.pieceCount++;
     // Increase level
     if (this.pieceCount > levelCount) {
+      this.level++;
       sounds.levelUp.load();
       sounds.levelUp.play();
       this.pieceCount = 0;
-      if (this.level >= levels.length - 1) {
+      if (this.level > levels.length - 1) {
         this.rateMultiplier *= rateMultiplier;
         this.rateMultiplier = Math.max(this.rateMultiplier, MAX_MULTIPLIER);
       } else {
-        this.level++;
         this.deck.deal = levels[this.level].deal;
       }
     }
