@@ -35,7 +35,7 @@ interface Options {
 /**
  * The board and deck for a single player.
  */
-export default class PlayerArea {
+export default class Player {
   onGameOver?: () => void;
 
   view: Container;
@@ -218,12 +218,15 @@ export default class PlayerArea {
   }
 
   measureStep() {
+    if (!(this.board.current instanceof MeasurementPiece)) {
+      throw new Error("Called `measureStep` without a MeasurementPiece");
+    }
     if (this.measureQueue.length === 0) {
       this.resolveMeasurement();
       return;
     }
     let newQueue: Point[] = [];
-    const current = this.board.current as MeasurementPiece;
+    const current = this.board.current;
     this.visited = this.visited.concat(this.measureQueue);
     const scoreSound =
       sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
@@ -302,15 +305,6 @@ export default class PlayerArea {
     }
     sounds.gate.load();
     sounds.gate.play();
-    // Apply the gate on everything in the gate's column
-    // const x = this.currentPosition.x;
-    // for (let y = this.currentPosition.y + 1; y < BOARD_HEIGHT; y++) {
-    //   const p = new Point(x, y);
-    //   const piece = this.board.getPiece(p);
-    //   piece?.setValue(
-    //     math.multiply((this.current as GatePiece).matrix, piece.value) as Qubit
-    //   );
-    // }
     // Apply the gate on the surrounding pieces
     for (let p of neighbors(this.board.currentPosition)) {
       let piece = this.board.getPiece(p);
@@ -319,7 +313,7 @@ export default class PlayerArea {
       }
     }
     this.currentState = "game";
-    this.board.view.removeChild(this.board.current?.view!);
+    this.board.view.removeChild(this.board.current?.view);
     this.newCurrent();
   }
 
