@@ -59,11 +59,11 @@ export default class Board {
       const row = [];
       for (let j = 0; j < BOARD_WIDTH; j++) {
         const qubit = QubitPiece.random();
-        qubit.sprite.position = new Point(
+        qubit.view.position = new Point(
           (j + 0.5) * CELL_SIZE,
           (i + 0.5) * CELL_SIZE
         );
-        this.view.addChild(qubit.sprite);
+        this.view.addChild(qubit.view);
         row.push(qubit);
       }
       grid.push(row);
@@ -82,15 +82,15 @@ export default class Board {
     // remove the previous item from the grid.
     const prevValue = this.grid[point.y][point.x];
     if (prevValue) {
-      this.view.removeChild(prevValue.sprite);
+      this.view.removeChild(prevValue.view);
     }
 
     this.grid[point.y][point.x] = value;
     if (value) {
-      if (value.sprite.parent !== this.view) {
-        this.view.addChild(value.sprite);
+      if (value.view.parent !== this.view) {
+        this.view.addChild(value.view);
       }
-      value.sprite.position = this.gridToLocal(point);
+      value.view.position = this.gridToLocal(point);
     }
   }
 
@@ -106,7 +106,7 @@ export default class Board {
 
   setCurrentPosition(p: Point) {
     this.currentPosition = p;
-    this.current!.sprite.position = this.gridToLocal(this.currentPosition);
+    this.current!.view.position = this.gridToLocal(this.currentPosition);
   }
 
   gridToLocal(p: Point) {

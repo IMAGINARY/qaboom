@@ -6,17 +6,17 @@ import QubitPiece from "./QubitPiece";
 type Orientation = "vertical" | "horizontal";
 // A pair of qubits
 export default class QubitPair {
-  sprite: Container;
+  view: Container;
   first: QubitPiece;
   second: QubitPiece;
   orientation: Orientation = "vertical";
 
   constructor(first: Qubit, second: Qubit) {
-    this.sprite = new Container();
+    this.view = new Container();
     this.first = new QubitPiece(first);
     this.second = new QubitPiece(second);
-    this.sprite.addChild(this.first.sprite);
-    this.sprite.addChild(this.second.sprite);
+    this.view.addChild(this.first.view);
+    this.view.addChild(this.second.view);
     this.setPositions();
   }
 
@@ -31,11 +31,11 @@ export default class QubitPair {
   }
 
   setPositions() {
-    this.first.sprite.position = { x: 0, y: 0 };
+    this.first.view.position = { x: 0, y: 0 };
     if (this.orientation === "vertical") {
-      this.second.sprite.position = { x: 0, y: -CELL_SIZE };
+      this.second.view.position = { x: 0, y: -CELL_SIZE };
     } else {
-      this.second.sprite.position = { x: CELL_SIZE, y: 0 };
+      this.second.view.position = { x: CELL_SIZE, y: 0 };
     }
   }
 

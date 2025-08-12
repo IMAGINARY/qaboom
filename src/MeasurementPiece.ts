@@ -7,18 +7,18 @@ import { PIECE_RADIUS } from "./constants";
 export default class MeasurementPiece {
   base: Qubit;
   ortho: Qubit;
-  sprite: Graphics;
+  view: Graphics;
   constructor(base: Qubit) {
     this.base = base;
     this.ortho = getOrtho(base);
-    this.sprite = new Graphics();
+    this.view = new Graphics();
     this.draw();
   }
 
   draw() {
     const baseColor = getColor(getBlochCoords(this.base));
     const orthoColor = getColor(getBlochCoords(this.ortho));
-    this.sprite
+    this.view
       .clear()
       .circle(0, 0, PIECE_RADIUS)
       .stroke({ color: "grey", width: 2 })

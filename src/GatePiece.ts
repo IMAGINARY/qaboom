@@ -12,14 +12,14 @@ const rotationSpeed = Math.PI / 16;
 export default class GatePiece {
   angle: number;
   axis: Axis;
-  sprite: Container;
+  view: Container;
   background: Graphics;
   angleMarker: Graphics;
 
   constructor(axis: Axis, angle: number) {
     this.axis = axis;
     this.angle = angle;
-    this.sprite = new Container();
+    this.view = new Container();
     this.angleMarker = new Graphics();
     this.background = new Graphics();
     for (let i = 0; i < 8; i++) {
@@ -36,8 +36,8 @@ export default class GatePiece {
         )
         .fill(colorMap[this.axis][i]);
     }
-    this.sprite.addChild(this.background);
-    this.sprite.addChild(this.angleMarker);
+    this.view.addChild(this.background);
+    this.view.addChild(this.angleMarker);
     this.drawAngle();
   }
 

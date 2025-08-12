@@ -51,7 +51,7 @@ export default class Deck {
       this.deck.push(new QubitPair(random(), random()));
     }
     for (let piece of this.deck) {
-      this.view.addChild(piece.sprite);
+      this.view.addChild(piece.view);
     }
     this.buffer = this.#deal();
     this.setDeckPositions();
@@ -66,7 +66,7 @@ export default class Deck {
   setDeckPositions() {
     for (let [i, piece] of this.deck.entries()) {
       const offset = piece instanceof QubitPair ? 0.75 : 0.5;
-      piece.sprite.position = {
+      piece.view.position = {
         x: DECK_WIDTH / 2,
         y: (i + offset) * DECK_PIECE_HEIGHT,
       };
@@ -75,13 +75,13 @@ export default class Deck {
 
   pop() {
     const popped = this.deck.shift()!;
-    this.view.removeChild(popped.sprite);
+    this.view.removeChild(popped.view);
     const newItem = this.buffer.shift()!;
     if (this.buffer.length === 0) {
       this.buffer = this.#deal();
     }
     this.deck.push(newItem);
-    this.view.addChild(newItem.sprite);
+    this.view.addChild(newItem.view);
     this.setDeckPositions();
     return popped;
   }

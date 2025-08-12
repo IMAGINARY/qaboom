@@ -270,7 +270,7 @@ export default class PlayerArea {
     this.measureQueue = [];
     this.visited = [];
     this.measureCount = 0;
-    this.board.view.removeChild(this.board.current!.sprite);
+    this.board.view.removeChild(this.board.current!.view);
     this.currentState = "fall";
     this.board.lines.removeChildren();
   }
@@ -322,7 +322,7 @@ export default class PlayerArea {
       }
     }
     this.currentState = "game";
-    this.board.view.removeChild(this.board.current?.sprite!);
+    this.board.view.removeChild(this.board.current?.view!);
     this.newCurrent();
   }
 
@@ -344,7 +344,7 @@ export default class PlayerArea {
     this.canSwap = true;
     this.board.current = this.deck.pop();
     this.board.setCurrentPosition(startingCell);
-    this.board.view.addChild(this.board.current.sprite);
+    this.board.view.addChild(this.board.current.view);
   }
 
   swap() {
@@ -357,7 +357,7 @@ export default class PlayerArea {
     }
     this.board.setCurrentPosition(startingCell);
     if (this.hold) {
-      this.hold.sprite.position = { x: 400, y: 600 };
+      this.hold.view.position = { x: 400, y: 600 };
     }
   }
 

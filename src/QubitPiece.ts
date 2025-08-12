@@ -10,7 +10,7 @@ const rate = 500;
 export default class QubitPiece {
   // The qubit value
   value: Qubit;
-  sprite: Container;
+  view: Container;
   circle: Graphics;
   rod: Graphics;
   outline: Graphics;
@@ -21,7 +21,7 @@ export default class QubitPiece {
 
   constructor(value: Qubit) {
     this.value = value;
-    this.sprite = new Graphics();
+    this.view = new Graphics();
     this.circle = new Graphics().circle(0, 0, PIECE_RADIUS).fill("white");
     this.rod = new Graphics()
       .moveTo(0, 0)
@@ -30,9 +30,9 @@ export default class QubitPiece {
     this.outline = new Graphics()
       .circle(0, 0, PIECE_RADIUS)
       .stroke({ color: "white", width: 1 });
-    this.sprite.addChild(this.circle);
-    this.sprite.addChild(this.rod);
-    this.sprite.addChild(this.outline);
+    this.view.addChild(this.circle);
+    this.view.addChild(this.rod);
+    this.view.addChild(this.outline);
     this.#current = getBlochCoords(value);
     this.#goal = this.#current;
     this.setSprite(this.#current);
