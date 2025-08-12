@@ -1,4 +1,4 @@
-import { Container, HTMLText, Point, Ticker, type PointData } from "pixi.js";
+import { HTMLText, Point, Ticker, type PointData } from "pixi.js";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
@@ -125,13 +125,11 @@ export default class Player extends GameNode {
     this.scoreboard.text = `${this.#score * 100}`;
   }
 
-  show(parent: Container) {
-    parent.addChild(this.view);
+  show() {
     document.addEventListener("keydown", this.handleKeyDown);
   }
 
   hide() {
-    this.view.parent.removeChild(this.view);
     document.removeEventListener("keydown", this.handleKeyDown);
   }
 

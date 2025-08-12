@@ -1,7 +1,8 @@
 import { Application } from "pixi.js";
-import Player from "./Player";
 import Menu from "./Menu";
 import { HEIGHT, WIDTH } from "./constants";
+import SinglePlayer from "./SinglePlayer";
+import Multiplayer from "./Multiplayer";
 
 export default class Game {
   async start() {
@@ -22,52 +23,26 @@ export default class Game {
     menu.show(app.stage);
     menu.onStart = (numPlayers) => {
       menu.hide();
-      let players: Player[];
       if (numPlayers === 1) {
-        players = [
-          new Player({
-            position: { x: WIDTH / 2 - 250, y: 0 },
-            inputMap: {
-              a: "left",
-              d: "right",
-              s: "down",
-              e: "rotate",
-            },
-          }),
-        ];
-      } else {
-        players = [
-          new Player({
-            position: { x: 0, y: 0 },
-            inputMap: {
-              a: "left",
-              d: "right",
-              s: "down",
-              e: "rotate",
-            },
-          }),
-
-          new Player({
-            position: { x: WIDTH / 2, y: 0 },
-            inputMap: {
-              j: "left",
-              l: "right",
-              k: "down",
-              o: "rotate",
-            },
-          }),
-        ];
-      }
-      for (let player of players) {
-        player.onGameOver = () => {
-          for (let p2 of players) {
-            p2.hide();
-            app.ticker.remove(p2.tick);
-          }
+        const singlePlayer = new SinglePlayer();
+        singlePlayer.onFinish = () => {
+          app.ticker.remove(singlePlayer.tick);
+          app.stage.removeChild(singlePlayer.view);
           menu.show(app.stage);
         };
-        player.show(app.stage);
-        app.ticker.add(player.tick);
+        app.stage.addChild(singlePlayer.view);
+        singlePlayer.show();
+        app.ticker.add(singlePlayer.tick);
+      } else {
+        const multiplayer = new Multiplayer();
+        multiplayer.onFinish = () => {
+          app.ticker.remove(multiplayer.tick);
+          app.stage.removeChild(multiplayer.view);
+          menu.show(app.stage);
+        };
+        app.stage.addChild(multiplayer.view);
+        multiplayer.show();
+        app.ticker.add(multiplayer.tick);
       }
     };
   }
