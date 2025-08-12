@@ -4,8 +4,27 @@ import GatePiece from "./GatePiece";
 import MeasurementPiece from "./MeasurementPiece";
 import { choice, shuffle } from "./random";
 import { PLUS, MINUS, ONE, ZERO, PLUS_I, MINUS_I } from "./quantum";
+import type { Piece } from "./Deck";
 
-const levels = [
+export interface Level {
+  deal: () => Piece[];
+}
+
+export const freeMode: Level = {
+  deal: () => {
+    let buffer = [];
+    for (let _i of range(4)) {
+      buffer.push(QubitPair.random());
+    }
+    buffer.push(GatePiece.random());
+    for (let _i of range(1)) {
+      buffer.push(MeasurementPiece.random());
+    }
+    return shuffle(buffer);
+  },
+};
+
+export const campaign: Level[] = [
   {
     deal: () => {
       const random = () => choice([ZERO, ONE]);
@@ -65,19 +84,5 @@ const levels = [
       return buffer;
     },
   },
-  {
-    deal: () => {
-      let buffer = [];
-      for (let _i of range(4)) {
-        buffer.push(QubitPair.random());
-      }
-      buffer.push(GatePiece.random());
-      for (let _i of range(1)) {
-        buffer.push(MeasurementPiece.random());
-      }
-      return shuffle(buffer);
-    },
-  },
+  freeMode,
 ];
-
-export default levels;

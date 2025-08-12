@@ -2,6 +2,7 @@ import type { Ticker } from "pixi.js";
 import { WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
+import { freeMode } from "./levels";
 
 export default class Multiplayer extends GameNode {
   players: Player[];
@@ -18,6 +19,7 @@ export default class Multiplayer extends GameNode {
           s: "down",
           e: "rotate",
         },
+        levels: [freeMode],
       }),
 
       new Player({
@@ -28,6 +30,7 @@ export default class Multiplayer extends GameNode {
           k: "down",
           o: "rotate",
         },
+        levels: [freeMode],
       }),
     ];
 

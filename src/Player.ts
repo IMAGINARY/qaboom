@@ -10,7 +10,7 @@ import QubitPair from "./QubitPair";
 import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
 import { sounds } from "./audio";
-import levels from "./levels";
+import { type Level } from "./levels";
 import GameNode from "./GameNode";
 
 type State = "game" | "measure" | "fall";
@@ -29,6 +29,7 @@ const rateMultiplier = 0.9;
 const levelCount = 20;
 
 interface Options {
+  levels: Level[];
   position: PointData;
   inputMap: InputMap;
 }
@@ -39,6 +40,7 @@ interface Options {
 export default class Player extends GameNode {
   onGameOver?: () => void;
 
+  levels: Level[];
   board: Board;
   deck: Deck;
   scoreboard: HTMLText;
@@ -65,12 +67,13 @@ export default class Player extends GameNode {
   nextTime: number = 0;
   inputMap: InputMap;
 
-  constructor({ position, inputMap }: Options) {
+  constructor({ position, inputMap, levels }: Options) {
     super();
     // TODO be able to reference the "current" position based on the board.
     this.view.position = position;
     this.inputMap = inputMap;
 
+    this.levels = levels;
     this.board = new Board();
     this.board.view.position = { x: 50, y: 50 };
     this.view.addChild(this.board.view);
@@ -314,11 +317,11 @@ export default class Player extends GameNode {
       sounds.levelUp.load();
       sounds.levelUp.play();
       this.pieceCount = 0;
-      if (this.level > levels.length - 1) {
+      if (this.level > this.levels.length - 1) {
         this.rateMultiplier *= rateMultiplier;
         this.rateMultiplier = Math.max(this.rateMultiplier, MAX_MULTIPLIER);
       } else {
-        this.deck.deal = levels[this.level].deal;
+        this.deck.deal = this.levels[this.level].deal;
       }
     }
     this.canSwap = true;

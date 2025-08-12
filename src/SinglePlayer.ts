@@ -2,6 +2,7 @@ import type { Ticker } from "pixi.js";
 import { WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
+import { campaign } from "./levels";
 
 export default class SinglePlayer extends GameNode {
   player: Player;
@@ -17,6 +18,7 @@ export default class SinglePlayer extends GameNode {
         s: "down",
         e: "rotate",
       },
+      levels: campaign,
     });
     this.view.addChild(this.player.view);
 
