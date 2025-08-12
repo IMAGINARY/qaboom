@@ -43,6 +43,7 @@ export default class PlayerArea {
   board: Board;
   deck: Deck;
   scoreboard: HTMLText;
+  levelSign: HTMLText;
 
   hold: Piece | null = null;
   canSwap = true;
@@ -51,7 +52,7 @@ export default class PlayerArea {
   #score: number = 0;
 
   // Level related
-  level = 0;
+  #level = 0;
   rateMultiplier = 1;
   pieceCount = 0;
 
@@ -84,10 +85,22 @@ export default class PlayerArea {
         align: "center",
         fill: "white",
         fontFamily: "monospace",
-        fontSize: 32,
+        fontSize: 28,
       },
     });
-    this.scoreboard.position = { x: 50, y: 0 };
+    this.scoreboard.position = { x: 475, y: 10 };
+    this.scoreboard.anchor = { x: 1, y: 0 };
+
+    this.levelSign = new HTMLText({
+      text: "Lvl " + (this.level + 1),
+      style: {
+        align: "center",
+        fill: "white",
+        fontFamily: "monospace",
+        fontSize: 28,
+      },
+    });
+    this.levelSign.position = { x: 50, y: 10 };
 
     this.initialize();
   }
@@ -97,11 +110,20 @@ export default class PlayerArea {
     this.view.removeChildren();
 
     this.view.addChild(this.scoreboard);
+    this.view.addChild(this.levelSign);
     this.view.addChild(this.board.view);
     this.view.addChild(this.deck.view);
 
     this.board.initialize();
     this.newCurrent();
+  }
+
+  get level() {
+    return this.#level;
+  }
+  set level(value: number) {
+    this.#level = value;
+    this.levelSign.text = `Lvl ${this.#level + 1}`;
   }
 
   get score() {
