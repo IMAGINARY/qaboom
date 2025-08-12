@@ -1,9 +1,8 @@
 import { Container, HTMLText, Point, Ticker, type PointData } from "pixi.js";
-import * as math from "mathjs";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
-import { applyGate, measure, type Qubit } from "./quantum";
+import { applyGate, measure } from "./quantum";
 import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck, { type Piece } from "./Deck";
