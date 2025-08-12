@@ -3,7 +3,7 @@ import * as math from "mathjs";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
-import { measure, type Qubit } from "./quantum";
+import { applyGate, measure, type Qubit } from "./quantum";
 import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck, { type Piece } from "./Deck";
@@ -298,6 +298,9 @@ export default class PlayerArea {
   }
 
   triggerGate() {
+    if (!(this.board.current instanceof GatePiece)) {
+      throw new Error("called `triggerGate` without GatePiece");
+    }
     sounds.gate.load();
     sounds.gate.play();
     // Apply the gate on everything in the gate's column
@@ -313,12 +316,7 @@ export default class PlayerArea {
     for (let p of neighbors(this.board.currentPosition)) {
       let piece = this.board.getPiece(p);
       if (piece) {
-        piece.setValue(
-          math.multiply(
-            (this.board.current as GatePiece).matrix,
-            piece.value
-          ) as Qubit
-        );
+        piece.setValue(applyGate(this.board.current.matrix, piece.value));
       }
     }
     this.currentState = "game";

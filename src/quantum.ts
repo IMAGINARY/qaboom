@@ -2,6 +2,8 @@ import * as math from "mathjs";
 // import { choice } from "./random";
 
 export type Qubit = math.Matrix<math.Complex>;
+// A 2x2 matrix
+export type Gate = math.Matrix<math.Complex>;
 // Common bases
 export const ZERO = math.matrix<math.Complex>([
   math.complex(1),
@@ -83,7 +85,7 @@ export function randomQubit() {
 
 // A matrix representing a turn of theta over the x axis
 export function rotateXGate(theta: number) {
-  return math.matrix([
+  return math.matrix<math.Complex>([
     [math.complex(Math.cos(theta / 2)), math.complex(0, -Math.sin(theta / 2))],
     [math.complex(0, -Math.sin(theta / 2)), math.complex(Math.cos(theta / 2))],
   ]);
@@ -91,7 +93,7 @@ export function rotateXGate(theta: number) {
 
 // A matrix representing a turn of theta over the y axis
 export function rotateYGate(theta: number) {
-  return math.matrix([
+  return math.matrix<math.Complex>([
     [math.complex(Math.cos(theta / 2)), math.complex(-Math.sin(theta / 2))],
     [math.complex(Math.sin(theta / 2)), math.complex(Math.cos(theta / 2))],
   ]);
@@ -99,10 +101,14 @@ export function rotateYGate(theta: number) {
 
 // A matrix representing a turn of theta over the z axis
 export function rotateZGate(theta: number) {
-  return math.matrix([
-    [math.exp(math.complex(0, -theta / 2)), 0],
-    [0, math.exp(math.complex(0, theta / 2))],
+  return math.matrix<math.Complex>([
+    [math.exp(math.complex(0, -theta / 2)), math.complex(0)],
+    [math.complex(0), math.exp(math.complex(0, theta / 2))],
   ]);
+}
+
+export function applyGate(gate: Gate, qubit: Qubit) {
+  return math.multiply(gate, qubit) as Qubit;
 }
 
 export function measure(qubit: Qubit, base: Qubit) {
