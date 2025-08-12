@@ -11,6 +11,10 @@ import {
 } from "mathjs";
 // import { choice } from "./random";
 
+// TODO (refactor)
+// Create a more type-safe wrapper around mathjs functions.
+// There are a lot of "as" casts because the types for mathjs are rather bad
+// (e.g. not genericized correctly).
 export type Qubit = Matrix<Complex>;
 // A 2x2 matrix
 export type Gate = Matrix<Complex>;
