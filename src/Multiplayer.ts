@@ -1,15 +1,18 @@
-import type { Ticker } from "pixi.js";
+import { type Ticker } from "pixi.js";
 import { WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
 import { freeMode } from "./levels";
+import Background from "./Background";
 
 export default class Multiplayer extends GameNode {
   players: Player[];
+  background: Background;
   onFinish?: () => void;
 
   constructor() {
     super();
+    this.background = new Background();
     this.players = [
       new Player({
         position: { x: 0, y: 0 },

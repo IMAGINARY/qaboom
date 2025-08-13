@@ -1,15 +1,19 @@
-import type { Ticker } from "pixi.js";
+import { type Ticker } from "pixi.js";
 import { WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "./levels";
+import Background from "./Background";
 
 export default class SinglePlayer extends GameNode {
   player: Player;
   onFinish?: () => void;
+  background: Background;
 
   constructor() {
     super();
+    this.background = new Background();
+    this.view.addChild(this.background.view);
     this.player = new Player({
       position: { x: WIDTH / 2 - 250, y: 0 },
       inputMap: {

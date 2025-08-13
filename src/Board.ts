@@ -22,6 +22,7 @@ export default class Board extends GameNode {
       new Graphics(
         new GraphicsContext()
           .rect(0, 0, BOARD_WIDTH * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE)
+          .fill({ color: "black", alpha: 0.5 })
           .stroke("white")
       )
     );

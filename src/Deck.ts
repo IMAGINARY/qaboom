@@ -1,4 +1,4 @@
-import { Graphics, Ticker } from "pixi.js";
+import { Graphics, GraphicsContext, Ticker } from "pixi.js";
 import MeasurementPiece from "./MeasurementPiece";
 import { CELL_SIZE } from "./constants";
 import QubitPair from "./QubitPair";
@@ -40,9 +40,12 @@ export default class Deck extends GameNode {
   initDeck() {
     this.view.removeChildren();
     this.view.addChild(
-      new Graphics()
-        .rect(0, 0, DECK_WIDTH, DECK_PIECE_HEIGHT * DECK_SIZE)
-        .stroke({ color: "white", width: 2 })
+      new Graphics(
+        new GraphicsContext()
+          .rect(0, 0, DECK_WIDTH, DECK_PIECE_HEIGHT * DECK_SIZE)
+          .fill({ color: "black", alpha: 0.75 })
+          .stroke({ color: "white", width: 2 })
+      )
     );
     for (let i = 0; i < DECK_SIZE; i++) {
       // TODO make this generic across levels.

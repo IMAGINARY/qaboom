@@ -9,6 +9,7 @@ import {
   type Matrix,
   Complex,
 } from "mathjs";
+import { choice } from "./random";
 // import { choice } from "./random";
 
 // TODO (refactor)
@@ -81,8 +82,11 @@ export function getOrtho(qubit: Qubit) {
   ]);
 }
 
+export function randomBasis() {
+  return choice([ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I]);
+}
+
 export function randomQubit() {
-  // return choice([ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I]);
   // https://mathworld.wolfram.com/SpherePointPicking.html
   const u = Math.random();
   const v = Math.random();
