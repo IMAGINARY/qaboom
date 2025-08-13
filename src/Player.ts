@@ -13,10 +13,9 @@ import { sounds } from "./audio";
 import { type Level } from "./levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
+import type { PlayerInput } from "./inputs";
 
 type State = "game" | "measure" | "fall";
-type Input = "left" | "right" | "down" | "rotate";
-type InputMap = Record<string, Input>;
 
 const MAX_MULTIPLIER = 1 / 5;
 
@@ -32,7 +31,7 @@ const levelCount = 20;
 interface Options {
   levels: Level[];
   position: PointData;
-  inputMap: InputMap;
+  inputMap: PlayerInput;
 }
 
 /**
@@ -66,7 +65,7 @@ export default class Player extends GameNode {
 
   time: number = 0;
   nextTime: number = 0;
-  inputMap: InputMap;
+  inputMap: PlayerInput;
 
   constructor({ position, inputMap, levels }: Options) {
     super();
@@ -356,9 +355,9 @@ export default class Player extends GameNode {
     if (this.currentState !== "game") {
       return;
     }
-    switch (this.inputMap[e.key]) {
+    switch (e.key) {
       // If the player presses left or right, move the current item (if possible)
-      case "left": {
+      case this.inputMap.left: {
         const left = this.board.currentPosition.add(LEFT);
         if (!this.board.isEmptyCell(left)) break;
         if (
@@ -372,7 +371,7 @@ export default class Player extends GameNode {
         sounds.move.play();
         break;
       }
-      case "right": {
+      case this.inputMap.right: {
         const right = this.board.currentPosition.add(RIGHT);
         if (!this.board.isEmptyCell(right)) break;
         if (this.board.current instanceof QubitPair) {
@@ -395,7 +394,7 @@ export default class Player extends GameNode {
         break;
       }
       // If the player presses down, speed up the steps
-      case "down": {
+      case this.inputMap.down: {
         let obstructed = false;
         const down = this.board.currentPosition.add(DOWN);
         if (this.board.containsPoint(down)) obstructed = true;
@@ -417,15 +416,14 @@ export default class Player extends GameNode {
         }
         break;
       }
-      // case "w":
-      // case "ArrowUp": {
+      // case this.inputMap.hold: {
       //   // if (this.canSwap) {
       //   //   this.swap();
       //   // }
       //   break;
       // }
       // If the player presses the trigger, rotate the qubit (if possible)
-      case "rotate": {
+      case this.inputMap.flip: {
         // Can only rotate qubit pairs
         if (this.board.current instanceof MeasurementPiece) {
           this.board.current.flip();

@@ -4,6 +4,7 @@ import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "./levels";
 import Background from "./Background";
+import { inputs } from "./inputs";
 
 export default class SinglePlayer extends GameNode {
   player: Player;
@@ -16,12 +17,7 @@ export default class SinglePlayer extends GameNode {
     this.view.addChild(this.background.view);
     this.player = new Player({
       position: { x: WIDTH / 2 - 250, y: 0 },
-      inputMap: {
-        a: "left",
-        d: "right",
-        s: "down",
-        e: "rotate",
-      },
+      inputMap: inputs.player1,
       levels: campaign,
     });
     this.view.addChild(this.player.view);

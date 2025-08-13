@@ -4,6 +4,7 @@ import GameNode from "./GameNode";
 import Player from "./Player";
 import { freeMode } from "./levels";
 import Background from "./Background";
+import { inputs } from "./inputs";
 
 export default class Multiplayer extends GameNode {
   players: Player[];
@@ -17,23 +18,13 @@ export default class Multiplayer extends GameNode {
     this.players = [
       new Player({
         position: { x: 0, y: 0 },
-        inputMap: {
-          a: "left",
-          d: "right",
-          s: "down",
-          e: "rotate",
-        },
+        inputMap: inputs.player1,
         levels: [freeMode],
       }),
 
       new Player({
         position: { x: WIDTH / 2, y: 0 },
-        inputMap: {
-          j: "left",
-          l: "right",
-          k: "down",
-          o: "rotate",
-        },
+        inputMap: inputs.player2,
         levels: [freeMode],
       }),
     ];

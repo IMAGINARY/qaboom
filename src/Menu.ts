@@ -1,6 +1,7 @@
 import { Container, HTMLText } from "pixi.js";
 import { HEIGHT, WIDTH } from "./constants";
 import GameNode from "./GameNode";
+import { inputs } from "./inputs";
 
 export default class Menu extends GameNode {
   onStart?: (numPlayers: number) => void;
@@ -66,12 +67,15 @@ export default class Menu extends GameNode {
 
   handleKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
-      case " ": {
+      case inputs.player1.flip:
+      case inputs.player2.flip: {
         this.onStart?.(this.numPlayers);
         break;
       }
-      case "ArrowUp":
-      case "ArrowDown": {
+      case inputs.player1.up:
+      case inputs.player1.down:
+      case inputs.player2.up:
+      case inputs.player2.down: {
         this.toggleNumPlayers();
         break;
       }
