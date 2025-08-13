@@ -79,7 +79,7 @@ export default class Player extends GameNode {
     this.view.addChild(this.board.view);
 
     this.deck = new Deck(levels[0].deal);
-    this.deck.view.position = { x: 50 + BOARD_WIDTH * CELL_SIZE + 20, y: 50 };
+    this.deck.view.position = { x: 50 + BOARD_WIDTH * CELL_SIZE + 35, y: 50 };
     this.deck.view.scale = 0.75;
     this.view.addChild(this.deck.view);
 
@@ -92,7 +92,7 @@ export default class Player extends GameNode {
         fontSize: 28,
       },
     });
-    this.scoreboard.position = { x: 475, y: 10 };
+    this.scoreboard.position = { x: 475, y: 5 };
     this.scoreboard.anchor = { x: 1, y: 0 };
     this.view.addChild(this.scoreboard);
 
@@ -105,7 +105,7 @@ export default class Player extends GameNode {
         fontSize: 28,
       },
     });
-    this.levelSign.position = { x: 50, y: 10 };
+    this.levelSign.position = { x: 50, y: 5 };
     this.view.addChild(this.levelSign);
 
     this.view.pivot.set(this.view.width / 2, this.view.height / 2);
