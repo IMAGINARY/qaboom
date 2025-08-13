@@ -203,12 +203,7 @@ export default class Player extends GameNode {
     } else if (this.board.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
       this.currentState = "measure";
-      this.measureQueue = orthoNeighbors(this.board.currentPosition).filter(
-        (p) => this.board.containsPoint(p)
-      );
-      for (let nbr of this.measureQueue) {
-        this.board.drawLine(this.board.currentPosition, nbr);
-      }
+      this.measureQueue = [this.board.currentPosition];
     } else if (this.board.current instanceof GatePiece) {
       // If it's a gate, trigger the gate.
       this.triggerGate();
@@ -226,37 +221,32 @@ export default class Player extends GameNode {
     let newQueue: Point[] = [];
     const current = this.board.current;
     this.visited = this.visited.concat(this.measureQueue);
-    const scoreSound =
-      sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
     for (const point of this.measureQueue) {
-      const qubit = this.board.getPiece(point);
-      if (!qubit) continue;
-      const measured = measure(qubit.value, current.base);
-      if (measured) {
-        qubit.setValue(current.base);
-        qubit.bounce();
-        this.measured.push(point);
-        // Add unvisited neighbors to the new queue.
-        for (const nbr of orthoNeighbors(point)) {
-          if (
-            inBounds(nbr) &&
-            this.board.containsPoint(nbr) &&
-            !this.visited.some((p) => p.equals(nbr))
-          ) {
-            newQueue.push(nbr);
-            this.board.drawLine(point, nbr);
-          }
+      for (const nbr of orthoNeighbors(point)) {
+        if (this.visited.some((p) => p.equals(nbr))) {
+          continue;
         }
-      } else {
-        qubit.setValue(current.ortho);
-        qubit.shake();
+        const qubit = this.board.getPiece(nbr);
+        if (!qubit) continue;
+        this.board.drawLine(point, nbr);
+        this.visited.push(nbr);
+        const measured = measure(qubit.value, current.base);
+        if (measured) {
+          qubit.setValue(current.base);
+          qubit.bounce();
+          this.measured.push(nbr);
+          newQueue.push(nbr);
+        } else {
+          qubit.setValue(current.ortho);
+          qubit.shake();
+        }
       }
     }
+
+    const scoreSound =
+      sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
     scoreSound.load();
     scoreSound.play();
-    // if (this.measured.length > 6) {
-    //   this.shake();
-    // }
     this.measureCount++;
     this.measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
   }
