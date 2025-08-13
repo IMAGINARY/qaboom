@@ -13,6 +13,7 @@ export default class Multiplayer extends GameNode {
   constructor() {
     super();
     this.background = new Background();
+    this.view.addChild(this.background.view);
     this.players = [
       new Player({
         position: { x: 0, y: 0 },
