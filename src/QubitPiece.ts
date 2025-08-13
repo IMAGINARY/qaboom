@@ -2,7 +2,7 @@ import { Container, Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
 import { CELL_SIZE, PIECE_RADIUS } from "./constants";
 import { getColor, getSecondaryColor } from "./colors";
-import { floatEquals, floatGreaterThan } from "./math";
+import { floatEquals } from "./math";
 import GameNode from "./GameNode";
 import { animate } from "motion";
 // A qubit is the basic "piece" that exists in the grid.

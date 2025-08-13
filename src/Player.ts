@@ -2,7 +2,7 @@ import { HTMLText, Point, Ticker, type PointData } from "pixi.js";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
-import { applyGate, getBlochCoords, measure } from "./quantum";
+import { applyGate, measure } from "./quantum";
 import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck, { type Piece } from "./Deck";
@@ -13,7 +13,6 @@ import { sounds } from "./audio";
 import { type Level } from "./levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
-import { getColor } from "./colors";
 
 type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
