@@ -1,4 +1,11 @@
-import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
+import {
+  Container,
+  Graphics,
+  GraphicsContext,
+  Point,
+  Ticker,
+  type ColorSource,
+} from "pixi.js";
 import QubitPiece from "./QubitPiece";
 import {
   BOARD_HEIGHT,
@@ -9,6 +16,8 @@ import {
 import { range } from "lodash-es";
 import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
+import { getBlochCoords, type Qubit } from "./quantum";
+import { getColor, getSecondaryColor } from "./colors";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -106,14 +115,18 @@ export default class Board extends GameNode {
     };
   }
 
-  drawLine(p1: Point, p2: Point) {
+  drawLine(p1: Point, p2: Point, value: Qubit) {
+    const { phi, theta } = getBlochCoords(value);
     const pos1 = this.gridToLocal(p1);
     const pos2 = this.gridToLocal(p2);
     this.lines.addChild(
       new Graphics()
         .moveTo(pos1.x, pos1.y)
         .lineTo(pos2.x, pos2.y)
-        .stroke({ color: "white", width: 5 })
+        .stroke({ color: getSecondaryColor({ phi, theta }), width: 10 })
+        .moveTo(pos1.x, pos1.y)
+        .lineTo(pos2.x, pos2.y)
+        .stroke({ color: getColor({ phi, theta }), width: 7.5 })
     );
   }
 }

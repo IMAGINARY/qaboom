@@ -1,4 +1,5 @@
 import { formatCss, formatHex, interpolate } from "culori";
+import { floatGreaterThan } from "./math";
 
 /**
  * Return the color corresponding to the given phi/theta coordinate.
@@ -11,4 +12,8 @@ export function getColor({ phi, theta }: { theta: number; phi: number }) {
   const hue = interpHue(phi / (2 * Math.PI));
   const interpLight = interpolate(["black", formatCss(hue), "white"], "oklch");
   return formatHex(interpLight(theta / Math.PI));
+}
+
+export function getSecondaryColor({ theta }: { theta: number; phi: number }) {
+  return floatGreaterThan(theta, Math.PI / 2) ? "black" : "white";
 }

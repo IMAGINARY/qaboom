@@ -2,7 +2,7 @@ import { HTMLText, Point, Ticker, type PointData } from "pixi.js";
 import "pixi.js/math-extras";
 import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
-import { applyGate, measure } from "./quantum";
+import { applyGate, getBlochCoords, measure } from "./quantum";
 import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import Deck, { type Piece } from "./Deck";
@@ -13,6 +13,7 @@ import { sounds } from "./audio";
 import { type Level } from "./levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
+import { getColor } from "./colors";
 
 type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
@@ -229,15 +230,16 @@ export default class Player extends GameNode {
         const qubit = this.board.getPiece(nbr);
         if (!qubit) continue;
         newMeasures = true;
-        this.board.drawLine(point, nbr);
         this.visited.push(nbr);
         const measured = measure(qubit.value, current.base);
         if (measured) {
           qubit.setValue(current.base);
+          this.board.drawLine(point, nbr, current.base);
           qubit.bounce();
           this.measured.push(nbr);
           newQueue.push(nbr);
         } else {
+          this.board.drawLine(point, nbr, current.ortho);
           qubit.setValue(current.ortho);
           qubit.shake();
         }

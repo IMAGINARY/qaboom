@@ -1,7 +1,7 @@
 import { Container, Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
 import { CELL_SIZE, PIECE_RADIUS } from "./constants";
-import { getColor } from "./colors";
+import { getColor, getSecondaryColor } from "./colors";
 import { floatEquals, floatGreaterThan } from "./math";
 import GameNode from "./GameNode";
 import { animate } from "motion";
@@ -116,9 +116,7 @@ export default class QubitPiece extends GameNode {
 
   setSprite({ phi, theta }: { phi: number; theta: number }) {
     const length = Math.sin(theta);
-    const secondaryColor = floatGreaterThan(theta, Math.PI / 2)
-      ? "black"
-      : "white";
+    const secondaryColor = getSecondaryColor({ phi, theta });
     this.circle.tint = getColor({ phi, theta });
     this.rod.rotation = phi;
     this.rod.tint = secondaryColor;
