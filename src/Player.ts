@@ -214,13 +214,13 @@ export default class Player extends GameNode {
     if (!(this.board.current instanceof MeasurementPiece)) {
       throw new Error("Called `measureStep` without a MeasurementPiece");
     }
-    if (this.measureQueue.length === 0) {
-      this.resolveMeasurement();
-      return;
-    }
+    // if (this.measureQueue.length === 0) {
+    //   this.resolveMeasurement();
+    //   return;
+    // }
     let newQueue: Point[] = [];
     const current = this.board.current;
-    this.visited = this.visited.concat(this.measureQueue);
+    let newMeasures = false;
     for (const point of this.measureQueue) {
       for (const nbr of orthoNeighbors(point)) {
         if (this.visited.some((p) => p.equals(nbr))) {
@@ -228,6 +228,7 @@ export default class Player extends GameNode {
         }
         const qubit = this.board.getPiece(nbr);
         if (!qubit) continue;
+        newMeasures = true;
         this.board.drawLine(point, nbr);
         this.visited.push(nbr);
         const measured = measure(qubit.value, current.base);
@@ -243,12 +244,16 @@ export default class Player extends GameNode {
       }
     }
 
-    const scoreSound =
-      sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
-    scoreSound.load();
-    scoreSound.play();
-    this.measureCount++;
-    this.measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
+    if (newMeasures) {
+      const scoreSound =
+        sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
+      scoreSound.load();
+      scoreSound.play();
+      this.measureCount++;
+      this.measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
+    } else {
+      this.resolveMeasurement();
+    }
   }
 
   resolveMeasurement() {

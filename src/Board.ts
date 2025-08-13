@@ -113,7 +113,7 @@ export default class Board extends GameNode {
       new Graphics()
         .moveTo(pos1.x, pos1.y)
         .lineTo(pos2.x, pos2.y)
-        .stroke({ color: "white", width: 3 })
+        .stroke({ color: "white", width: 5 })
     );
   }
 }
