@@ -1,9 +1,10 @@
-import { Graphics, Ticker } from "pixi.js";
+import { Container, Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
-import { PIECE_RADIUS } from "./constants";
+import { CELL_SIZE, PIECE_RADIUS } from "./constants";
 import { getColor } from "./colors";
 import { floatEquals, floatGreaterThan } from "./math";
 import GameNode from "./GameNode";
+import { animate } from "motion";
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
@@ -11,6 +12,8 @@ const rate = 500;
 export default class QubitPiece extends GameNode {
   // The qubit value
   value: Qubit;
+  // Container for internal stuff for animation;
+  container: Container;
   circle: Graphics;
   rod: Graphics;
   outline: Graphics;
@@ -21,6 +24,7 @@ export default class QubitPiece extends GameNode {
 
   constructor(value: Qubit) {
     super();
+    this.container = new Container();
     this.value = value;
     this.circle = new Graphics().circle(0, 0, PIECE_RADIUS).fill("white");
     this.rod = new Graphics()
@@ -30,9 +34,10 @@ export default class QubitPiece extends GameNode {
     this.outline = new Graphics()
       .circle(0, 0, PIECE_RADIUS)
       .stroke({ color: "white", width: 1 });
-    this.view.addChild(this.circle);
-    this.view.addChild(this.rod);
-    this.view.addChild(this.outline);
+    this.container.addChild(this.circle);
+    this.container.addChild(this.rod);
+    this.container.addChild(this.outline);
+    this.view.addChild(this.container);
     this.#current = getBlochCoords(value);
     this.#goal = this.#current;
     this.setSprite(this.#current);
@@ -81,6 +86,32 @@ export default class QubitPiece extends GameNode {
       this.#current.phi = this.#goal.phi;
     }
     this.#alpha = 0;
+  }
+
+  bounce() {
+    animate([
+      [
+        this.container.scale,
+        { x: 1.15, y: 1.15 },
+        { duration: 0.15, ease: "easeInOut" },
+      ],
+      [
+        this.container.scale,
+        { x: 1, y: 1 },
+        { duration: 0.15, ease: "easeInOut" },
+      ],
+    ]);
+  }
+
+  shake() {
+    animate([
+      [this.container.position, { x: CELL_SIZE * 0.15 }, { duration: 0.1 }],
+      [
+        this.container.position,
+        { x: 0 },
+        { type: "spring", stiffness: 2000, damping: 4, mass: 0.4 },
+      ],
+    ]);
   }
 
   setSprite({ phi, theta }: { phi: number; theta: number }) {

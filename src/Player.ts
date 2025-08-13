@@ -230,6 +230,7 @@ export default class Player extends GameNode {
       const measured = measure(qubit.value, current.base);
       if (measured) {
         qubit.setValue(current.base);
+        qubit.bounce();
         this.measured.push(point);
         // Add unvisited neighbors to the new queue.
         for (const nbr of orthoNeighbors(point)) {
@@ -244,6 +245,7 @@ export default class Player extends GameNode {
         }
       } else {
         qubit.setValue(current.ortho);
+        qubit.shake();
       }
     }
     this.measureCount++;
@@ -302,6 +304,7 @@ export default class Player extends GameNode {
       let piece = this.board.getPiece(p);
       if (piece) {
         piece.setValue(applyGate(this.board.current.matrix, piece.value));
+        piece.bounce();
       }
     }
     this.currentState = "game";
