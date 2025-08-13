@@ -12,6 +12,7 @@ import GatePiece from "./GatePiece";
 import { sounds } from "./audio";
 import { type Level } from "./levels";
 import GameNode from "./GameNode";
+import { animate } from "motion";
 
 type State = "game" | "measure" | "fall";
 type Input = "left" | "right" | "down" | "rotate";
@@ -70,7 +71,6 @@ export default class Player extends GameNode {
   constructor({ position, inputMap, levels }: Options) {
     super();
     // TODO be able to reference the "current" position based on the board.
-    this.view.position = position;
     this.inputMap = inputMap;
 
     this.levels = levels;
@@ -107,6 +107,12 @@ export default class Player extends GameNode {
     });
     this.levelSign.position = { x: 50, y: 10 };
     this.view.addChild(this.levelSign);
+
+    this.view.pivot.set(this.view.width / 2, this.view.height / 2);
+    this.view.position = new Point(
+      position.x + this.view.width / 2,
+      position.y + this.view.height / 2
+    );
 
     this.newCurrent();
   }
@@ -222,8 +228,6 @@ export default class Player extends GameNode {
     this.visited = this.visited.concat(this.measureQueue);
     const scoreSound =
       sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
-    scoreSound.load();
-    scoreSound.play();
     for (const point of this.measureQueue) {
       const qubit = this.board.getPiece(point);
       if (!qubit) continue;
@@ -248,6 +252,11 @@ export default class Player extends GameNode {
         qubit.shake();
       }
     }
+    scoreSound.load();
+    scoreSound.play();
+    // if (this.measured.length > 6) {
+    //   this.shake();
+    // }
     this.measureCount++;
     this.measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
   }
@@ -469,6 +478,14 @@ export default class Player extends GameNode {
       }
     }
   };
+
+  shake() {
+    animate([
+      [this.view, { rotation: 0.01 }, { duration: 0.05 }],
+      [this.view, { rotation: -0.01 }, { duration: 0.05 }],
+      [this.view, { rotation: 0 }, { duration: 0.05, bounce: 0.25 }],
+    ]);
+  }
 }
 
 function triangular(n: number) {
