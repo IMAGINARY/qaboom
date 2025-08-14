@@ -10,6 +10,7 @@ import {
   Complex,
 } from "mathjs";
 import { choice } from "./random";
+import { range } from "lodash-es";
 // import { choice } from "./random";
 
 // TODO (refactor)
@@ -19,6 +20,7 @@ import { choice } from "./random";
 export type Qubit = Matrix<Complex>;
 // A 2x2 matrix
 export type Gate = Matrix<Complex>;
+export type Axis = "X" | "Y" | "Z";
 // Common bases
 export const ZERO = matrix<Complex>([complex(1), complex(0)]);
 export const ONE = matrix<Complex>([complex(0), complex(1)]);
@@ -38,6 +40,24 @@ export const MINUS_I = matrix<Complex>([
   complex(1 / Math.sqrt(2)),
   complex(0, -1 / Math.sqrt(2)),
 ]);
+
+const axisMap = {
+  X: rotateXGate,
+  Y: rotateYGate,
+  Z: rotateZGate,
+};
+export function rotationGate(axis: Axis, theta: number) {
+  return axisMap[axis](theta);
+}
+
+// Return the bases around the axis and the intermediate qubits (e.g. white, pink, red)
+export function octet(axis: Axis) {
+  const start = axis === "Z" ? PLUS : ZERO;
+  return range(0, 8).map((i) => {
+    const theta = i * (Math.PI / 4);
+    return applyGate(rotationGate(axis, theta), start);
+  });
+}
 
 export function qubitFromSpherical({
   theta,

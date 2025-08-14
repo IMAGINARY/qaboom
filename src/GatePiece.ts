@@ -2,10 +2,8 @@ import { Container, Graphics, Ticker } from "pixi.js";
 import { PIECE_RADIUS } from "./constants";
 import { choice } from "./random";
 import { getColor } from "./colors";
-import { rotateXGate, rotateYGate, rotateZGate } from "./quantum";
+import { getBlochCoords, octet, rotationGate, type Axis } from "./quantum";
 import GameNode from "./GameNode";
-
-type Axis = "X" | "Y" | "Z";
 
 const rotationSpeed = Math.PI / 16;
 
@@ -23,6 +21,7 @@ export default class GatePiece extends GameNode {
     this.view = new Container();
     this.angleMarker = new Graphics();
     this.background = new Graphics();
+    const colorMap = octet(axis);
     for (let i = 0; i < 8; i++) {
       let angle = (i / 8) * 2 * Math.PI - Math.PI / 2;
       this.background
@@ -35,7 +34,7 @@ export default class GatePiece extends GameNode {
           angle + Math.PI / 8
           // true
         )
-        .fill(colorMap[this.axis][i]);
+        .fill(getColor(getBlochCoords(colorMap[i])));
     }
     this.view.addChild(this.background);
     this.view.addChild(this.angleMarker);
@@ -43,7 +42,7 @@ export default class GatePiece extends GameNode {
   }
 
   get matrix() {
-    return matrices[this.axis](this.angle);
+    return rotationGate(this.axis, this.angle);
   }
 
   static random() {
@@ -77,67 +76,3 @@ export default class GatePiece extends GameNode {
       .stroke({ color: "white", width: 2 });
   }
 }
-
-const colors = {
-  black: getColor({ phi: 0, theta: 0 }),
-  white: getColor({ phi: 0, theta: Math.PI }),
-  // Primary band
-  red: getColor({ phi: 0, theta: Math.PI / 2 }),
-  yellow: getColor({ phi: Math.PI / 2, theta: Math.PI / 2 }),
-  green: getColor({ phi: Math.PI, theta: Math.PI / 2 }),
-  blue: getColor({ phi: (3 * Math.PI) / 2, theta: Math.PI / 2 }),
-  // Secondary colors
-  orange: getColor({ phi: (1 / 4) * Math.PI, theta: Math.PI / 2 }),
-  lime: getColor({ phi: (3 / 4) * Math.PI, theta: Math.PI / 2 }),
-  teal: getColor({ phi: (5 / 4) * Math.PI, theta: Math.PI / 2 }),
-  purple: getColor({ phi: (7 / 4) * Math.PI, theta: Math.PI / 2 }),
-  // Shades
-  dark_red: getColor({ phi: 0, theta: (1 / 4) * Math.PI }),
-  dark_yellow: getColor({ phi: Math.PI / 2, theta: (1 / 4) * Math.PI }),
-  dark_green: getColor({ phi: Math.PI, theta: (1 / 4) * Math.PI }),
-  dark_blue: getColor({ phi: (3 * Math.PI) / 2, theta: (1 / 4) * Math.PI }),
-  // Tints
-  light_red: getColor({ phi: 0, theta: (3 / 4) * Math.PI }),
-  light_yellow: getColor({ phi: Math.PI / 2, theta: (3 / 4) * Math.PI }),
-  light_green: getColor({ phi: Math.PI, theta: (3 / 4) * Math.PI }),
-  light_blue: getColor({ phi: (3 * Math.PI) / 2, theta: (3 / 4) * Math.PI }),
-};
-
-const colorMap = {
-  X: [
-    colors.black,
-    colors.dark_yellow,
-    colors.yellow,
-    colors.light_yellow,
-    colors.white,
-    colors.light_blue,
-    colors.blue,
-    colors.dark_blue,
-  ],
-  Y: [
-    colors.black,
-    colors.dark_red,
-    colors.red,
-    colors.light_red,
-    colors.white,
-    colors.light_green,
-    colors.green,
-    colors.dark_green,
-  ],
-  Z: [
-    colors.red,
-    colors.orange,
-    colors.yellow,
-    colors.lime,
-    colors.green,
-    colors.teal,
-    colors.blue,
-    colors.purple,
-  ],
-};
-
-const matrices = {
-  X: rotateXGate,
-  Y: rotateYGate,
-  Z: rotateZGate,
-};
