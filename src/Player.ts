@@ -38,7 +38,7 @@ interface Options {
  * The board and deck for a single player.
  */
 export default class Player extends GameNode {
-  onGameOver?: () => void;
+  onGameOver?: (score: number) => void;
 
   levels: Level[];
   board: Board;
@@ -188,14 +188,14 @@ export default class Player extends GameNode {
       // If the second position of the qubit is higher than the initial position,
       // it's game over.
       if (secondPosition.y < 0) {
-        this.onGameOver?.();
+        this.onGameOver?.(this.score);
         return;
       }
       this.board.setPiece(this.board.currentPosition, this.board.current.first);
       this.board.setPiece(secondPosition, this.board.current.second);
       // If the starting cell is occupied, it's game over.
       if (this.board.containsPoint(startingCell)) {
-        this.onGameOver?.();
+        this.onGameOver?.(this.score);
         return;
       }
       this.currentState = "fall";
