@@ -1,4 +1,4 @@
-import { Container, HTMLText } from "pixi.js";
+import { Container, Graphics, HTMLText } from "pixi.js";
 import { HEIGHT, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { inputs } from "./inputs";
@@ -8,11 +8,12 @@ const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 type State = "enter_name" | "high_scores";
 
 // List of player scores
-export default class Scores extends GameNode {
+export default class ScoreScreen extends GameNode {
   score: number;
   letters: HTMLText[];
   activeIndex = 0;
   nameEnter = new Container();
+  arrows = new Container();
   state: State = "enter_name";
   onFinish?: () => void;
 
@@ -20,6 +21,13 @@ export default class Scores extends GameNode {
     super();
     this.score = score;
     this.view.position = { x: WIDTH / 2, y: HEIGHT / 2 };
+
+    this.view.addChild(
+      new Graphics()
+        .roundRect(-300, -300, 600, 600)
+        .fill({ color: "black", alpha: 0.5 })
+        .stroke({ color: "white", width: 2 })
+    );
 
     this.letters = [];
     for (let i = 0; i < 3; i++) {
@@ -54,7 +62,14 @@ export default class Scores extends GameNode {
       letter.anchor = { x: 0.5, y: 0.5 };
       this.nameEnter.addChild(letter);
     }
+    this.arrows.addChild(
+      new Graphics().poly([-10, 50, 0, 60, 10, 50]).fill("white"),
+      new Graphics().poly([-10, -50, 0, -60, 10, -50]).fill("white")
+    );
+    this.nameEnter.addChild(this.arrows);
+
     this.letters[this.activeIndex].style.fill = "white";
+    this.arrows.position.x = this.letters[this.activeIndex].position.x;
     this.view.addChild(this.nameEnter);
   }
 
@@ -72,22 +87,35 @@ export default class Scores extends GameNode {
       score: this.score,
     });
     setScores(scores);
+    const highScoresLabel = new HTMLText({
+      text: "High Scores",
+      style: {
+        fill: "white",
+        fontFamily: "Impact",
+        fontSize: 72,
+      },
+    });
+    highScoresLabel.position.y = -250;
+    highScoresLabel.anchor = { x: 0.5, y: 0.5 };
+    this.view.addChild(highScoresLabel);
     for (let [i, entry] of scores.slice(0, 8).entries()) {
       const nameText = new HTMLText({
         text: entry.name,
         style: {
+          fontFamily: "monospace",
           fill: "white",
         },
       });
-      nameText.position = { x: -100, y: -200 + i * 50 };
+      nameText.position = { x: -100, y: -150 + i * 50 };
       nameText.anchor = { x: 0, y: 0.5 };
       const scoreText = new HTMLText({
         text: entry.score,
         style: {
+          fontFamily: "monospace",
           fill: "white",
         },
       });
-      scoreText.position = { x: 100, y: -200 + i * 50 };
+      scoreText.position = { x: 100, y: -150 + i * 50 };
       scoreText.anchor = { x: 1, y: 0.5 };
       this.view.addChild(scoreText);
       this.view.addChild(nameText);
@@ -115,12 +143,14 @@ export default class Scores extends GameNode {
           this.letters[this.activeIndex].style.fill = "grey";
           this.activeIndex = (this.activeIndex || this.letters.length) - 1;
           this.letters[this.activeIndex].style.fill = "white";
+          this.arrows.position.x = this.letters[this.activeIndex].position.x;
           break;
         }
         case inputs.player1.right: {
           this.letters[this.activeIndex].style.fill = "grey";
           this.activeIndex = (this.activeIndex + 1) % this.letters.length;
           this.letters[this.activeIndex].style.fill = "white";
+          this.arrows.position.x = this.letters[this.activeIndex].position.x;
           break;
         }
         case inputs.player1.flip: {

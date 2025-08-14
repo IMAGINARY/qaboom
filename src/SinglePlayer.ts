@@ -5,7 +5,7 @@ import Player from "./Player";
 import { campaign } from "./levels";
 import Background from "./Background";
 import { inputs } from "./inputs";
-import Scores from "./Scores";
+import ScoreScreen from "./ScoreScreen";
 
 type Mode = "game" | "score";
 
@@ -30,7 +30,7 @@ export default class SinglePlayer extends GameNode {
       this.view.removeChild(this.player.view);
       this.player.hide();
       this.mode = "score";
-      const scores = new Scores(score * 100);
+      const scores = new ScoreScreen(score * 100);
       this.view.addChild(scores.view);
       scores.onFinish = () => {
         scores.destroy();
