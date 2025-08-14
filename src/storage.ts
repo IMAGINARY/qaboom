@@ -6,14 +6,14 @@ interface Score {
 }
 
 const initialScores: Score[] = [
-  { name: "CAT", score: 200000 },
-  { name: "NAT", score: 150000 },
-  { name: "QBT", score: 120000 },
-  { name: "BIT", score: 100000 },
-  { name: "BRA", score: 90000 },
-  { name: "KET", score: 80000 },
-  { name: "HAD", score: 70000 },
-  { name: "ENT", score: 60000 },
+  { name: "CAT", score: 500000 },
+  { name: "NAT", score: 400000 },
+  { name: "QBT", score: 300000 },
+  { name: "BIT", score: 200000 },
+  { name: "BRA", score: 150000 },
+  { name: "KET", score: 100000 },
+  { name: "HAD", score: 75000 },
+  { name: "ENT", score: 50000 },
 ];
 
 export function getScores() {
