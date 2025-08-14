@@ -16,11 +16,21 @@ import {
   rotateZGate,
   type Axis,
   octet,
+  quartet,
 } from "./quantum";
 import type { Piece } from "./Deck";
 
 export interface Level {
   deal: () => Piece[];
+}
+
+// TODO use this for more balanced dealing?
+export function* getCombos<T>(array: T[]) {
+  for (let i = 0; i < array.length; i++) {
+    for (let j = i; j < array.length; j++) {
+      yield [array[i], array[j]];
+    }
+  }
 }
 
 export const freeMode: Level = {
@@ -37,6 +47,21 @@ export const freeMode: Level = {
   },
 };
 
+function primaryLevel(axis: Axis): Level {
+  return {
+    deal: () => {
+      const random = () => choice(quartet(axis));
+      let buffer = [];
+      for (let _i of range(5)) {
+        buffer.push(new QubitPair(random(), random()));
+      }
+      buffer.push(new GatePiece(axis, Math.PI));
+      buffer.push(new MeasurementPiece(random()));
+      return buffer;
+    },
+  };
+}
+
 function secondaryLevel(axis: Axis): Level {
   return {
     deal: () => {
@@ -51,7 +76,28 @@ function secondaryLevel(axis: Axis): Level {
     },
   };
 }
-export const secondaryColors: Level[] = [
+
+// The primary stage of the campaign, only dealing with basis qubit states
+export const primaryLevels: Level[] = [
+  primaryLevel("X"),
+  primaryLevel("Y"),
+  primaryLevel("Z"),
+  {
+    deal: () => {
+      const random = () => choice([ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I]);
+      let buffer = [];
+      for (let _i of range(5)) {
+        buffer.push(new QubitPair(random(), random()));
+      }
+      buffer.push(new GatePiece(choice(["X", "Y", "Z"]), Math.PI));
+      buffer.push(new MeasurementPiece(random()));
+      return buffer;
+    },
+  },
+];
+
+// The second stage of the campaign, dealing with all secondary colors
+export const secondaryLevels: Level[] = [
   secondaryLevel("X"),
   secondaryLevel("Y"),
   secondaryLevel("Z"),
@@ -114,54 +160,7 @@ export const campaign: Level[] = [
       return buffer;
     },
   },
-  {
-    deal: () => {
-      const random = () => choice([ZERO, ONE, PLUS_I, MINUS_I]);
-      let buffer = [];
-      for (let _i of range(5)) {
-        buffer.push(new QubitPair(random(), random()));
-      }
-      buffer.push(new GatePiece("X", Math.PI));
-      buffer.push(new MeasurementPiece(random()));
-      return buffer;
-    },
-  },
-  {
-    deal: () => {
-      const random = () => choice([ZERO, ONE, PLUS, MINUS]);
-      let buffer = [];
-      for (let _i of range(5)) {
-        buffer.push(new QubitPair(random(), random()));
-      }
-      buffer.push(new GatePiece("Y", Math.PI));
-      buffer.push(new MeasurementPiece(random()));
-      return buffer;
-    },
-  },
-  {
-    deal: () => {
-      const random = () => choice([PLUS, MINUS, PLUS_I, MINUS_I]);
-      let buffer = [];
-      for (let _i of range(5)) {
-        buffer.push(new QubitPair(random(), random()));
-      }
-      buffer.push(new GatePiece("Z", Math.PI));
-      buffer.push(new MeasurementPiece(random()));
-      return buffer;
-    },
-  },
-  {
-    deal: () => {
-      const random = () => choice([ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I]);
-      let buffer = [];
-      for (let _i of range(5)) {
-        buffer.push(new QubitPair(random(), random()));
-      }
-      buffer.push(new GatePiece(choice(["X", "Y", "Z"]), Math.PI));
-      buffer.push(new MeasurementPiece(random()));
-      return buffer;
-    },
-  },
-  ...secondaryColors,
+  ...primaryLevels,
+  ...secondaryLevels,
   freeMode,
 ];

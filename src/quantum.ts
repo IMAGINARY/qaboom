@@ -50,6 +50,15 @@ export function rotationGate(axis: Axis, theta: number) {
   return axisMap[axis](theta);
 }
 
+// Get the octet of bases around the axis
+export function quartet(axis: Axis) {
+  const start = axis === "Z" ? PLUS : ZERO;
+  return range(0, 4).map((i) => {
+    const theta = i * (Math.PI / 2);
+    return applyGate(rotationGate(axis, theta), start);
+  });
+}
+
 // Return the bases around the axis and the intermediate qubits (e.g. white, pink, red)
 export function octet(axis: Axis) {
   const start = axis === "Z" ? PLUS : ZERO;
