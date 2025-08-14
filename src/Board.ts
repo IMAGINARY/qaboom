@@ -1,11 +1,4 @@
-import {
-  Container,
-  Graphics,
-  GraphicsContext,
-  Point,
-  Ticker,
-  type ColorSource,
-} from "pixi.js";
+import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
 import QubitPiece from "./QubitPiece";
 import {
   BOARD_HEIGHT,
