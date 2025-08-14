@@ -3,6 +3,7 @@ import { HEIGHT, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { inputs } from "./inputs";
 import { getScores, setScores } from "./storage";
+import { sounds } from "./audio";
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
 type State = "enter_name" | "high_scores";
@@ -130,12 +131,16 @@ export default class ScoreScreen extends GameNode {
           const currentLetter = this.letters[this.activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex || LETTERS.length) - 1];
+          sounds.move.load();
+          sounds.move.play();
           break;
         }
         case inputs.player1.down: {
           const currentLetter = this.letters[this.activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex + 1) % LETTERS.length];
+          sounds.move.load();
+          sounds.move.play();
           break;
         }
         // left/right: change active index
@@ -144,6 +149,8 @@ export default class ScoreScreen extends GameNode {
           this.activeIndex = (this.activeIndex || this.letters.length) - 1;
           this.letters[this.activeIndex].style.fill = "white";
           this.arrows.position.x = this.letters[this.activeIndex].position.x;
+          sounds.move.load();
+          sounds.move.play();
           break;
         }
         case inputs.player1.right: {
@@ -151,9 +158,13 @@ export default class ScoreScreen extends GameNode {
           this.activeIndex = (this.activeIndex + 1) % this.letters.length;
           this.letters[this.activeIndex].style.fill = "white";
           this.arrows.position.x = this.letters[this.activeIndex].position.x;
+          sounds.move.load();
+          sounds.move.play();
           break;
         }
         case inputs.player1.flip: {
+          sounds.clear.load();
+          sounds.clear.play();
           this.showHighScores();
           break;
         }
