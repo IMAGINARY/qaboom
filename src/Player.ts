@@ -15,7 +15,7 @@ import GameNode from "./GameNode";
 import { animate } from "motion";
 import type { PlayerInput } from "./inputs";
 
-type State = "game" | "measure" | "fall";
+type State = "game" | "measure" | "fall" | "game_over";
 
 const MAX_MULTIPLIER = 1 / 5;
 
@@ -24,6 +24,7 @@ const RATES = {
   game: 500,
   measure: 350,
   fall: 250,
+  game_over: 0,
 };
 
 const rateMultiplier = 0.9;
@@ -152,6 +153,9 @@ export default class Player extends GameNode {
   }
 
   tick = (time: Ticker) => {
+    if (this.currentState === "game_over") {
+      return;
+    }
     for (let key of [
       this.inputMap.left,
       this.inputMap.right,
@@ -208,14 +212,14 @@ export default class Player extends GameNode {
       // If the second position of the qubit is higher than the initial position,
       // it's game over.
       if (secondPosition.y < 0) {
-        this.onGameOver?.(this.score);
+        this.gameOver();
         return;
       }
       this.board.setPiece(this.board.currentPosition, this.board.current.first);
       this.board.setPiece(secondPosition, this.board.current.second);
       // If the starting cell is occupied, it's game over.
       if (this.board.containsPoint(startingCell)) {
-        this.onGameOver?.(this.score);
+        this.gameOver();
         return;
       }
       this.currentState = "fall";
@@ -227,6 +231,15 @@ export default class Player extends GameNode {
       // If it's a gate, trigger the gate.
       this.triggerGate();
     }
+  }
+
+  gameOver() {
+    this.currentState = "game_over";
+    sounds.gameOver.load();
+    sounds.gameOver.play();
+    this.shake().then(() => {
+      this.onGameOver?.(this.score);
+    });
   }
 
   measureStep() {
@@ -508,11 +521,11 @@ export default class Player extends GameNode {
     }
   };
 
-  shake() {
-    animate([
-      [this.view, { rotation: 0.01 }, { duration: 0.05 }],
-      [this.view, { rotation: -0.01 }, { duration: 0.05 }],
-      [this.view, { rotation: 0 }, { duration: 0.05, bounce: 0.25 }],
+  async shake() {
+    await animate([
+      [this.view, { rotation: 0.1 }, { duration: 0.1 }],
+      // [this.view, { rotation: -0.1 }, { duration: 0.1 }],
+      [this.view, { rotation: 0 }, { type: "spring", duration: 1, bounce: 1 }],
     ]);
   }
 }
