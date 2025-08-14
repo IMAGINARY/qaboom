@@ -33,19 +33,19 @@ export default class Multiplayer extends GameNode {
       player.onGameOver = () => {
         for (let p2 of this.players) {
           this.view.removeChild(p2.view);
-          p2.hide();
+          p2.destroy();
         }
         // TODO show win screen
         this.onFinish?.();
       };
       this.view.addChild(player.view);
-      player.show();
+      player.start();
     }
   }
 
   show() {
     for (let player of this.players) {
-      player.show();
+      player.start();
     }
   }
 

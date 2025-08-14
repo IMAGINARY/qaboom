@@ -41,6 +41,20 @@ export const MINUS_I = matrix<Complex>([
   complex(0, -1 / Math.sqrt(2)),
 ]);
 
+export const qubitBases = [ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I];
+export const secondaryQubits = [
+  ...qubitBases,
+  ...range(0, 4).map((theta) => {
+    return applyGate(rotateXGate((theta * Math.PI) / 2 + Math.PI / 4), ZERO);
+  }),
+  ...range(0, 4).map((theta) => {
+    return applyGate(rotateYGate((theta * Math.PI) / 2 + Math.PI / 4), ZERO);
+  }),
+  ...range(0, 4).map((theta) => {
+    return applyGate(rotateZGate((theta * Math.PI) / 2 + Math.PI / 4), PLUS);
+  }),
+];
+
 const axisMap = {
   X: rotateXGate,
   Y: rotateYGate,

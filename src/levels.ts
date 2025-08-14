@@ -4,23 +4,20 @@ import GatePiece from "./GatePiece";
 import MeasurementPiece from "./MeasurementPiece";
 import { choice, shuffle } from "./random";
 import {
-  PLUS,
-  MINUS,
   ONE,
   ZERO,
-  PLUS_I,
-  MINUS_I,
-  applyGate,
-  rotateXGate,
-  rotateYGate,
-  rotateZGate,
   type Axis,
   octet,
   quartet,
+  type Qubit,
+  randomQubit,
+  qubitBases,
+  secondaryQubits,
 } from "./quantum";
 import type { Piece } from "./Deck";
 
 export interface Level {
+  randomQubit: () => Qubit;
   deal: () => Piece[];
 }
 
@@ -33,7 +30,10 @@ export function* getCombos<T>(array: T[]) {
   }
 }
 
+const gateRotations = [Math.PI / 2, Math.PI, Math.PI * (3 / 2)];
+
 export const freeMode: Level = {
+  randomQubit: () => randomQubit(),
   deal: () => {
     let buffer = [];
     for (let _i of range(4)) {
@@ -49,19 +49,15 @@ export const freeMode: Level = {
 
 function primaryLevel(axis: Axis): Level {
   return {
+    randomQubit: () => choice(quartet(axis)),
     deal: () => {
-      const qubits = quartet(axis);
+      const random = () => choice(quartet(axis));
       let buffer = [];
-      for (let [a, b] of getCombos(qubits)) {
-        buffer.push(new QubitPair(a, b));
+      for (let _i of range(5)) {
+        buffer.push(new QubitPair(random(), random()));
       }
-      for (let _i of range(2)) {
-        buffer.push(
-          new GatePiece(axis, choice([Math.PI / 2, Math.PI, (Math.PI * 3) / 2]))
-        );
-      }
-      buffer.push(new MeasurementPiece(qubits[0]));
-      buffer.push(new MeasurementPiece(qubits[1]));
+      buffer.push(new GatePiece(axis, choice(gateRotations)));
+      buffer.push(new MeasurementPiece(random()));
       return buffer;
     },
   };
@@ -69,13 +65,14 @@ function primaryLevel(axis: Axis): Level {
 
 function secondaryLevel(axis: Axis): Level {
   return {
+    randomQubit: () => choice(octet(axis)),
     deal: () => {
       const random = () => choice(octet(axis));
       let buffer = [];
       for (let _i of range(5)) {
         buffer.push(new QubitPair(random(), random()));
       }
-      buffer.push(new GatePiece(axis, Math.PI));
+      buffer.push(new GatePiece(axis, choice(gateRotations)));
       buffer.push(new MeasurementPiece(random()));
       return buffer;
     },
@@ -88,13 +85,16 @@ export const primaryLevels: Level[] = [
   primaryLevel("Y"),
   primaryLevel("Z"),
   {
+    randomQubit: () => choice(qubitBases),
     deal: () => {
-      const random = () => choice([ZERO, ONE, PLUS, MINUS, PLUS_I, MINUS_I]);
+      const random = () => choice(qubitBases);
       let buffer = [];
       for (let _i of range(5)) {
         buffer.push(new QubitPair(random(), random()));
       }
-      buffer.push(new GatePiece(choice(["X", "Y", "Z"]), Math.PI));
+      buffer.push(
+        new GatePiece(choice(["X", "Y", "Z"]), choice(gateRotations))
+      );
       buffer.push(new MeasurementPiece(random()));
       return buffer;
     },
@@ -107,43 +107,15 @@ export const secondaryLevels: Level[] = [
   secondaryLevel("Y"),
   secondaryLevel("Z"),
   {
+    randomQubit: () => choice(secondaryQubits),
     deal: () => {
-      const qubits = [
-        ZERO,
-        ONE,
-        PLUS,
-        MINUS,
-        PLUS_I,
-        MINUS_I,
-        ...range(0, 4).map((theta) => {
-          return applyGate(
-            rotateXGate((theta * Math.PI) / 2 + Math.PI / 4),
-            ZERO
-          );
-        }),
-        ...range(0, 4).map((theta) => {
-          return applyGate(
-            rotateYGate((theta * Math.PI) / 2 + Math.PI / 4),
-            ZERO
-          );
-        }),
-        ...range(0, 4).map((theta) => {
-          return applyGate(
-            rotateZGate((theta * Math.PI) / 2 + Math.PI / 4),
-            PLUS
-          );
-        }),
-      ];
-      const random = () => choice(qubits);
+      const random = () => choice(secondaryQubits);
       let buffer = [];
       for (let _i of range(5)) {
         buffer.push(new QubitPair(random(), random()));
       }
       buffer.push(
-        new GatePiece(
-          choice(["X", "Y", "Z"]),
-          choice([Math.PI / 2, Math.PI, Math.PI * (3 / 2)])
-        )
+        new GatePiece(choice(["X", "Y", "Z"]), choice(gateRotations))
       );
       buffer.push(new MeasurementPiece(random()));
       return buffer;
@@ -155,6 +127,7 @@ export const secondaryLevels: Level[] = [
 // export const campaign = secondaryColors;
 export const campaign: Level[] = [
   {
+    randomQubit: () => choice([ZERO, ONE]),
     deal: () => {
       const random = () => choice([ZERO, ONE]);
       let buffer = [];

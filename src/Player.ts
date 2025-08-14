@@ -41,6 +41,7 @@ interface Options {
  */
 export default class Player extends GameNode {
   onGameOver?: (score: number) => void;
+  onLevelUp?: (level: Level) => void;
   pressedKeys: Record<string, number> = {};
 
   levels: Level[];
@@ -142,12 +143,13 @@ export default class Player extends GameNode {
     this.scoreboard.text = `${this.#score * 100}`;
   }
 
-  show() {
+  start() {
     document.addEventListener("keydown", this.handleKeyDown);
     document.addEventListener("keyup", this.handleKeyUp);
+    this.onLevelUp?.(this.levels[this.level]);
   }
 
-  hide() {
+  destroy() {
     document.removeEventListener("keydown", this.handleKeyDown);
     document.removeEventListener("keyup", this.handleKeyUp);
   }
@@ -362,6 +364,7 @@ export default class Player extends GameNode {
         this.rateMultiplier = Math.max(this.rateMultiplier, MAX_MULTIPLIER);
       } else {
         this.deck.deal = this.levels[this.level].deal;
+        this.onLevelUp?.(this.levels[this.level]);
       }
     }
     this.canSwap = true;

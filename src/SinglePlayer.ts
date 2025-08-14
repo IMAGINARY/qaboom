@@ -26,9 +26,14 @@ export default class SinglePlayer extends GameNode {
     });
     this.view.addChild(this.player.view);
 
+    this.player.onLevelUp = (level) => {
+      for (let piece of this.background.pieces) {
+        piece.setValue(level.randomQubit());
+      }
+    };
     this.player.onGameOver = (score) => {
       this.view.removeChild(this.player.view);
-      this.player.hide();
+      this.player.destroy();
       this.mode = "score";
       const scores = new ScoreScreen(score * 100);
       this.view.addChild(scores.view);
@@ -42,12 +47,13 @@ export default class SinglePlayer extends GameNode {
   }
 
   show() {
-    this.player.show();
+    this.player.start();
   }
 
   tick = (time: Ticker) => {
     if (this.mode === "game") {
       this.player.tick(time);
+      this.background.tick(time);
     }
   };
 }

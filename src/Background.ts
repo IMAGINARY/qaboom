@@ -1,4 +1,4 @@
-import { BlurFilter, ColorMatrixFilter, NoiseFilter } from "pixi.js";
+import { BlurFilter, ColorMatrixFilter, NoiseFilter, Ticker } from "pixi.js";
 import GameNode from "./GameNode";
 import { CELL_SIZE, HEIGHT, WIDTH } from "./constants";
 import QubitPiece from "./QubitPiece";
@@ -6,6 +6,7 @@ import { randomBasis } from "./quantum";
 
 // A background of qubits
 export default class Background extends GameNode {
+  pieces: QubitPiece[] = [];
   constructor() {
     super();
     const matrixFilter = new ColorMatrixFilter();
@@ -21,9 +22,16 @@ export default class Background extends GameNode {
     for (let x = 0; x < Math.ceil(WIDTH / CELL_SIZE / scale); x++) {
       for (let y = 0; y < Math.ceil(HEIGHT / CELL_SIZE / scale); y++) {
         const piece = new QubitPiece(randomBasis());
+        this.pieces.push(piece);
         piece.view.position = { x: x * CELL_SIZE, y: y * CELL_SIZE };
         this.view.addChild(piece.view);
       }
+    }
+  }
+
+  tick(time: Ticker) {
+    for (let piece of this.pieces) {
+      piece.tick(time);
     }
   }
 }
