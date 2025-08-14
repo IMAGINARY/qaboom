@@ -50,13 +50,18 @@ export const freeMode: Level = {
 function primaryLevel(axis: Axis): Level {
   return {
     deal: () => {
-      const random = () => choice(quartet(axis));
+      const qubits = quartet(axis);
       let buffer = [];
-      for (let _i of range(5)) {
-        buffer.push(new QubitPair(random(), random()));
+      for (let [a, b] of getCombos(qubits)) {
+        buffer.push(new QubitPair(a, b));
       }
-      buffer.push(new GatePiece(axis, Math.PI));
-      buffer.push(new MeasurementPiece(random()));
+      for (let _i of range(2)) {
+        buffer.push(
+          new GatePiece(axis, choice([Math.PI / 2, Math.PI, (Math.PI * 3) / 2]))
+        );
+      }
+      buffer.push(new MeasurementPiece(qubits[0]));
+      buffer.push(new MeasurementPiece(qubits[1]));
       return buffer;
     },
   };
