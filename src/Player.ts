@@ -416,12 +416,12 @@ export default class Player extends GameNode {
         }
         break;
       }
-      // case this.inputMap.hold: {
-      //   // if (this.canSwap) {
-      //   //   this.swap();
-      //   // }
-      //   break;
-      // }
+      case this.inputMap.hold: {
+        if (this.canSwap) {
+          this.swap();
+        }
+        break;
+      }
       // If the player presses the trigger, rotate the qubit (if possible)
       case this.inputMap.flip: {
         // Can only rotate qubit pairs
