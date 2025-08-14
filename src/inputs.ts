@@ -17,9 +17,9 @@ export const inputs = {
   },
   player2: {
     left: "j",
-    right: "k",
+    right: "l",
     up: "i",
-    down: "l",
+    down: "k",
     flip: "o",
     hold: "u",
   },
