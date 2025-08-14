@@ -19,6 +19,7 @@ type State = "game" | "measure" | "fall";
 
 const MAX_MULTIPLIER = 1 / 5;
 
+const INPUT_POLL_RATE = 100;
 const RATES = {
   game: 500,
   measure: 350,
@@ -39,6 +40,7 @@ interface Options {
  */
 export default class Player extends GameNode {
   onGameOver?: (score: number) => void;
+  pressedKeys: Record<string, number> = {};
 
   levels: Level[];
   board: Board;
@@ -66,11 +68,17 @@ export default class Player extends GameNode {
   time: number = 0;
   nextTime: number = 0;
   inputMap: PlayerInput;
+  keyDelays: Record<string, number> = {};
 
   constructor({ position, inputMap, levels }: Options) {
     super();
     // TODO be able to reference the "current" position based on the board.
     this.inputMap = inputMap;
+    this.keyDelays = {
+      [this.inputMap.left]: 300,
+      [this.inputMap.right]: 300,
+      [this.inputMap.down]: INPUT_POLL_RATE,
+    };
 
     this.levels = levels;
     this.board = new Board();
@@ -135,13 +143,25 @@ export default class Player extends GameNode {
 
   show() {
     document.addEventListener("keydown", this.handleKeyDown);
+    document.addEventListener("keyup", this.handleKeyUp);
   }
 
   hide() {
     document.removeEventListener("keydown", this.handleKeyDown);
+    document.removeEventListener("keyup", this.handleKeyUp);
   }
 
   tick = (time: Ticker) => {
+    for (let key of [
+      this.inputMap.left,
+      this.inputMap.right,
+      this.inputMap.down,
+    ]) {
+      if (this.time >= this.pressedKeys[key]) {
+        this.onPress(key);
+        this.pressedKeys[key] += INPUT_POLL_RATE;
+      }
+    }
     this.board.tick(time);
     this.deck.tick(time);
     if (this.time >= this.nextTime) {
@@ -352,10 +372,25 @@ export default class Player extends GameNode {
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
+    this.onPress(e.key);
+    if (
+      [this.inputMap.left, this.inputMap.right, this.inputMap.down].includes(
+        e.key
+      )
+    ) {
+      this.pressedKeys[e.key] = this.time + this.keyDelays[e.key];
+    }
+  };
+
+  handleKeyUp = (e: KeyboardEvent) => {
+    delete this.pressedKeys[e.key];
+  };
+
+  onPress = (key: string) => {
     if (this.currentState !== "game") {
       return;
     }
-    switch (e.key) {
+    switch (key) {
       // If the player presses left or right, move the current item (if possible)
       case this.inputMap.left: {
         const left = this.board.currentPosition.add(LEFT);
