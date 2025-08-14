@@ -12,7 +12,7 @@ type State = "enter_name" | "high_scores";
 export default class ScoreScreen extends GameNode {
   score: number;
   letters: HTMLText[];
-  activeIndex = 0;
+  #activeIndex = 0;
   nameEnter = new Container();
   arrows = new Container();
   state: State = "enter_name";
@@ -69,8 +69,8 @@ export default class ScoreScreen extends GameNode {
     );
     this.nameEnter.addChild(this.arrows);
 
-    this.letters[this.activeIndex].style.fill = "white";
-    this.arrows.position.x = this.letters[this.activeIndex].position.x;
+    this.letters[this.#activeIndex].style.fill = "white";
+    this.arrows.position.x = this.letters[this.#activeIndex].position.x;
     this.view.addChild(this.nameEnter);
   }
 
@@ -128,7 +128,7 @@ export default class ScoreScreen extends GameNode {
       switch (e.key) {
         // up/down: change letter
         case inputs.player1.up: {
-          const currentLetter = this.letters[this.activeIndex];
+          const currentLetter = this.letters[this.#activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex || LETTERS.length) - 1];
           sounds.move.load();
@@ -136,7 +136,7 @@ export default class ScoreScreen extends GameNode {
           break;
         }
         case inputs.player1.down: {
-          const currentLetter = this.letters[this.activeIndex];
+          const currentLetter = this.letters[this.#activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex + 1) % LETTERS.length];
           sounds.move.load();
@@ -145,19 +145,13 @@ export default class ScoreScreen extends GameNode {
         }
         // left/right: change active index
         case inputs.player1.left: {
-          this.letters[this.activeIndex].style.fill = "grey";
           this.activeIndex = (this.activeIndex || this.letters.length) - 1;
-          this.letters[this.activeIndex].style.fill = "white";
-          this.arrows.position.x = this.letters[this.activeIndex].position.x;
           sounds.move.load();
           sounds.move.play();
           break;
         }
         case inputs.player1.right: {
-          this.letters[this.activeIndex].style.fill = "grey";
           this.activeIndex = (this.activeIndex + 1) % this.letters.length;
-          this.letters[this.activeIndex].style.fill = "white";
-          this.arrows.position.x = this.letters[this.activeIndex].position.x;
           sounds.move.load();
           sounds.move.play();
           break;
@@ -174,6 +168,17 @@ export default class ScoreScreen extends GameNode {
       this.onFinish?.();
     }
   };
+
+  get activeIndex() {
+    return this.#activeIndex;
+  }
+
+  set activeIndex(value: number) {
+    this.letters[this.#activeIndex].style.fill = "grey";
+    this.#activeIndex = value;
+    this.letters[this.#activeIndex].style.fill = "white";
+    this.arrows.position.x = this.letters[this.#activeIndex].position.x;
+  }
 
   start() {
     document.addEventListener("keydown", this.handleKeyDown);
