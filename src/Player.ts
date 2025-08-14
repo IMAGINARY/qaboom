@@ -77,7 +77,7 @@ export default class Player extends GameNode {
     this.board.view.position = { x: 50, y: 50 };
     this.view.addChild(this.board.view);
 
-    this.deck = new Deck(levels[0].deal);
+    this.deck = new Deck(levels[this.level].deal);
     this.deck.view.position = { x: 50 + BOARD_WIDTH * CELL_SIZE + 35, y: 50 };
     this.deck.view.scale = 0.75;
     this.view.addChild(this.deck.view);

@@ -54,7 +54,7 @@ export const secondaryColors: Level[] = [
   {
     deal: () => {
       const qubits = range(0, 8).map((theta) => {
-        return applyGate(rotateYGate((theta * Math.PI) / 8), ZERO);
+        return applyGate(rotateYGate((theta * Math.PI) / 4), ZERO);
       });
       const random = () => choice(qubits);
       let buffer = [];
