@@ -116,26 +116,44 @@ export default class QubitPiece extends GameNode {
   }
 
   async destroy() {
-    await animate(this.container.scale, { x: 0, y: 0 }, { duration: 0.2 });
+    // await animate(this.container.scale, { x: 0, y: 0 }, { duration: 0.15 });
     this.view.removeChild(this.container);
-    const explosion = new Graphics();
     const numBubbles = 8;
-    const explodeRadius = PIECE_RADIUS * 0.75;
-    for (let i = 0; i < numBubbles; i++) {
-      explosion.circle(
-        explodeRadius * Math.cos((i * (2 * Math.PI)) / numBubbles),
-        explodeRadius * Math.sin((i * (2 * Math.PI)) / numBubbles),
-        PIECE_RADIUS / 6
-      );
-    }
+    const explodeRadius = PIECE_RADIUS;
+    const explodeContainers = [];
+    const explodeBits: Graphics[] = [];
     const coords = getBlochCoords(this.value);
-    explosion.fill(getColor(coords)).stroke(getSecondaryColor(coords));
-    this.view.addChild(explosion);
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 250);
-    });
+    for (let i = 0; i < numBubbles; i++) {
+      const container = new Container();
+      const circle = new Graphics()
+        .circle(0, 0, PIECE_RADIUS / 4)
+        .fill(getColor(coords))
+        .stroke(getSecondaryColor(coords));
+      container.rotation = i * ((2 * Math.PI) / numBubbles);
+      circle.scale = 0;
+      explodeContainers.push(container);
+      explodeBits.push(circle);
+      this.view.addChild(container);
+      container.addChild(circle);
+    }
+
+    await Promise.all(
+      explodeBits.map((circle) => {
+        return animate([
+          [
+            circle.position,
+            { x: explodeRadius },
+            { ease: "easeOut", duration: 0.4 },
+          ],
+          [
+            circle.scale,
+            { x: 1, y: 1 },
+            { ease: "easeOut", duration: 0.2, at: 0 },
+          ],
+          [circle.scale, { x: 0, y: 0 }, { ease: "easeIn", duration: 0.2 }],
+        ]);
+      })
+    );
   }
 
   setSprite({ phi, theta }: { phi: number; theta: number }) {
