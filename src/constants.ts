@@ -1,6 +1,6 @@
 export const WIDTH = 1920;
 export const HEIGHT = 1080;
-export const CELL_SIZE = 80;
+export const CELL_SIZE = 75;
 export const PIECE_RADIUS = (CELL_SIZE / 2) * 0.875;
 
 export const BOARD_WIDTH = 6;

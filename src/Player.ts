@@ -37,6 +37,8 @@ const RATES = {
 const rateMultiplier = 0.9;
 const levelCount = 16;
 
+const BOARD_OFFSET_Y = 80;
+
 interface Options {
   levels: Level[];
   position: PointData;
@@ -91,11 +93,14 @@ export default class Player extends GameNode {
 
     this.levels = levels;
     this.board = new Board();
-    this.board.view.position = { x: 50, y: 75 };
+    this.board.view.position = { x: 50, y: BOARD_OFFSET_Y };
     this.view.addChild(this.board.view);
 
     this.deck = new Deck(levels[this.level].deal);
-    this.deck.view.position = { x: 50 + BOARD_WIDTH * CELL_SIZE + 35, y: 75 };
+    this.deck.view.position = {
+      x: 50 + BOARD_WIDTH * CELL_SIZE + 35,
+      y: BOARD_OFFSET_Y,
+    };
     this.deck.view.scale = 0.75;
     this.view.addChild(this.deck.view);
 
@@ -105,11 +110,12 @@ export default class Player extends GameNode {
         align: "center",
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
-        fontSize: 28,
+        fontWeight: "bold",
+        fontSize: 48,
       },
     });
     this.scoreboard.position = {
-      x: this.board.view.width + this.deck.view.width,
+      x: this.view.width,
       y: 10,
     };
     this.scoreboard.anchor = { x: 1, y: 0 };
@@ -121,7 +127,8 @@ export default class Player extends GameNode {
         align: "center",
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
-        fontSize: 28,
+        fontWeight: "bold",
+        fontSize: 48,
       },
     });
     this.levelSign.position = { x: 50, y: 10 };
