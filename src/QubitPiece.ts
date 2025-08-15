@@ -1,6 +1,6 @@
 import { Container, Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
-import { CELL_SIZE, PIECE_RADIUS, theme } from "./constants";
+import { PIECE_RADIUS, theme } from "./constants";
 import { getColor, getSecondaryColor } from "./colors";
 import { floatEquals } from "./math";
 import GameNode from "./GameNode";
@@ -97,15 +97,8 @@ export default class QubitPiece extends GameNode {
     pulse(this.container);
   }
 
-  shake() {
-    animate([
-      [this.container.position, { x: CELL_SIZE * 0.15 }, { duration: 0.1 }],
-      [
-        this.container.position,
-        { x: 0 },
-        { type: "spring", stiffness: 2000, damping: 4, mass: 0.4 },
-      ],
-    ]);
+  bounceIn() {
+    pulse(this.container, 0.85);
   }
 
   async destroy() {

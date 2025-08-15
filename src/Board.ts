@@ -158,7 +158,7 @@ export default class Board extends GameNode {
           } else {
             this.drawLine(point, nbr, current.ortho);
             qubit.setValue(current.ortho);
-            qubit.shake();
+            qubit.bounceIn();
           }
         }
       }
