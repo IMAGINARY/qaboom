@@ -9,6 +9,7 @@ import {
   BOARD_HEIGHT,
   TEXT_FONT,
   theme,
+  HEIGHT,
 } from "./constants";
 import Deck, { type Piece } from "./Deck";
 import QubitPair from "./QubitPair";
@@ -20,6 +21,7 @@ import GameNode from "./GameNode";
 import { animate } from "motion";
 import type { PlayerInput } from "./inputs";
 import { pulse } from "./animations";
+import { delay } from "./util";
 
 type State = "pause" | "game";
 
@@ -246,7 +248,7 @@ export default class Player extends GameNode {
     this.currentState = "pause";
     sounds.gameOver.load();
     sounds.gameOver.play();
-    this.shake().then(() => {
+    this.fallOff().then(() => {
       this.onGameOver?.(this.score);
     });
   }
@@ -453,11 +455,22 @@ export default class Player extends GameNode {
     }
   };
 
-  async shake() {
+  async fallOff() {
     await animate([
       [this.view, { rotation: 0.1 }, { duration: 0.1 }],
       // [this.view, { rotation: -0.1 }, { duration: 0.1 }],
-      [this.view, { rotation: 0 }, { type: "spring", duration: 1, bounce: 1 }],
+      [
+        this.view,
+        { rotation: 0 },
+        { type: "spring", duration: 0.75, bounce: 1 },
+      ],
+    ]);
+    await delay(250);
+    const duration = 1;
+    await animate([
+      [this.view, { rotation: Math.PI / 2 }, { duration }],
+      [this.view, { opacity: 0 }, { duration, at: 0 }],
+      [this.view.position, { y: 1.5 * HEIGHT }, { duration, at: 0 }],
     ]);
   }
 }
