@@ -1,9 +1,8 @@
 import { HTMLText, Point, Ticker, type PointData } from "pixi.js";
 import "pixi.js/math-extras";
-import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
-import { applyGate, measure } from "./quantum";
-import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
+import { applyGate } from "./quantum";
+import { DOWN, LEFT, neighbors, RIGHT, UP } from "./points";
 import {
   CELL_SIZE,
   BOARD_WIDTH,
@@ -20,18 +19,13 @@ import { type Level } from "./levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
 import type { PlayerInput } from "./inputs";
-import type QubitPiece from "./QubitPiece";
 
-type State = "pause" | "game" | "measure";
+type State = "pause" | "game";
 
 const MAX_MULTIPLIER = 1 / 5;
 
+const STEP_RATE = 500;
 const INPUT_POLL_RATE = 100;
-const RATES = {
-  pause: 0,
-  game: 500,
-  measure: 350,
-};
 
 const rateMultiplier = 0.9;
 const levelCount = 16;
@@ -68,12 +62,6 @@ export default class Player extends GameNode {
   #level = 0;
   rateMultiplier = 1;
   pieceCount = 0;
-
-  // State relating to measurement
-  measureQueue: Point[] = [];
-  measured: Point[] = [];
-  measureCount = 0;
-  visited: Point[] = [];
 
   time: number = 0;
   nextTime: number = 0;
@@ -172,6 +160,8 @@ export default class Player extends GameNode {
   }
 
   tick = (time: Ticker) => {
+    this.board.tick(time);
+    this.deck.tick(time);
     if (this.currentState === "pause") {
       return;
     }
@@ -185,16 +175,9 @@ export default class Player extends GameNode {
         this.pressedKeys[key] += INPUT_POLL_RATE;
       }
     }
-    this.board.tick(time);
-    this.deck.tick(time);
     if (this.time >= this.nextTime) {
-      if (this.currentState === "game") {
-        this.step();
-      } else if (this.currentState === "measure") {
-        this.measureStep();
-      }
-      const multiplier = this.currentState === "game" ? this.rateMultiplier : 1;
-      this.nextTime = this.time + RATES[this.currentState] * multiplier;
+      this.step();
+      this.nextTime = this.time + STEP_RATE * this.rateMultiplier;
     }
     this.time += time.deltaMS;
   };
@@ -242,8 +225,15 @@ export default class Player extends GameNode {
       this.triggerFall();
     } else if (this.board.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
-      this.currentState = "measure";
-      this.measureQueue = [this.board.currentPosition];
+      this.currentState = "pause";
+      this.board
+        .measure((score) => {
+          this.score += score;
+        })
+        .then(() => {
+          this.currentState = "game";
+          this.newCurrent();
+        });
     } else if (this.board.current instanceof GatePiece) {
       // If it's a gate, trigger the gate.
       this.triggerGate();
@@ -257,79 +247,6 @@ export default class Player extends GameNode {
     this.shake().then(() => {
       this.onGameOver?.(this.score);
     });
-  }
-
-  measureStep() {
-    if (!(this.board.current instanceof MeasurementPiece)) {
-      throw new Error("Called `measureStep` without a MeasurementPiece");
-    }
-    let newQueue: Point[] = [];
-    const current = this.board.current;
-    let newMeasures = false;
-    for (const point of this.measureQueue) {
-      for (const nbr of orthoNeighbors(point)) {
-        if (this.visited.some((p) => p.equals(nbr))) {
-          continue;
-        }
-        const qubit = this.board.getPiece(nbr);
-        if (!qubit) continue;
-        newMeasures = true;
-        this.visited.push(nbr);
-        const measured = measure(qubit.value, current.base);
-        if (measured) {
-          qubit.setValue(current.base);
-          this.board.drawLine(point, nbr, current.base);
-          qubit.bounce();
-          this.measured.push(nbr);
-          newQueue.push(nbr);
-        } else {
-          this.board.drawLine(point, nbr, current.ortho);
-          qubit.setValue(current.ortho);
-          qubit.shake();
-        }
-      }
-    }
-
-    if (newMeasures) {
-      const scoreSound =
-        sounds.score[Math.min(this.measureCount, sounds.score.length - 1)];
-      scoreSound.load();
-      scoreSound.play();
-      this.measureCount++;
-      this.measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
-    } else {
-      this.resolveMeasurement();
-    }
-  }
-
-  resolveMeasurement() {
-    this.currentState = "pause";
-    const uniqMeasured = uniqWith(this.measured, (a, b) => a.equals(b));
-    if (uniqMeasured.length > 0) {
-      sounds.clear.load();
-      sounds.clear.play();
-    }
-    this.score += triangular(uniqMeasured.length);
-    const removedPieces: QubitPiece[] = [];
-    for (const point of uniqMeasured) {
-      const piece = this.board.getPiece(point);
-      if (piece) {
-        removedPieces.push(piece);
-      }
-      this.board.setPiece(point, null, false);
-    }
-    Promise.all(removedPieces.map((piece) => piece?.destroy())).then(() => {
-      for (const piece of removedPieces) {
-        this.board.view.removeChild(piece.view);
-      }
-      this.triggerFall();
-    });
-    this.measured = [];
-    this.measureQueue = [];
-    this.visited = [];
-    this.measureCount = 0;
-    this.board.view.removeChild(this.board.current!.view);
-    this.board.lines.removeChildren();
   }
 
   async triggerFall() {
@@ -541,8 +458,4 @@ export default class Player extends GameNode {
       [this.view, { rotation: 0 }, { type: "spring", duration: 1, bounce: 1 }],
     ]);
   }
-}
-
-function triangular(n: number) {
-  return (n * (n - 1)) / 2;
 }

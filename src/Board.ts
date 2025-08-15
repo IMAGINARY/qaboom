@@ -6,13 +6,15 @@ import {
   CELL_SIZE,
   PIECE_RADIUS,
 } from "./constants";
-import { range } from "lodash-es";
+import { range, uniqWith } from "lodash-es";
 import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
-import { getBlochCoords, type Qubit } from "./quantum";
+import { getBlochCoords, measure, type Qubit } from "./quantum";
 import { getColor, getSecondaryColor } from "./colors";
 import { container, delay } from "./util";
-import { DOWN } from "./points";
+import { DOWN, orthoNeighbors } from "./points";
+import MeasurementPiece from "./MeasurementPiece";
+import { sounds } from "./audio";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -122,6 +124,80 @@ export default class Board extends GameNode {
     );
   }
 
+  async measure(onScore: (score: number) => void) {
+    if (!(this.current instanceof MeasurementPiece)) {
+      throw new Error("Attempting to measure without a MeasurementPiece");
+    }
+    let measureCount = 0;
+    let measureQueue = [this.currentPosition];
+    const measuredQubits = [];
+    let newMeasures = false;
+    let visited: Point[] = [];
+    do {
+      let newQueue: Point[] = [];
+      let scoreToAdd = 0;
+      const current = this.current;
+      newMeasures = false;
+      for (const point of measureQueue) {
+        for (const nbr of orthoNeighbors(point)) {
+          if (visited.some((p) => p.equals(nbr))) {
+            continue;
+          }
+          const qubit = this.getPiece(nbr);
+          if (!qubit) continue;
+          newMeasures = true;
+          visited.push(nbr);
+          const measured = measure(qubit.value, current.base);
+          if (measured) {
+            qubit.setValue(current.base);
+            this.drawLine(point, nbr, current.base);
+            qubit.bounce();
+            measuredQubits.push(nbr);
+            scoreToAdd += measuredQubits.length;
+            newQueue.push(nbr);
+          } else {
+            this.drawLine(point, nbr, current.ortho);
+            qubit.setValue(current.ortho);
+            qubit.shake();
+          }
+        }
+      }
+      if (newMeasures) {
+        const scoreSound =
+          sounds.score[Math.min(measureCount, sounds.score.length - 1)];
+        scoreSound.load();
+        scoreSound.play();
+        measureCount++;
+        measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
+        onScore(scoreToAdd);
+        await delay(350);
+      }
+    } while (newMeasures);
+
+    const uniqMeasured = uniqWith(measuredQubits, (a, b) => a.equals(b));
+    if (uniqMeasured.length > 0) {
+      sounds.clear.load();
+      sounds.clear.play();
+    }
+    let score = 0;
+    score += triangular(uniqMeasured.length);
+    const removedPieces: QubitPiece[] = [];
+    for (const point of uniqMeasured) {
+      const piece = this.getPiece(point);
+      if (piece) {
+        removedPieces.push(piece);
+      }
+      this.setPiece(point, null, false);
+    }
+    this.view.removeChild(this.current.view);
+    this.lines.removeChildren();
+    await Promise.all(removedPieces.map((piece) => piece?.destroy()));
+    for (const piece of removedPieces) {
+      this.view.removeChild(piece.view);
+    }
+    await this.fall();
+  }
+
   async fall() {
     let anyFalling = false;
     do {
@@ -147,4 +223,8 @@ export default class Board extends GameNode {
 
 export function inBounds(p: Point) {
   return p.x >= 0 && p.x < BOARD_WIDTH && p.y >= 0 && p.y < BOARD_HEIGHT;
+}
+
+function triangular(n: number) {
+  return (n * (n - 1)) / 2;
 }
