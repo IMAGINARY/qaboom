@@ -5,6 +5,7 @@ import { inputs } from "./inputs";
 import { getScores, setScores } from "./storage";
 import { sounds } from "./audio";
 import { container } from "./util";
+import { pulse } from "./animations";
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
 type State = "enter_name" | "high_scores";
@@ -24,8 +25,16 @@ export default class ScoreScreen extends GameNode {
     this.score = score;
     this.view.position = { x: WIDTH / 2, y: HEIGHT / 2 };
 
+    const containerSize = HEIGHT * 0.75;
     this.view.addChild(
-      container(new Graphics().roundRect(-300, -300, 600, 600))
+      container(
+        new Graphics().roundRect(
+          -containerSize / 2,
+          -containerSize / 2,
+          containerSize,
+          containerSize
+        )
+      )
     );
 
     this.letters = [];
@@ -36,8 +45,8 @@ export default class ScoreScreen extends GameNode {
           style: {
             fill: "grey",
             fontFamily: TEXT_FONT,
-            fontWeight: "600",
-            fontSize: 72,
+            fontWeight: "bold",
+            fontSize: 256,
           },
         })
       );
@@ -47,24 +56,44 @@ export default class ScoreScreen extends GameNode {
       style: {
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
+        fontWeight: "bold",
         fontSize: 48,
       },
     });
     title.anchor = { x: 0.5, y: 0.5 };
-    title.position.y = -100;
+    title.position.y = -300;
     this.nameEnter.addChild(title);
 
-    this.letters[0].position = { x: -50, y: 0 };
+    this.letters[0].position = { x: -200, y: 0 };
     this.letters[1].position = { x: 0, y: 0 };
-    this.letters[2].position = { x: 50, y: 0 };
+    this.letters[2].position = { x: 200, y: 0 };
     for (let letter of this.letters) {
       letter.anchor = { x: 0.5, y: 0.5 };
       this.nameEnter.addChild(letter);
     }
+
+    const arrowRadius = 30;
+    const arrowBase = 125;
     this.arrows.addChild(
-      new Graphics().poly([-10, 50, 0, 60, 10, 50]).fill(theme.colors.primary),
       new Graphics()
-        .poly([-10, -50, 0, -60, 10, -50])
+        .poly([
+          -arrowRadius,
+          arrowBase,
+          0,
+          arrowBase + arrowRadius,
+          arrowRadius,
+          arrowBase,
+        ])
+        .fill(theme.colors.primary),
+      new Graphics()
+        .poly([
+          -arrowRadius,
+          -arrowBase,
+          0,
+          -(arrowBase + arrowRadius),
+          arrowRadius,
+          -arrowBase,
+        ])
         .fill(theme.colors.primary)
     );
     this.nameEnter.addChild(this.arrows);
@@ -94,29 +123,34 @@ export default class ScoreScreen extends GameNode {
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
         fontSize: 72,
+        fontWeight: "bold",
       },
     });
-    highScoresLabel.position.y = -250;
+    highScoresLabel.position.y = -300;
     highScoresLabel.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(highScoresLabel);
     for (let [i, entry] of scores.slice(0, 8).entries()) {
       const nameText = new HTMLText({
-        text: entry.name,
+        text: `${i + 1} ${entry.name}`,
         style: {
           fontFamily: TEXT_FONT,
           fill: theme.colors.primary,
+          fontSize: 48,
+          fontWeight: "bold",
         },
       });
-      nameText.position = { x: -100, y: -150 + i * 50 };
+      nameText.position = { x: -250, y: -200 + i * 60 };
       nameText.anchor = { x: 0, y: 0.5 };
       const scoreText = new HTMLText({
         text: entry.score,
         style: {
           fontFamily: TEXT_FONT,
           fill: theme.colors.primary,
+          fontSize: 48,
+          fontWeight: "bold",
         },
       });
-      scoreText.position = { x: 100, y: -150 + i * 50 };
+      scoreText.position = { x: 250, y: -200 + i * 60 };
       scoreText.anchor = { x: 1, y: 0.5 };
       this.view.addChild(scoreText);
       this.view.addChild(nameText);
@@ -131,6 +165,7 @@ export default class ScoreScreen extends GameNode {
           const currentLetter = this.letters[this.#activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex || LETTERS.length) - 1];
+          pulse(currentLetter, 1.1);
           sounds.move.load();
           sounds.move.play();
           break;
@@ -139,6 +174,7 @@ export default class ScoreScreen extends GameNode {
           const currentLetter = this.letters[this.#activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex + 1) % LETTERS.length];
+          pulse(currentLetter, 1.1);
           sounds.move.load();
           sounds.move.play();
           break;
@@ -176,8 +212,10 @@ export default class ScoreScreen extends GameNode {
   set activeIndex(value: number) {
     this.letters[this.#activeIndex].style.fill = theme.colors.muted;
     this.#activeIndex = value;
-    this.letters[this.#activeIndex].style.fill = theme.colors.primary;
-    this.arrows.position.x = this.letters[this.#activeIndex].position.x;
+    const active = this.letters[this.#activeIndex];
+    active.style.fill = theme.colors.primary;
+    this.arrows.position.x = active.position.x;
+    pulse(active, 1.1);
   }
 
   start() {
