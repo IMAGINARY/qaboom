@@ -22,16 +22,15 @@ import { animate } from "motion";
 import type { PlayerInput } from "./inputs";
 import type QubitPiece from "./QubitPiece";
 
-type State = "wait" | "game" | "measure" | "fall" | "game_over";
+type State = "pause" | "game" | "measure";
 
 const MAX_MULTIPLIER = 1 / 5;
 
 const INPUT_POLL_RATE = 100;
 const RATES = {
+  pause: 0,
   game: 500,
   measure: 350,
-  fall: 100,
-  game_over: 0,
 };
 
 const rateMultiplier = 0.9;
@@ -62,7 +61,7 @@ export default class Player extends GameNode {
   hold: Piece | null = null;
   canSwap = true;
 
-  currentState: State = "wait";
+  currentState: State = "pause";
   #score: number = 0;
 
   // Level related
@@ -173,7 +172,7 @@ export default class Player extends GameNode {
   }
 
   tick = (time: Ticker) => {
-    if (this.currentState === "wait" || this.currentState === "game_over") {
+    if (this.currentState === "pause") {
       return;
     }
     for (let key of [
@@ -193,8 +192,6 @@ export default class Player extends GameNode {
         this.step();
       } else if (this.currentState === "measure") {
         this.measureStep();
-      } else {
-        this.fallStep();
       }
       const multiplier = this.currentState === "game" ? this.rateMultiplier : 1;
       this.nextTime = this.time + RATES[this.currentState] * multiplier;
@@ -242,7 +239,7 @@ export default class Player extends GameNode {
         this.gameOver();
         return;
       }
-      this.currentState = "fall";
+      this.triggerFall();
     } else if (this.board.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
       this.currentState = "measure";
@@ -254,7 +251,7 @@ export default class Player extends GameNode {
   }
 
   gameOver() {
-    this.currentState = "game_over";
+    this.currentState = "pause";
     sounds.gameOver.load();
     sounds.gameOver.play();
     this.shake().then(() => {
@@ -306,6 +303,7 @@ export default class Player extends GameNode {
   }
 
   resolveMeasurement() {
+    this.currentState = "pause";
     const uniqMeasured = uniqWith(this.measured, (a, b) => a.equals(b));
     if (uniqMeasured.length > 0) {
       sounds.clear.load();
@@ -324,7 +322,7 @@ export default class Player extends GameNode {
       for (const piece of removedPieces) {
         this.board.view.removeChild(piece.view);
       }
-      this.currentState = "fall";
+      this.triggerFall();
     });
     this.measured = [];
     this.measureQueue = [];
@@ -334,26 +332,11 @@ export default class Player extends GameNode {
     this.board.lines.removeChildren();
   }
 
-  fallStep() {
-    let anyFalling = false;
-    for (let x = 0; x < BOARD_WIDTH; x++) {
-      for (let y = BOARD_HEIGHT - 2; y >= 0; y--) {
-        const point = new Point(x, y);
-        if (
-          this.board.containsPoint(point) &&
-          !this.board.containsPoint(point.add(DOWN))
-        ) {
-          const piece = this.board.getPiece(point);
-          this.board.setPiece(point, null);
-          this.board.setPiece(point.add(DOWN), piece);
-          anyFalling = true;
-        }
-      }
-    }
-    if (!anyFalling) {
-      this.currentState = "game";
-      this.newCurrent();
-    }
+  async triggerFall() {
+    this.currentState = "pause";
+    await this.board.fall();
+    this.currentState = "game";
+    this.newCurrent();
   }
 
   triggerGate() {

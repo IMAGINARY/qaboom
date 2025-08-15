@@ -11,7 +11,8 @@ import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
 import { getBlochCoords, type Qubit } from "./quantum";
 import { getColor, getSecondaryColor } from "./colors";
-import { container } from "./util";
+import { container, delay } from "./util";
+import { DOWN } from "./points";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -119,6 +120,28 @@ export default class Board extends GameNode {
         .lineTo(pos2.x, pos2.y)
         .stroke({ color: getColor({ phi, theta }), width: 7.5 })
     );
+  }
+
+  async fall() {
+    let anyFalling = false;
+    do {
+      anyFalling = false;
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        for (let y = BOARD_HEIGHT - 2; y >= 0; y--) {
+          const point = new Point(x, y);
+          if (
+            this.containsPoint(point) &&
+            !this.containsPoint(point.add(DOWN))
+          ) {
+            const piece = this.getPiece(point);
+            this.setPiece(point, null);
+            this.setPiece(point.add(DOWN), piece);
+            anyFalling = true;
+          }
+        }
+      }
+      await delay(150);
+    } while (anyFalling);
   }
 }
 
