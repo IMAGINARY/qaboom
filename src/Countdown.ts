@@ -29,7 +29,7 @@ export default class Countdown extends GameNode {
       this.text.text = count;
       sounds.score[3 - count].play();
       pulse(this.text, 1.5);
-      await delay(750);
+      await delay(1000 * (5 / 8));
     }
     this.text.text = "GO!";
     sounds.levelUp.load();
