@@ -18,9 +18,8 @@ export default class SinglePlayer extends GameNode {
   constructor(background: Background) {
     super();
     this.background = background;
-    // this.view.addChild(this.background.view);
     this.player = new Player({
-      position: { x: WIDTH / 2 - 250, y: 0 },
+      position: { x: WIDTH / 2 - 300, y: 0 },
       inputMap: inputs.player1,
       levels: campaign,
     });
