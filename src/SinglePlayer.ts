@@ -27,9 +27,7 @@ export default class SinglePlayer extends GameNode {
     this.view.addChild(this.player.view);
 
     this.player.onLevelUp = (level) => {
-      for (let piece of this.background.pieces) {
-        piece.setValue(level.randomQubit());
-      }
+      this.background.setGenerator(level.randomQubit);
     };
     this.player.onGameOver = (score) => {
       this.view.removeChild(this.player.view);
