@@ -5,6 +5,7 @@ import { getColor, getSecondaryColor } from "./colors";
 import { floatEquals } from "./math";
 import GameNode from "./GameNode";
 import { animate } from "motion";
+
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
@@ -112,6 +113,29 @@ export default class QubitPiece extends GameNode {
         { type: "spring", stiffness: 2000, damping: 4, mass: 0.4 },
       ],
     ]);
+  }
+
+  async destroy() {
+    await animate(this.container.scale, { x: 0, y: 0 }, { duration: 0.2 });
+    this.view.removeChild(this.container);
+    const explosion = new Graphics();
+    const numBubbles = 8;
+    const explodeRadius = (PIECE_RADIUS * 5) / 6;
+    for (let i = 0; i < numBubbles; i++) {
+      explosion.circle(
+        explodeRadius * Math.cos((i * (2 * Math.PI)) / numBubbles),
+        explodeRadius * Math.sin((i * (2 * Math.PI)) / numBubbles),
+        PIECE_RADIUS / numBubbles
+      );
+    }
+    const coords = getBlochCoords(this.value);
+    explosion.fill(getColor(coords)).stroke(getSecondaryColor(coords));
+    this.view.addChild(explosion);
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 250);
+    });
   }
 
   setSprite({ phi, theta }: { phi: number; theta: number }) {

@@ -70,10 +70,10 @@ export default class Board extends GameNode {
     return this.grid[point.y][point.x];
   }
 
-  setPiece(point: Point, value: QubitPiece | null) {
+  setPiece(point: Point, value: QubitPiece | null, remove = true) {
     // remove the previous item from the grid.
     const prevValue = this.grid[point.y][point.x];
-    if (prevValue) {
+    if (prevValue && remove) {
       this.view.removeChild(prevValue.view);
     }
 

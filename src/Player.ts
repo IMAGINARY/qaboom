@@ -14,6 +14,7 @@ import { type Level } from "./levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
 import type { PlayerInput } from "./inputs";
+import type QubitPiece from "./QubitPiece";
 
 type State = "game" | "measure" | "fall" | "game_over";
 
@@ -248,10 +249,6 @@ export default class Player extends GameNode {
     if (!(this.board.current instanceof MeasurementPiece)) {
       throw new Error("Called `measureStep` without a MeasurementPiece");
     }
-    // if (this.measureQueue.length === 0) {
-    //   this.resolveMeasurement();
-    //   return;
-    // }
     let newQueue: Point[] = [];
     const current = this.board.current;
     let newMeasures = false;
@@ -298,15 +295,25 @@ export default class Player extends GameNode {
       sounds.clear.play();
     }
     this.score += triangular(uniqMeasured.length);
+    const removedPieces: QubitPiece[] = [];
     for (const point of uniqMeasured) {
-      this.board.setPiece(point, null);
+      const piece = this.board.getPiece(point);
+      if (piece) {
+        removedPieces.push(piece);
+      }
+      this.board.setPiece(point, null, false);
     }
+    Promise.all(removedPieces.map((piece) => piece?.destroy())).then(() => {
+      for (const piece of removedPieces) {
+        this.board.view.removeChild(piece.view);
+      }
+      this.currentState = "fall";
+    });
     this.measured = [];
     this.measureQueue = [];
     this.visited = [];
     this.measureCount = 0;
     this.board.view.removeChild(this.board.current!.view);
-    this.currentState = "fall";
     this.board.lines.removeChildren();
   }
 
