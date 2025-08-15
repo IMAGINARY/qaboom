@@ -120,12 +120,12 @@ export default class QubitPiece extends GameNode {
     this.view.removeChild(this.container);
     const explosion = new Graphics();
     const numBubbles = 8;
-    const explodeRadius = (PIECE_RADIUS * 5) / 6;
+    const explodeRadius = PIECE_RADIUS * 0.75;
     for (let i = 0; i < numBubbles; i++) {
       explosion.circle(
         explodeRadius * Math.cos((i * (2 * Math.PI)) / numBubbles),
         explodeRadius * Math.sin((i * (2 * Math.PI)) / numBubbles),
-        PIECE_RADIUS / numBubbles
+        PIECE_RADIUS / 6
       );
     }
     const coords = getBlochCoords(this.value);
