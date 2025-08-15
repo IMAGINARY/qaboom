@@ -18,7 +18,7 @@ export default class Game {
     });
 
     // Append the application canvas to the document body
-    document.body.appendChild(app.canvas);
+    document.getElementById("app")!.appendChild(app.canvas);
 
     const background = new Background();
 
