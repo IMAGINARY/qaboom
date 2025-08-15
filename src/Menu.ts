@@ -33,8 +33,9 @@ export default class Menu extends GameNode {
       style: {
         align: "center",
         fill: theme.colors.primary,
-        fontFamily: "Impact",
-        fontSize: 256,
+        fontFamily: "sans-serif",
+        // fontWeight: "bold",
+        fontSize: 220,
       },
     });
     titleText.anchor = { x: 0.5, y: 0.5 };
