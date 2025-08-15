@@ -19,6 +19,7 @@ import { type Level } from "./levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
 import type { PlayerInput } from "./inputs";
+import { pulse } from "./animations";
 
 type State = "pause" | "game";
 
@@ -145,6 +146,7 @@ export default class Player extends GameNode {
   set score(value: number) {
     this.#score = value;
     this.scoreboard.text = `${this.#score * 100}`;
+    pulse(this.scoreboard);
   }
 
   start() {
