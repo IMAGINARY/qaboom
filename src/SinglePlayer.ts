@@ -6,6 +6,7 @@ import { campaign } from "./levels";
 import Background from "./Background";
 import { inputs } from "./inputs";
 import ScoreScreen from "./ScoreScreen";
+import Countdown from "./Countdown";
 
 type Mode = "game" | "score";
 
@@ -39,12 +40,15 @@ export default class SinglePlayer extends GameNode {
         this.onFinish?.();
       };
       scores.start();
-      // this.onFinish?.();
     };
   }
 
-  show() {
+  async start() {
+    const countdown = new Countdown();
+    this.view.addChild(countdown.view);
+    await countdown.start();
     this.player.start();
+    this.view.removeChild(countdown.view);
   }
 
   tick = (time: Ticker) => {

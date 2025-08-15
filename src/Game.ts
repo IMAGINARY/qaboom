@@ -36,7 +36,7 @@ export default class Game {
           menu.show(app.stage);
         };
         app.stage.addChild(singlePlayer.view);
-        singlePlayer.show();
+        singlePlayer.start();
         app.ticker.add(singlePlayer.tick);
       } else {
         const multiplayer = new Multiplayer(background);
@@ -46,7 +46,7 @@ export default class Game {
           menu.show(app.stage);
         };
         app.stage.addChild(multiplayer.view);
-        multiplayer.show();
+        multiplayer.start();
         app.ticker.add(multiplayer.tick);
       }
     };

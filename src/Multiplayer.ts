@@ -5,6 +5,7 @@ import Player from "./Player";
 import { freeMode } from "./levels";
 import Background from "./Background";
 import { inputs } from "./inputs";
+import Countdown from "./Countdown";
 
 export default class Multiplayer extends GameNode {
   players: Player[];
@@ -38,11 +39,14 @@ export default class Multiplayer extends GameNode {
         this.onFinish?.();
       };
       this.view.addChild(player.view);
-      player.start();
     }
   }
 
-  show() {
+  async start() {
+    const countdown = new Countdown();
+    this.view.addChild(countdown.view);
+    await countdown.start();
+    this.view.removeChild(countdown.view);
     for (let player of this.players) {
       player.start();
     }

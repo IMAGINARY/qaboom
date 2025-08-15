@@ -22,7 +22,7 @@ import { animate } from "motion";
 import type { PlayerInput } from "./inputs";
 import type QubitPiece from "./QubitPiece";
 
-type State = "game" | "measure" | "fall" | "game_over";
+type State = "wait" | "game" | "measure" | "fall" | "game_over";
 
 const MAX_MULTIPLIER = 1 / 5;
 
@@ -62,7 +62,7 @@ export default class Player extends GameNode {
   hold: Piece | null = null;
   canSwap = true;
 
-  currentState: State = "game";
+  currentState: State = "wait";
   #score: number = 0;
 
   // Level related
@@ -163,6 +163,7 @@ export default class Player extends GameNode {
   start() {
     document.addEventListener("keydown", this.handleKeyDown);
     document.addEventListener("keyup", this.handleKeyUp);
+    this.currentState = "game";
     this.onLevelUp?.(this.levels[this.level]);
   }
 
@@ -172,7 +173,7 @@ export default class Player extends GameNode {
   }
 
   tick = (time: Ticker) => {
-    if (this.currentState === "game_over") {
+    if (this.currentState === "wait" || this.currentState === "game_over") {
       return;
     }
     for (let key of [
