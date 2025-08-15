@@ -30,13 +30,14 @@ export default class QubitPiece extends GameNode {
     this.circle = new Graphics()
       .circle(0, 0, PIECE_RADIUS)
       .fill(theme.colors.primary);
-    this.rod = new Graphics()
-      .moveTo(0, 0)
-      .lineTo(0, PIECE_RADIUS)
-      .stroke({ color: theme.colors.primary, width: 2 });
+    this.rod = new Graphics().moveTo(0, 0).lineTo(0, PIECE_RADIUS).stroke({
+      color: theme.colors.primary,
+      width: 3,
+      cap: "round",
+    });
     this.outline = new Graphics()
       .circle(0, 0, PIECE_RADIUS)
-      .stroke({ color: theme.colors.primary, width: 1 });
+      .stroke({ color: theme.colors.primary, width: 2 });
     this.container.addChild(this.circle);
     this.container.addChild(this.rod);
     this.container.addChild(this.outline);
