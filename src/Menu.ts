@@ -1,5 +1,5 @@
 import { Container, Graphics, HTMLText } from "pixi.js";
-import { HEIGHT, TEXT_FONT, WIDTH } from "./constants";
+import { HEIGHT, TEXT_FONT, theme, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { inputs } from "./inputs";
 import { sounds } from "./audio";
@@ -20,14 +20,14 @@ export default class Menu extends GameNode {
     this.view.addChild(
       new Graphics()
         .roundRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight)
-        .fill({ color: "black", alpha: 0.5 })
-        .stroke({ color: "white", width: 5, alpha: 0.5 })
+        .fill({ color: theme.colors.background, alpha: 0.5 })
+        .stroke({ color: theme.colors.primary, width: 5, alpha: 0.5 })
     );
     const titleText = new HTMLText({
       text: "<strong>Qaboom!</strong>",
       style: {
         align: "center",
-        fill: "white",
+        fill: theme.colors.primary,
         fontFamily: "Impact",
         fontSize: 256,
       },
@@ -40,7 +40,7 @@ export default class Menu extends GameNode {
       text: "<| 1 Player |>",
       style: {
         align: "center",
-        fill: "white",
+        fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
         fontWeight: "bold",
         fontSize: 72,
@@ -54,7 +54,7 @@ export default class Menu extends GameNode {
       text: "2 Players",
       style: {
         align: "center",
-        fill: "grey",
+        fill: theme.colors.muted,
         fontWeight: "bold",
         fontFamily: TEXT_FONT,
         fontSize: 72,
@@ -69,15 +69,15 @@ export default class Menu extends GameNode {
   toggleNumPlayers() {
     if (this.numPlayers === 1) {
       this.player1Text.text = "1 Player";
-      this.player1Text.style.fill = "grey";
+      this.player1Text.style.fill = theme.colors.muted;
       this.player2Text.text = "<| 2 Players |>";
-      this.player2Text.style.fill = "white";
+      this.player2Text.style.fill = theme.colors.primary;
       this.numPlayers = 2;
     } else {
       this.player1Text.text = "<| 1 Player |>";
-      this.player1Text.style.fill = "white";
+      this.player1Text.style.fill = theme.colors.primary;
       this.player2Text.text = "2 Players";
-      this.player2Text.style.fill = "grey";
+      this.player2Text.style.fill = theme.colors.muted;
       this.numPlayers = 1;
     }
   }

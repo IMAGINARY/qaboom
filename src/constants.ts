@@ -8,3 +8,11 @@ export const BOARD_HEIGHT = 12;
 export const INIT_FILL_HEIGHT = 0;
 
 export const TEXT_FONT = "Courier New";
+
+export const theme = {
+  colors: {
+    primary: "white",
+    background: "black",
+    muted: "grey",
+  },
+};

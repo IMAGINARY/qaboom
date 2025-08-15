@@ -4,7 +4,13 @@ import { uniqWith } from "lodash-es";
 import MeasurementPiece from "./MeasurementPiece";
 import { applyGate, measure } from "./quantum";
 import { DOWN, LEFT, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
-import { CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT, TEXT_FONT } from "./constants";
+import {
+  CELL_SIZE,
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  TEXT_FONT,
+  theme,
+} from "./constants";
 import Deck, { type Piece } from "./Deck";
 import QubitPair from "./QubitPair";
 import Board, { inBounds, startingCell } from "./Board";
@@ -97,7 +103,7 @@ export default class Player extends GameNode {
       text: "" + this.score,
       style: {
         align: "center",
-        fill: "white",
+        fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
         fontSize: 28,
       },
@@ -113,7 +119,7 @@ export default class Player extends GameNode {
       text: "Lvl " + (this.level + 1),
       style: {
         align: "center",
-        fill: "white",
+        fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
         fontSize: 28,
       },

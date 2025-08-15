@@ -1,6 +1,6 @@
 import { Graphics, GraphicsContext, Ticker } from "pixi.js";
 import MeasurementPiece from "./MeasurementPiece";
-import { CELL_SIZE, PIECE_RADIUS } from "./constants";
+import { CELL_SIZE, PIECE_RADIUS, theme } from "./constants";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 import { choice } from "./random";
@@ -50,8 +50,8 @@ export default class Deck extends GameNode {
             DECK_PIECE_HEIGHT * DECK_SIZE + 2 * RECT_MARGIN,
             RECT_MARGIN
           )
-          .fill({ color: "black", alpha: 0.5 })
-          .stroke({ color: "white", width: 2 })
+          .fill({ color: theme.colors.background, alpha: 0.5 })
+          .stroke({ color: theme.colors.primary, width: 2 })
       )
     );
     for (let i = 0; i < DECK_SIZE; i++) {

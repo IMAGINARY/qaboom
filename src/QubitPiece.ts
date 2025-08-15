@@ -1,6 +1,6 @@
 import { Container, Graphics, Ticker } from "pixi.js";
 import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
-import { CELL_SIZE, PIECE_RADIUS } from "./constants";
+import { CELL_SIZE, PIECE_RADIUS, theme } from "./constants";
 import { getColor, getSecondaryColor } from "./colors";
 import { floatEquals } from "./math";
 import GameNode from "./GameNode";
@@ -27,14 +27,16 @@ export default class QubitPiece extends GameNode {
     super();
     this.container = new Container();
     this.value = value;
-    this.circle = new Graphics().circle(0, 0, PIECE_RADIUS).fill("white");
+    this.circle = new Graphics()
+      .circle(0, 0, PIECE_RADIUS)
+      .fill(theme.colors.primary);
     this.rod = new Graphics()
       .moveTo(0, 0)
       .lineTo(0, PIECE_RADIUS)
-      .stroke({ color: "white", width: 2 });
+      .stroke({ color: theme.colors.primary, width: 2 });
     this.outline = new Graphics()
       .circle(0, 0, PIECE_RADIUS)
-      .stroke({ color: "white", width: 1 });
+      .stroke({ color: theme.colors.primary, width: 1 });
     this.container.addChild(this.circle);
     this.container.addChild(this.rod);
     this.container.addChild(this.outline);

@@ -1,5 +1,5 @@
 import { Container, Graphics, HTMLText } from "pixi.js";
-import { HEIGHT, TEXT_FONT, WIDTH } from "./constants";
+import { HEIGHT, TEXT_FONT, theme, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { inputs } from "./inputs";
 import { getScores, setScores } from "./storage";
@@ -26,8 +26,8 @@ export default class ScoreScreen extends GameNode {
     this.view.addChild(
       new Graphics()
         .roundRect(-300, -300, 600, 600)
-        .fill({ color: "black", alpha: 0.5 })
-        .stroke({ color: "white", width: 2 })
+        .fill({ color: theme.colors.background, alpha: 0.5 })
+        .stroke({ color: theme.colors.primary, width: 2 })
     );
 
     this.letters = [];
@@ -47,7 +47,7 @@ export default class ScoreScreen extends GameNode {
     const title = new HTMLText({
       text: "Enter your name",
       style: {
-        fill: "white",
+        fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
         fontSize: 48,
       },
@@ -64,12 +64,14 @@ export default class ScoreScreen extends GameNode {
       this.nameEnter.addChild(letter);
     }
     this.arrows.addChild(
-      new Graphics().poly([-10, 50, 0, 60, 10, 50]).fill("white"),
-      new Graphics().poly([-10, -50, 0, -60, 10, -50]).fill("white")
+      new Graphics().poly([-10, 50, 0, 60, 10, 50]).fill(theme.colors.primary),
+      new Graphics()
+        .poly([-10, -50, 0, -60, 10, -50])
+        .fill(theme.colors.primary)
     );
     this.nameEnter.addChild(this.arrows);
 
-    this.letters[this.#activeIndex].style.fill = "white";
+    this.letters[this.#activeIndex].style.fill = theme.colors.primary;
     this.arrows.position.x = this.letters[this.#activeIndex].position.x;
     this.view.addChild(this.nameEnter);
   }
@@ -91,8 +93,8 @@ export default class ScoreScreen extends GameNode {
     const highScoresLabel = new HTMLText({
       text: "High Scores",
       style: {
-        fill: "white",
-        fontFamily: "Impact",
+        fill: theme.colors.primary,
+        fontFamily: TEXT_FONT,
         fontSize: 72,
       },
     });
@@ -104,7 +106,7 @@ export default class ScoreScreen extends GameNode {
         text: entry.name,
         style: {
           fontFamily: TEXT_FONT,
-          fill: "white",
+          fill: theme.colors.primary,
         },
       });
       nameText.position = { x: -100, y: -150 + i * 50 };
@@ -113,7 +115,7 @@ export default class ScoreScreen extends GameNode {
         text: entry.score,
         style: {
           fontFamily: TEXT_FONT,
-          fill: "white",
+          fill: theme.colors.primary,
         },
       });
       scoreText.position = { x: 100, y: -150 + i * 50 };
@@ -174,9 +176,9 @@ export default class ScoreScreen extends GameNode {
   }
 
   set activeIndex(value: number) {
-    this.letters[this.#activeIndex].style.fill = "grey";
+    this.letters[this.#activeIndex].style.fill = theme.colors.muted;
     this.#activeIndex = value;
-    this.letters[this.#activeIndex].style.fill = "white";
+    this.letters[this.#activeIndex].style.fill = theme.colors.primary;
     this.arrows.position.x = this.letters[this.#activeIndex].position.x;
   }
 

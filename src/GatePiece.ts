@@ -1,5 +1,5 @@
 import { Container, Graphics, Ticker } from "pixi.js";
-import { PIECE_RADIUS } from "./constants";
+import { PIECE_RADIUS, theme } from "./constants";
 import { choice } from "./random";
 import { getColor } from "./colors";
 import { getBlochCoords, octet, rotationGate, type Axis } from "./quantum";
@@ -73,6 +73,6 @@ export default class GatePiece extends GameNode {
         this.angle < 0
       )
       .lineTo(0, 0)
-      .stroke({ color: "white", width: 2 });
+      .stroke({ color: theme.colors.primary, width: 2 });
   }
 }

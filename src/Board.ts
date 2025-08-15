@@ -5,6 +5,7 @@ import {
   BOARD_WIDTH,
   CELL_SIZE,
   PIECE_RADIUS,
+  theme,
 } from "./constants";
 import { range } from "lodash-es";
 import type { Piece } from "./Deck";
@@ -36,8 +37,8 @@ export default class Board extends GameNode {
             BOARD_HEIGHT * CELL_SIZE + 2 * RECT_MARGIN,
             RECT_MARGIN
           )
-          .fill({ color: "black", alpha: 0.5 })
-          .stroke("white")
+          .fill({ color: theme.colors.background, alpha: 0.5 })
+          .stroke({ color: theme.colors.primary, width: 5, alpha: 0.5 })
       )
     );
     this.lines = new Container();
