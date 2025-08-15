@@ -1,5 +1,5 @@
 import { Container, Graphics, HTMLText } from "pixi.js";
-import { HEIGHT, WIDTH } from "./constants";
+import { HEIGHT, TEXT_FONT, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { inputs } from "./inputs";
 import { getScores, setScores } from "./storage";
@@ -37,7 +37,7 @@ export default class ScoreScreen extends GameNode {
           text: "A",
           style: {
             fill: "grey",
-            fontFamily: "monospace",
+            fontFamily: TEXT_FONT,
             fontWeight: "600",
             fontSize: 72,
           },
@@ -48,7 +48,7 @@ export default class ScoreScreen extends GameNode {
       text: "Enter your name",
       style: {
         fill: "white",
-        fontFamily: "monospace",
+        fontFamily: TEXT_FONT,
         fontSize: 48,
       },
     });
@@ -103,7 +103,7 @@ export default class ScoreScreen extends GameNode {
       const nameText = new HTMLText({
         text: entry.name,
         style: {
-          fontFamily: "monospace",
+          fontFamily: TEXT_FONT,
           fill: "white",
         },
       });
@@ -112,7 +112,7 @@ export default class ScoreScreen extends GameNode {
       const scoreText = new HTMLText({
         text: entry.score,
         style: {
-          fontFamily: "monospace",
+          fontFamily: TEXT_FONT,
           fill: "white",
         },
       });

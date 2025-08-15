@@ -1,5 +1,5 @@
-import { Container, HTMLText } from "pixi.js";
-import { HEIGHT, WIDTH } from "./constants";
+import { Container, Graphics, HTMLText } from "pixi.js";
+import { HEIGHT, TEXT_FONT, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { inputs } from "./inputs";
 import { sounds } from "./audio";
@@ -12,27 +12,38 @@ export default class Menu extends GameNode {
 
   constructor() {
     super();
+    this.view.position.x = WIDTH / 2;
+    this.view.position.y = HEIGHT / 2;
+
+    const boxHeight = 900;
+    const boxWidth = 1500;
+    this.view.addChild(
+      new Graphics()
+        .roundRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight)
+        .fill({ color: "black", alpha: 0.5 })
+        .stroke({ color: "white", width: 5, alpha: 0.5 })
+    );
     const titleText = new HTMLText({
       text: "<strong>Qaboom!</strong>",
       style: {
         align: "center",
         fill: "white",
         fontFamily: "Impact",
-        fontSize: 48,
+        fontSize: 256,
       },
     });
-    this.view.position.x = WIDTH / 2;
-    this.view.position.y = HEIGHT / 2;
     titleText.anchor = { x: 0.5, y: 0.5 };
+    titleText.position.y = -HEIGHT / 6;
     this.view.addChild(titleText);
 
     this.player1Text = new HTMLText({
-      text: "< 1 Player >",
+      text: "<| 1 Player |>",
       style: {
         align: "center",
         fill: "white",
-        fontFamily: "monospace",
-        fontSize: 24,
+        fontFamily: TEXT_FONT,
+        fontWeight: "bold",
+        fontSize: 72,
       },
     });
     this.player1Text.position.x = 0;
@@ -43,13 +54,14 @@ export default class Menu extends GameNode {
       text: "2 Players",
       style: {
         align: "center",
-        fill: "white",
-        fontFamily: "monospace",
-        fontSize: 24,
+        fill: "grey",
+        fontWeight: "bold",
+        fontFamily: TEXT_FONT,
+        fontSize: 72,
       },
     });
     this.player2Text.position.x = 0;
-    this.player2Text.position.y = 100;
+    this.player2Text.position.y = 200;
     this.player2Text.anchor.x = 0.5;
     this.view.addChild(this.player2Text);
   }
@@ -57,11 +69,15 @@ export default class Menu extends GameNode {
   toggleNumPlayers() {
     if (this.numPlayers === 1) {
       this.player1Text.text = "1 Player";
-      this.player2Text.text = "< 2 Players >";
+      this.player1Text.style.fill = "grey";
+      this.player2Text.text = "<| 2 Players |>";
+      this.player2Text.style.fill = "white";
       this.numPlayers = 2;
     } else {
-      this.player1Text.text = "< 1 Player >";
+      this.player1Text.text = "<| 1 Player |>";
+      this.player1Text.style.fill = "white";
       this.player2Text.text = "2 Players";
+      this.player2Text.style.fill = "grey";
       this.numPlayers = 1;
     }
   }
