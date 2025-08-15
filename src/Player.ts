@@ -29,7 +29,7 @@ const RATES = {
 };
 
 const rateMultiplier = 0.9;
-const levelCount = 20;
+const levelCount = 16;
 
 interface Options {
   levels: Level[];
