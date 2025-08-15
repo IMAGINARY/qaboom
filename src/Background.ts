@@ -29,9 +29,9 @@ export default class Background extends GameNode {
     }
   }
 
-  tick(time: Ticker) {
+  tick = (time: Ticker) => {
     for (let piece of this.pieces) {
       piece.tick(time);
     }
-  }
+  };
 }

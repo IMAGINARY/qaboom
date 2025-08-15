@@ -15,10 +15,10 @@ export default class SinglePlayer extends GameNode {
   background: Background;
   mode: Mode = "game";
 
-  constructor() {
+  constructor(background: Background) {
     super();
-    this.background = new Background();
-    this.view.addChild(this.background.view);
+    this.background = background;
+    // this.view.addChild(this.background.view);
     this.player = new Player({
       position: { x: WIDTH / 2 - 250, y: 0 },
       inputMap: inputs.player1,
@@ -53,7 +53,6 @@ export default class SinglePlayer extends GameNode {
   tick = (time: Ticker) => {
     if (this.mode === "game") {
       this.player.tick(time);
-      this.background.tick(time);
     }
   };
 }
