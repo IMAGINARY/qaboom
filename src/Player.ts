@@ -24,7 +24,7 @@ const INPUT_POLL_RATE = 100;
 const RATES = {
   game: 500,
   measure: 350,
-  fall: 250,
+  fall: 100,
   game_over: 0,
 };
 
