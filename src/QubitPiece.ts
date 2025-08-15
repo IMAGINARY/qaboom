@@ -5,6 +5,7 @@ import { getColor, getSecondaryColor } from "./colors";
 import { floatEquals } from "./math";
 import GameNode from "./GameNode";
 import { animate } from "motion";
+import { pulse } from "./animations";
 
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
@@ -93,18 +94,7 @@ export default class QubitPiece extends GameNode {
   }
 
   bounce() {
-    animate([
-      [
-        this.container.scale,
-        { x: 1.15, y: 1.15 },
-        { duration: 0.15, ease: "easeInOut" },
-      ],
-      [
-        this.container.scale,
-        { x: 1, y: 1 },
-        { duration: 0.15, ease: "easeInOut" },
-      ],
-    ]);
+    pulse(this.container);
   }
 
   shake() {

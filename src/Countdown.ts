@@ -3,6 +3,7 @@ import { HEIGHT, TEXT_FONT, theme, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { sounds } from "./audio";
 import { delay } from "./util";
+import { pulse } from "./animations";
 
 export default class Countdown extends GameNode {
   text: HTMLText;
@@ -16,7 +17,7 @@ export default class Countdown extends GameNode {
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
         fontWeight: "bold",
-        fontSize: 144,
+        fontSize: 256,
       },
     });
     this.text.anchor = { x: 0.5, y: 0.5 };
@@ -27,6 +28,7 @@ export default class Countdown extends GameNode {
     for (let count = 3; count > 0; count--) {
       this.text.text = count;
       sounds.score[3 - count].play();
+      pulse(this.text, 1.5);
       await delay(750);
     }
     this.text.text = "GO!";
