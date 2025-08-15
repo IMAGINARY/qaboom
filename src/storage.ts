@@ -1,6 +1,6 @@
 const SCORE_KEY = "scores";
 
-interface Score {
+export interface Score {
   name: string;
   score: number;
 }

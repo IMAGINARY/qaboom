@@ -2,7 +2,7 @@ import { Container, Graphics, HTMLText } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { inputs } from "./inputs";
-import { getScores, setScores } from "./storage";
+import { getScores, setScores, type Score } from "./storage";
 import { sounds } from "./audio";
 import { container } from "./util";
 import { pulse } from "./animations";
@@ -112,10 +112,11 @@ export default class ScoreScreen extends GameNode {
       index = scores.length;
     }
     const name = this.letters.map((letter) => letter.text).join("");
-    scores.splice(index, 0, {
+    const newEntry = {
       name,
       score: this.score,
-    });
+    };
+    scores.splice(index, 0, newEntry);
     setScores(scores);
     const highScoresLabel = new HTMLText({
       text: "High Scores",
@@ -130,31 +131,36 @@ export default class ScoreScreen extends GameNode {
     highScoresLabel.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(highScoresLabel);
     for (let [i, entry] of scores.slice(0, 8).entries()) {
-      const nameText = new HTMLText({
-        text: `${i + 1} ${entry.name}`,
-        style: {
-          fontFamily: TEXT_FONT,
-          fill: theme.colors.primary,
-          fontSize: 48,
-          fontWeight: "bold",
-        },
-      });
-      nameText.position = { x: -250, y: -200 + i * 60 };
-      nameText.anchor = { x: 0, y: 0.5 };
-      const scoreText = new HTMLText({
-        text: entry.score,
-        style: {
-          fontFamily: TEXT_FONT,
-          fill: theme.colors.primary,
-          fontSize: 48,
-          fontWeight: "bold",
-        },
-      });
-      scoreText.position = { x: 250, y: -200 + i * 60 };
-      scoreText.anchor = { x: 1, y: 0.5 };
-      this.view.addChild(scoreText);
-      this.view.addChild(nameText);
+      this.showEntry(i, entry, -200 + i * 60);
     }
+    this.showEntry(index, newEntry, -200 + 9 * 60);
+  }
+
+  showEntry(index: number, entry: Score, position: number) {
+    const nameText = new HTMLText({
+      text: `${(index + 1 + "").padStart(3)} ${entry.name}`,
+      style: {
+        fontFamily: TEXT_FONT,
+        fill: theme.colors.primary,
+        fontSize: 48,
+        fontWeight: "bold",
+      },
+    });
+    nameText.position = { x: -300, y: position };
+    nameText.anchor = { x: 0, y: 0.5 };
+    const scoreText = new HTMLText({
+      text: entry.score,
+      style: {
+        fontFamily: TEXT_FONT,
+        fill: theme.colors.primary,
+        fontSize: 48,
+        fontWeight: "bold",
+      },
+    });
+    scoreText.position = { x: 250, y: position };
+    scoreText.anchor = { x: 1, y: 0.5 };
+    this.view.addChild(scoreText);
+    this.view.addChild(nameText);
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
