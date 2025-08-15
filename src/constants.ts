@@ -11,8 +11,8 @@ export const TEXT_FONT = "Courier New";
 
 export const theme = {
   colors: {
-    primary: "white",
-    background: "black",
+    primary: "#ddd",
+    background: "#080808",
     muted: "grey",
   },
 };
