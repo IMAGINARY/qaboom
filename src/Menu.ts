@@ -3,6 +3,7 @@ import { HEIGHT, TEXT_FONT, theme, WIDTH } from "./constants";
 import GameNode from "./GameNode";
 import { inputs } from "./inputs";
 import { sounds } from "./audio";
+import { container } from "./util";
 
 export default class Menu extends GameNode {
   onStart?: (numPlayers: number) => void;
@@ -18,10 +19,14 @@ export default class Menu extends GameNode {
     const boxHeight = 900;
     const boxWidth = 1500;
     this.view.addChild(
-      new Graphics()
-        .roundRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight)
-        .fill({ color: theme.colors.background, alpha: 0.5 })
-        .stroke({ color: theme.colors.primary, width: 5, alpha: 0.5 })
+      container(
+        new Graphics().roundRect(
+          -boxWidth / 2,
+          -boxHeight / 2,
+          boxWidth,
+          boxHeight
+        )
+      )
     );
     const titleText = new HTMLText({
       text: "<strong>Qaboom!</strong>",

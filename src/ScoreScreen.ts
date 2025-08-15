@@ -4,6 +4,7 @@ import GameNode from "./GameNode";
 import { inputs } from "./inputs";
 import { getScores, setScores } from "./storage";
 import { sounds } from "./audio";
+import { container } from "./util";
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
 type State = "enter_name" | "high_scores";
@@ -24,10 +25,7 @@ export default class ScoreScreen extends GameNode {
     this.view.position = { x: WIDTH / 2, y: HEIGHT / 2 };
 
     this.view.addChild(
-      new Graphics()
-        .roundRect(-300, -300, 600, 600)
-        .fill({ color: theme.colors.background, alpha: 0.5 })
-        .stroke({ color: theme.colors.primary, width: 2 })
+      container(new Graphics().roundRect(-300, -300, 600, 600))
     );
 
     this.letters = [];

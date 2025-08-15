@@ -1,17 +1,17 @@
-import { Container, Graphics, GraphicsContext, Point, Ticker } from "pixi.js";
+import { Container, Graphics, Point, Ticker } from "pixi.js";
 import QubitPiece from "./QubitPiece";
 import {
   BOARD_HEIGHT,
   BOARD_WIDTH,
   CELL_SIZE,
   PIECE_RADIUS,
-  theme,
 } from "./constants";
 import { range } from "lodash-es";
 import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
 import { getBlochCoords, type Qubit } from "./quantum";
 import { getColor, getSecondaryColor } from "./colors";
+import { container } from "./util";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -28,17 +28,14 @@ export default class Board extends GameNode {
     super();
     this.grid = this.initGrid();
     this.view.addChild(
-      new Graphics(
-        new GraphicsContext()
-          .roundRect(
-            -RECT_MARGIN,
-            -RECT_MARGIN,
-            BOARD_WIDTH * CELL_SIZE + 2 * RECT_MARGIN,
-            BOARD_HEIGHT * CELL_SIZE + 2 * RECT_MARGIN,
-            RECT_MARGIN
-          )
-          .fill({ color: theme.colors.background, alpha: 0.5 })
-          .stroke({ color: theme.colors.primary, width: 5, alpha: 0.5 })
+      container(
+        new Graphics().roundRect(
+          -RECT_MARGIN,
+          -RECT_MARGIN,
+          BOARD_WIDTH * CELL_SIZE + 2 * RECT_MARGIN,
+          BOARD_HEIGHT * CELL_SIZE + 2 * RECT_MARGIN,
+          RECT_MARGIN
+        )
       )
     );
     this.lines = new Container();

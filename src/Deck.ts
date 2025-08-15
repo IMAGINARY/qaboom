@@ -1,11 +1,12 @@
-import { Graphics, GraphicsContext, Ticker } from "pixi.js";
+import { Graphics, Ticker } from "pixi.js";
 import MeasurementPiece from "./MeasurementPiece";
-import { CELL_SIZE, PIECE_RADIUS, theme } from "./constants";
+import { CELL_SIZE, PIECE_RADIUS } from "./constants";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 import { choice } from "./random";
 import { ONE, ZERO } from "./quantum";
 import GameNode from "./GameNode";
+import { container } from "./util";
 
 export type Piece = QubitPair | MeasurementPiece | GatePiece;
 const DECK_SIZE = 4;
@@ -41,17 +42,14 @@ export default class Deck extends GameNode {
   initDeck() {
     this.view.removeChildren();
     this.view.addChild(
-      new Graphics(
-        new GraphicsContext()
-          .roundRect(
-            -RECT_MARGIN,
-            -RECT_MARGIN,
-            DECK_WIDTH + 2 * RECT_MARGIN,
-            DECK_PIECE_HEIGHT * DECK_SIZE + 2 * RECT_MARGIN,
-            RECT_MARGIN
-          )
-          .fill({ color: theme.colors.background, alpha: 0.5 })
-          .stroke({ color: theme.colors.primary, width: 2 })
+      container(
+        new Graphics().roundRect(
+          -RECT_MARGIN,
+          -RECT_MARGIN,
+          DECK_WIDTH + 2 * RECT_MARGIN,
+          DECK_PIECE_HEIGHT * DECK_SIZE + 2 * RECT_MARGIN,
+          RECT_MARGIN * 2
+        )
       )
     );
     for (let i = 0; i < DECK_SIZE; i++) {
