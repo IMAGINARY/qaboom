@@ -399,7 +399,10 @@ export default class Player extends GameNode {
     }
     this.board.setCurrentPosition(startingCell);
     if (this.hold) {
-      this.hold.view.position = { x: 400, y: 600 };
+      this.hold.view.position = {
+        x: this.board.view.width + 100,
+        y: this.deck.view.height + 150,
+      };
     }
   }
 
