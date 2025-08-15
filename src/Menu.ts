@@ -4,6 +4,7 @@ import GameNode from "./GameNode";
 import { inputs } from "./inputs";
 import { sounds } from "./audio";
 import { container } from "./util";
+import { pulse } from "./animations";
 
 export default class Menu extends GameNode {
   onStart?: (numPlayers: number) => void;
@@ -54,7 +55,7 @@ export default class Menu extends GameNode {
     });
     this.player1Text.position.x = 0;
     this.player1Text.position.y = 50;
-    this.player1Text.anchor.x = 0.5;
+    this.player1Text.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(this.player1Text);
     this.player2Text = new HTMLText({
       text: "2 Players",
@@ -68,7 +69,7 @@ export default class Menu extends GameNode {
     });
     this.player2Text.position.x = 0;
     this.player2Text.position.y = 200;
-    this.player2Text.anchor.x = 0.5;
+    this.player2Text.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(this.player2Text);
   }
 
@@ -78,10 +79,12 @@ export default class Menu extends GameNode {
       this.player1Text.style.fill = theme.colors.muted;
       this.player2Text.text = "<| 2 Players |>";
       this.player2Text.style.fill = theme.colors.primary;
+      pulse(this.player2Text, 1.1);
       this.numPlayers = 2;
     } else {
       this.player1Text.text = "<| 1 Player |>";
       this.player1Text.style.fill = theme.colors.primary;
+      pulse(this.player1Text, 1.1);
       this.player2Text.text = "2 Players";
       this.player2Text.style.fill = theme.colors.muted;
       this.numPlayers = 1;
