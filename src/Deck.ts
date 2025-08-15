@@ -3,8 +3,6 @@ import MeasurementPiece from "./MeasurementPiece";
 import { CELL_SIZE, PIECE_RADIUS } from "./constants";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
-import { choice } from "./random";
-import { ONE, ZERO } from "./quantum";
 import GameNode from "./GameNode";
 import { container } from "./util";
 
@@ -52,12 +50,9 @@ export default class Deck extends GameNode {
         )
       )
     );
-    for (let i = 0; i < DECK_SIZE; i++) {
-      // TODO make this generic across levels.
-      // For now, for the campaign, just assume we're black and white.
-      const random = () => choice([ZERO, ONE]);
-      this.deck.push(new QubitPair(random(), random()));
-    }
+    this.deck = this.#deal()
+      .filter((piece) => piece instanceof QubitPair)
+      .slice(0, DECK_SIZE);
     for (let piece of this.deck) {
       this.view.addChild(piece.view);
     }
