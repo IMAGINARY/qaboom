@@ -26,8 +26,10 @@ type State = "pause" | "game";
 
 const MAX_MULTIPLIER = 1 / 5;
 
-const STEP_RATE = 500;
-const INPUT_POLL_RATE = 100;
+// Initial rate at which pieces fall
+const INITIAL_STEP_RATE = 750;
+// The rate at which to check if inputs are still pressed
+const INPUT_POLL_RATE = 120;
 
 const rateMultiplier = 0.9;
 const levelCount = 16;
@@ -180,7 +182,7 @@ export default class Player extends GameNode {
     }
     if (this.time >= this.nextTime) {
       this.step();
-      this.nextTime = this.time + STEP_RATE * this.rateMultiplier;
+      this.nextTime = this.time + INITIAL_STEP_RATE * this.rateMultiplier;
     }
     this.time += time.deltaMS;
   };
