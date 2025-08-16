@@ -1,8 +1,7 @@
 import { HTMLText, Point, Ticker, type PointData } from "pixi.js";
 import "pixi.js/math-extras";
 import MeasurementPiece from "./MeasurementPiece";
-import { applyGate } from "./quantum";
-import { DOWN, LEFT, neighbors, RIGHT, UP } from "./points";
+import { DOWN, LEFT, RIGHT, UP } from "./points";
 import {
   CELL_SIZE,
   BOARD_WIDTH,
@@ -203,47 +202,21 @@ export default class Player extends GameNode {
     }
   }
 
-  // Resolve the current piece's action when it can't move any more.
-  resolve() {
-    // If it's a pair of qubits, just add it to the grid.
-    if (this.board.current instanceof QubitPair) {
-      sounds.set.load();
-      sounds.set.volume = 0.5;
-      sounds.set.play();
-      const secondPosition = this.board.currentPosition.add(
-        this.board.current.orientation === "vertical" ? UP : RIGHT
-      );
-      // If the second position of the qubit is higher than the initial position,
-      // it's game over.
-      if (secondPosition.y < 0) {
-        this.gameOver();
-        return;
-      }
-      this.board.setPiece(this.board.currentPosition, this.board.current.first);
-      this.board.setPiece(secondPosition, this.board.current.second);
-      // If the starting cell is occupied, it's game over.
-      if (this.board.containsPoint(startingCell)) {
-        this.gameOver();
-        return;
-      }
-      this.triggerFall();
-    } else if (this.board.current instanceof MeasurementPiece) {
-      // If it's a measurement, trigger the measurement reaction chain.
-      this.currentState = "pause";
-      this.board
-        .measure((score) => {
-          this.score += score;
-        })
-        .then(() => {
-          this.currentState = "game";
-          this.newCurrent();
-        });
-    } else if (this.board.current instanceof GatePiece) {
-      // If it's a gate, trigger the gate.
-      this.triggerGate();
+  async resolve() {
+    this.currentState = "pause";
+    if (
+      await this.board.resolve((score) => {
+        this.score += score;
+      })
+    ) {
+      this.newCurrent();
+      this.currentState = "game";
+    } else {
+      this.gameOver();
     }
   }
 
+  // Resolve the current piece's action when it can't move any more.
   gameOver() {
     this.currentState = "pause";
     sounds.gameOver.load();
@@ -251,32 +224,6 @@ export default class Player extends GameNode {
     this.fallOff().then(() => {
       this.onGameOver?.(this.score);
     });
-  }
-
-  async triggerFall() {
-    this.currentState = "pause";
-    await this.board.fall();
-    this.currentState = "game";
-    this.newCurrent();
-  }
-
-  triggerGate() {
-    if (!(this.board.current instanceof GatePiece)) {
-      throw new Error("called `triggerGate` without GatePiece");
-    }
-    sounds.gate.load();
-    sounds.gate.play();
-    // Apply the gate on the surrounding pieces
-    for (let p of neighbors(this.board.currentPosition)) {
-      let piece = this.board.getPiece(p);
-      if (piece) {
-        piece.setValue(applyGate(this.board.current.matrix, piece.value));
-        piece.bounce();
-      }
-    }
-    this.currentState = "game";
-    this.board.view.removeChild(this.board.current?.view);
-    this.newCurrent();
   }
 
   newCurrent() {

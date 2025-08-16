@@ -9,12 +9,14 @@ import {
 import { range, uniqWith } from "lodash-es";
 import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
-import { getBlochCoords, measure, type Qubit } from "./quantum";
+import { applyGate, getBlochCoords, measure, type Qubit } from "./quantum";
 import { getColor, getSecondaryColor } from "./colors";
 import { container, delay } from "./util";
-import { DOWN, orthoNeighbors } from "./points";
+import { DOWN, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
 import MeasurementPiece from "./MeasurementPiece";
 import { sounds } from "./audio";
+import QubitPair from "./QubitPair";
+import GatePiece from "./GatePiece";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -122,6 +124,56 @@ export default class Board extends GameNode {
         .lineTo(pos2.x, pos2.y)
         .stroke({ color: getColor({ phi, theta }), width: 7.5 })
     );
+  }
+
+  // Resolve the current piece action.
+  // Return whether the game still continues.
+  async resolve(onScore: (score: number) => void) {
+    // If it's a pair of qubits, just add it to the grid.
+    if (this.current instanceof QubitPair) {
+      sounds.set.load();
+      sounds.set.volume = 0.5;
+      sounds.set.play();
+      const secondPosition = this.currentPosition.add(
+        this.current.orientation === "vertical" ? UP : RIGHT
+      );
+      // If the second position of the qubit is higher than the initial position,
+      // it's game over.
+      if (secondPosition.y < 0) {
+        return false;
+      }
+      this.setPiece(this.currentPosition, this.current.first);
+      this.setPiece(secondPosition, this.current.second);
+      // If the starting cell is occupied, it's game over.
+      if (this.containsPoint(startingCell)) {
+        return false;
+      }
+      await this.fall();
+    } else if (this.current instanceof MeasurementPiece) {
+      // If it's a measurement, trigger the measurement reaction chain.
+      await this.measure(onScore);
+    } else if (this.current instanceof GatePiece) {
+      // If it's a gate, trigger the gate.
+      await this.triggerGate();
+    }
+    return true;
+  }
+
+  async triggerGate() {
+    if (!(this.current instanceof GatePiece)) {
+      throw new Error("called `triggerGate` without GatePiece");
+    }
+    sounds.gate.load();
+    sounds.gate.play();
+    // Apply the gate on the surrounding pieces
+    for (let p of neighbors(this.currentPosition)) {
+      let piece = this.getPiece(p);
+      if (piece) {
+        piece.setValue(applyGate(this.current.matrix, piece.value));
+        piece.bounce();
+      }
+    }
+    this.view.removeChild(this.current?.view);
   }
 
   async measure(onScore: (score: number) => void) {
