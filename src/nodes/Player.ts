@@ -14,13 +14,13 @@ import Deck, { type Piece } from "./Deck";
 import QubitPair from "./QubitPair";
 import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
-import { sounds } from "../audio";
 import { type Level } from "../levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
 import type { PlayerInput } from "../inputs";
 import { pulse } from "../animations";
 import { delay } from "../util";
+import { playSound } from "../audio";
 
 type State = "pause" | "game";
 
@@ -219,8 +219,7 @@ export default class Player extends GameNode {
   // Resolve the current piece's action when it can't move any more.
   gameOver() {
     this.currentState = "pause";
-    sounds.gameOver.load();
-    sounds.gameOver.play();
+    playSound("gameOver");
     this.fallOff().then(() => {
       this.onGameOver?.(this.score);
     });
@@ -231,8 +230,7 @@ export default class Player extends GameNode {
     // Increase level
     if (this.pieceCount > levelCount) {
       this.level++;
-      sounds.levelUp.load();
-      sounds.levelUp.play();
+      playSound("levelUp");
       this.pieceCount = 0;
       if (this.level > this.levels.length - 1) {
         this.rateMultiplier *= rateMultiplier;
@@ -250,8 +248,7 @@ export default class Player extends GameNode {
 
   swap() {
     this.canSwap = false;
-    sounds.swap.load();
-    sounds.swap.play();
+    playSound("swap");
     [this.board.current, this.hold] = [this.hold, this.board.current];
     if (!this.board.current) {
       this.newCurrent();
@@ -296,8 +293,7 @@ export default class Player extends GameNode {
         )
           break;
         this.board.setCurrentPosition(left);
-        sounds.move.load();
-        sounds.move.play();
+        playSound("move");
         break;
       }
       case this.inputMap.right: {
@@ -318,8 +314,7 @@ export default class Player extends GameNode {
             break;
         }
         this.board.setCurrentPosition(right);
-        sounds.move.load();
-        sounds.move.play();
+        playSound("move");
         break;
       }
       // If the player presses down, speed up the steps
@@ -339,8 +334,6 @@ export default class Player extends GameNode {
         if (obstructed) {
           this.resolve();
         } else {
-          // sounds.move.load();
-          // sounds.move.play();
           this.board.setCurrentPosition(down);
         }
         break;
@@ -356,13 +349,11 @@ export default class Player extends GameNode {
         // Can only rotate qubit pairs
         if (this.board.current instanceof MeasurementPiece) {
           this.board.current.flip();
-          sounds.turn.load();
-          sounds.turn.play();
+          playSound("turn");
           break;
         } else if (this.board.current instanceof GatePiece) {
           this.board.current.rotate();
-          sounds.turn.load();
-          sounds.turn.play();
+          playSound("turn");
           break;
         } else if (this.board.current instanceof QubitPair) {
           if (this.board.current.orientation === "vertical") {
@@ -394,8 +385,7 @@ export default class Player extends GameNode {
             }
           }
           this.board.current.rotate();
-          sounds.turn.load();
-          sounds.turn.play();
+          playSound("turn");
         }
         break;
       }

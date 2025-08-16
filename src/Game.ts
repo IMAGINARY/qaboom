@@ -4,9 +4,11 @@ import { HEIGHT, WIDTH } from "./constants";
 import SinglePlayer from "./nodes/SinglePlayer";
 import Multiplayer from "./nodes/Multiplayer";
 import Background from "./nodes/Background";
+import { initSounds } from "./audio";
 
 export default class Game {
   async start() {
+    initSounds();
     const app = new Application();
 
     // Initialize the application

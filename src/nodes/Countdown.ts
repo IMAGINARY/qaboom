@@ -1,7 +1,7 @@
 import { HTMLText } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
-import { sounds } from "../audio";
+import { playScoreSound, playSound } from "../audio";
 import { delay } from "../util";
 import { pulse } from "../animations";
 
@@ -28,13 +28,12 @@ export default class Countdown extends GameNode {
     await delay(250);
     for (let count = 3; count > 0; count--) {
       this.text.text = count;
-      sounds.score[3 - count].play();
+      playScoreSound(3 - count);
       pulse(this.text, 1.5);
       await delay(1000 * (5 / 8));
     }
     this.text.text = "GO!";
-    sounds.levelUp.load();
-    sounds.levelUp.play();
+    playSound("levelUp");
     await delay(1000);
   }
 }

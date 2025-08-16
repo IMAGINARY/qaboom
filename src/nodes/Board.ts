@@ -14,7 +14,7 @@ import { getColor, getSecondaryColor } from "../colors";
 import { container, delay } from "../util";
 import { DOWN, neighbors, orthoNeighbors, RIGHT, UP } from "../points";
 import MeasurementPiece from "./MeasurementPiece";
-import { sounds } from "../audio";
+import { playScoreSound, playSound } from "../audio";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 
@@ -131,9 +131,7 @@ export default class Board extends GameNode {
   async resolve(onScore: (score: number) => void) {
     // If it's a pair of qubits, just add it to the grid.
     if (this.current instanceof QubitPair) {
-      sounds.set.load();
-      sounds.set.volume = 0.5;
-      sounds.set.play();
+      playSound("set");
       const secondPosition = this.currentPosition.add(
         this.current.orientation === "vertical" ? UP : RIGHT
       );
@@ -163,8 +161,7 @@ export default class Board extends GameNode {
     if (!(this.current instanceof GatePiece)) {
       throw new Error("called `triggerGate` without GatePiece");
     }
-    sounds.gate.load();
-    sounds.gate.play();
+    playSound("gate");
     // Apply the gate on the surrounding pieces
     for (let p of neighbors(this.currentPosition)) {
       let piece = this.getPiece(p);
@@ -215,10 +212,7 @@ export default class Board extends GameNode {
         }
       }
       if (newMeasures) {
-        const scoreSound =
-          sounds.score[Math.min(measureCount, sounds.score.length - 1)];
-        scoreSound.load();
-        scoreSound.play();
+        playScoreSound(measureCount);
         measureCount++;
         measureQueue = uniqWith(newQueue, (a, b) => a.equals(b));
         onScore(scoreToAdd);
@@ -228,8 +222,7 @@ export default class Board extends GameNode {
 
     const uniqMeasured = uniqWith(measuredQubits, (a, b) => a.equals(b));
     if (uniqMeasured.length > 0) {
-      sounds.clear.load();
-      sounds.clear.play();
+      playSound("clear");
     }
     let score = 0;
     score += triangular(uniqMeasured.length);

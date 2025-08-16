@@ -3,7 +3,7 @@ import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import { inputs } from "../inputs";
 import { getScores, setScores, type Score } from "../storage";
-import { sounds } from "../audio";
+import { playSound } from "../audio";
 import { container } from "../util";
 import { pulse } from "../animations";
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
@@ -172,8 +172,7 @@ export default class ScoreScreen extends GameNode {
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex || LETTERS.length) - 1];
           pulse(currentLetter, 1.1);
-          sounds.move.load();
-          sounds.move.play();
+          playSound("move");
           break;
         }
         case inputs.player1.down: {
@@ -181,26 +180,22 @@ export default class ScoreScreen extends GameNode {
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex + 1) % LETTERS.length];
           pulse(currentLetter, 1.1);
-          sounds.move.load();
-          sounds.move.play();
+          playSound("move");
           break;
         }
         // left/right: change active index
         case inputs.player1.left: {
           this.activeIndex = (this.activeIndex || this.letters.length) - 1;
-          sounds.move.load();
-          sounds.move.play();
+          playSound("move");
           break;
         }
         case inputs.player1.right: {
           this.activeIndex = (this.activeIndex + 1) % this.letters.length;
-          sounds.move.load();
-          sounds.move.play();
+          playSound("move");
           break;
         }
         case inputs.player1.flip: {
-          sounds.clear.load();
-          sounds.clear.play();
+          playSound("clear");
           this.showHighScores();
           break;
         }
