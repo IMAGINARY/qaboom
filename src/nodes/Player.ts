@@ -205,6 +205,10 @@ export default class Player extends GameNode {
   }
 
   async resolve() {
+    // Don't trigger if we're already paused for something else
+    if (this.currentState === "pause") {
+      return;
+    }
     this.currentState = "pause";
     if (
       await this.board.resolve((score) => {
