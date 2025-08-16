@@ -1,10 +1,18 @@
-import { Container, Graphics, Point, Ticker } from "pixi.js";
+import {
+  Container,
+  Graphics,
+  HTMLText,
+  Point,
+  TextStyle,
+  Ticker,
+} from "pixi.js";
 import QubitPiece from "./QubitPiece";
 import {
   BOARD_HEIGHT,
   BOARD_WIDTH,
   CELL_SIZE,
   PIECE_RADIUS,
+  TEXT_FONT,
 } from "../constants";
 import { range, uniqWith } from "lodash-es";
 import type { Piece } from "./Deck";
@@ -17,6 +25,7 @@ import MeasurementPiece from "./MeasurementPiece";
 import { playScoreSound, playSound } from "../audio";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
+import { animate } from "motion";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -202,6 +211,7 @@ export default class Board extends GameNode {
             this.drawLine(point, nbr, current.base);
             qubit.bounce();
             measuredQubits.push(nbr);
+            this.pingScore(nbr, measuredQubits.length);
             scoreToAdd += measuredQubits.length;
             newQueue.push(nbr);
           } else {
@@ -263,6 +273,33 @@ export default class Board extends GameNode {
       }
       await delay(150);
     } while (anyFalling);
+  }
+
+  async pingScore(position: Point, score: number) {
+    if (!(this.current instanceof MeasurementPiece)) {
+      return;
+    }
+    const coords = getBlochCoords(this.current.base);
+    const text = new HTMLText({
+      text: `${score * 100}`,
+      style: new TextStyle({
+        fontSize: 24 + 2 * score,
+        fontFamily: TEXT_FONT,
+        fontWeight: "bold",
+        fill: getColor(coords),
+        stroke: { color: getSecondaryColor(coords), width: 4 },
+      }),
+    });
+    text.anchor = { x: 0.5, y: 0.5 };
+    text.position = this.gridToLocal(position);
+    text.alpha = 0;
+    this.view.addChild(text);
+    await animate([
+      [text.position, { y: text.position.y - CELL_SIZE / 2 }],
+      [text, { alpha: 1 }, { at: 0 }],
+      [text, { alpha: 0 }, { delay: 0.25 }],
+    ]);
+    this.view.removeChild(text);
   }
 }
 
