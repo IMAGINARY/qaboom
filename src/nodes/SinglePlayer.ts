@@ -1,10 +1,10 @@
 import { type Ticker } from "pixi.js";
-import { WIDTH } from "./constants";
+import { WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
-import { campaign } from "./levels";
+import { campaign } from "../levels";
 import Background from "./Background";
-import { inputs } from "./inputs";
+import { inputs } from "../inputs";
 import ScoreScreen from "./ScoreScreen";
 import Countdown from "./Countdown";
 

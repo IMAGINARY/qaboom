@@ -1,10 +1,10 @@
 import { type Ticker } from "pixi.js";
-import { WIDTH } from "./constants";
+import { WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
-import { freeMode } from "./levels";
+import { freeMode } from "../levels";
 import Background from "./Background";
-import { inputs } from "./inputs";
+import { inputs } from "../inputs";
 import Countdown from "./Countdown";
 
 export default class Multiplayer extends GameNode {

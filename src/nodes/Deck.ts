@@ -1,10 +1,10 @@
 import { Graphics, Ticker } from "pixi.js";
 import MeasurementPiece from "./MeasurementPiece";
-import { CELL_SIZE, PIECE_RADIUS } from "./constants";
+import { CELL_SIZE, PIECE_RADIUS } from "../constants";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 import GameNode from "./GameNode";
-import { container } from "./util";
+import { container } from "../util";
 
 export type Piece = QubitPair | MeasurementPiece | GatePiece;
 const DECK_SIZE = 4;

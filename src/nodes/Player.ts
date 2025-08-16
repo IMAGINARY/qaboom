@@ -1,7 +1,7 @@
 import { HTMLText, Point, Ticker, type PointData } from "pixi.js";
 import "pixi.js/math-extras";
 import MeasurementPiece from "./MeasurementPiece";
-import { DOWN, LEFT, RIGHT, UP } from "./points";
+import { DOWN, LEFT, RIGHT, UP } from "../points";
 import {
   CELL_SIZE,
   BOARD_WIDTH,
@@ -9,18 +9,18 @@ import {
   TEXT_FONT,
   theme,
   HEIGHT,
-} from "./constants";
+} from "../constants";
 import Deck, { type Piece } from "./Deck";
 import QubitPair from "./QubitPair";
 import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
-import { sounds } from "./audio";
-import { type Level } from "./levels";
+import { sounds } from "../audio";
+import { type Level } from "../levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
-import type { PlayerInput } from "./inputs";
-import { pulse } from "./animations";
-import { delay } from "./util";
+import type { PlayerInput } from "../inputs";
+import { pulse } from "../animations";
+import { delay } from "../util";
 
 type State = "pause" | "game";
 

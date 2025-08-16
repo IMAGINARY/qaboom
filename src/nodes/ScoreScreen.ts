@@ -1,11 +1,11 @@
 import { Container, Graphics, HTMLText } from "pixi.js";
-import { HEIGHT, TEXT_FONT, theme, WIDTH } from "./constants";
+import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
-import { inputs } from "./inputs";
-import { getScores, setScores, type Score } from "./storage";
-import { sounds } from "./audio";
-import { container } from "./util";
-import { pulse } from "./animations";
+import { inputs } from "../inputs";
+import { getScores, setScores, type Score } from "../storage";
+import { sounds } from "../audio";
+import { container } from "../util";
+import { pulse } from "../animations";
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
 type State = "enter_name" | "high_scores";

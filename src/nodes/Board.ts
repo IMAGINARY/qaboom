@@ -5,16 +5,16 @@ import {
   BOARD_WIDTH,
   CELL_SIZE,
   PIECE_RADIUS,
-} from "./constants";
+} from "../constants";
 import { range, uniqWith } from "lodash-es";
 import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
-import { applyGate, getBlochCoords, measure, type Qubit } from "./quantum";
-import { getColor, getSecondaryColor } from "./colors";
-import { container, delay } from "./util";
-import { DOWN, neighbors, orthoNeighbors, RIGHT, UP } from "./points";
+import { applyGate, getBlochCoords, measure, type Qubit } from "../quantum";
+import { getColor, getSecondaryColor } from "../colors";
+import { container, delay } from "../util";
+import { DOWN, neighbors, orthoNeighbors, RIGHT, UP } from "../points";
 import MeasurementPiece from "./MeasurementPiece";
-import { sounds } from "./audio";
+import { sounds } from "../audio";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 

@@ -1,9 +1,9 @@
 import { BlurFilter, ColorMatrixFilter, NoiseFilter, Ticker } from "pixi.js";
 import GameNode from "./GameNode";
-import { CELL_SIZE, HEIGHT, WIDTH } from "./constants";
+import { CELL_SIZE, HEIGHT, WIDTH } from "../constants";
 import QubitPiece from "./QubitPiece";
-import { randomBasis, type Qubit } from "./quantum";
-import { range } from "./random";
+import { randomBasis, type Qubit } from "../quantum";
+import { range } from "../random";
 
 const scale = 0.75;
 const piecesWidth = Math.ceil(WIDTH / CELL_SIZE / scale);

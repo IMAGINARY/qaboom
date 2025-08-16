@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
-import { getBlochCoords, getOrtho, randomQubit, type Qubit } from "./quantum";
-import { getColor } from "./colors";
-import { PIECE_RADIUS } from "./constants";
+import { getBlochCoords, getOrtho, randomQubit, type Qubit } from "../quantum";
+import { getColor } from "../colors";
+import { PIECE_RADIUS } from "../constants";
 import GameNode from "./GameNode";
 
 // Represents a measurement along an axis

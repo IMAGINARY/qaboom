@@ -1,5 +1,5 @@
-import { CELL_SIZE } from "./constants";
-import { randomQubit, type Qubit } from "./quantum";
+import { CELL_SIZE } from "../constants";
+import { randomQubit, type Qubit } from "../quantum";
 import QubitPiece from "./QubitPiece";
 import GameNode from "./GameNode";
 

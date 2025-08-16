@@ -1,8 +1,8 @@
 import { Container, Graphics, Ticker } from "pixi.js";
-import { PIECE_RADIUS, theme } from "./constants";
-import { choice } from "./random";
-import { getColor } from "./colors";
-import { getBlochCoords, octet, rotationGate, type Axis } from "./quantum";
+import { PIECE_RADIUS, theme } from "../constants";
+import { choice } from "../random";
+import { getColor } from "../colors";
+import { getBlochCoords, octet, rotationGate, type Axis } from "../quantum";
 import GameNode from "./GameNode";
 
 const rotationSpeed = Math.PI / 16;

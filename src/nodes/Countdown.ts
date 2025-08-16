@@ -1,9 +1,9 @@
 import { HTMLText } from "pixi.js";
-import { HEIGHT, TEXT_FONT, theme, WIDTH } from "./constants";
+import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
-import { sounds } from "./audio";
-import { delay } from "./util";
-import { pulse } from "./animations";
+import { sounds } from "../audio";
+import { delay } from "../util";
+import { pulse } from "../animations";
 
 export default class Countdown extends GameNode {
   text: HTMLText;

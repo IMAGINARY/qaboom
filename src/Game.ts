@@ -1,9 +1,9 @@
 import { Application } from "pixi.js";
-import Menu from "./Menu";
+import Menu from "./nodes/Menu";
 import { HEIGHT, WIDTH } from "./constants";
-import SinglePlayer from "./SinglePlayer";
-import Multiplayer from "./Multiplayer";
-import Background from "./Background";
+import SinglePlayer from "./nodes/SinglePlayer";
+import Multiplayer from "./nodes/Multiplayer";
+import Background from "./nodes/Background";
 
 export default class Game {
   async start() {

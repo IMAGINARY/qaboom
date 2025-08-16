@@ -1,11 +1,11 @@
 import { Container, Graphics, Ticker } from "pixi.js";
-import { getBlochCoords, randomQubit, type Qubit } from "./quantum";
-import { PIECE_RADIUS, theme } from "./constants";
-import { getColor, getSecondaryColor } from "./colors";
-import { floatEquals } from "./math";
+import { getBlochCoords, randomQubit, type Qubit } from "../quantum";
+import { PIECE_RADIUS, theme } from "../constants";
+import { getColor, getSecondaryColor } from "../colors";
+import { floatEquals } from "../math";
 import GameNode from "./GameNode";
 import { animate } from "motion";
-import { pulse } from "./animations";
+import { pulse } from "../animations";
 
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D

@@ -1,7 +1,7 @@
 import { range } from "lodash-es";
-import QubitPair from "./QubitPair";
-import GatePiece from "./GatePiece";
-import MeasurementPiece from "./MeasurementPiece";
+import QubitPair from "./nodes/QubitPair";
+import GatePiece from "./nodes/GatePiece";
+import MeasurementPiece from "./nodes/MeasurementPiece";
 import { choice, shuffle } from "./random";
 import {
   ONE,
@@ -14,7 +14,7 @@ import {
   qubitBases,
   secondaryQubits,
 } from "./quantum";
-import type { Piece } from "./Deck";
+import type { Piece } from "./nodes/Deck";
 
 export interface Level {
   randomQubit: () => Qubit;
