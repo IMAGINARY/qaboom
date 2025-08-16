@@ -25,6 +25,7 @@ export default class Countdown extends GameNode {
   }
 
   async start() {
+    await delay(250);
     for (let count = 3; count > 0; count--) {
       this.text.text = count;
       sounds.score[3 - count].play();
