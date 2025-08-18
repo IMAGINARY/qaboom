@@ -27,7 +27,7 @@ type State = "pause" | "game";
 const MAX_MULTIPLIER = 1 / 5;
 
 // Initial rate at which pieces fall
-const INITIAL_STEP_RATE = 750;
+const INITIAL_STEP_RATE = 1000;
 // The rate at which to check if inputs are still pressed
 const INPUT_POLL_RATE = 120;
 
