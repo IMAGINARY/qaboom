@@ -6,7 +6,7 @@ import { getScores, setScores, type Score } from "../storage";
 import { playSound } from "../audio";
 import { container } from "../util";
 import { pulse } from "../animations";
-const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 type State = "enter_name" | "high_scores";
 
