@@ -234,7 +234,15 @@ export default class Player extends GameNode {
   }
 
   newCurrent() {
-    this.pieceCount++;
+    this.canSwap = true;
+    this.board.current = this.deck.pop();
+    this.board.setCurrentPosition(startingCell);
+    this.board.view.addChild(this.board.current.view);
+
+    if (this.board.current instanceof QubitPair) {
+      // Only increase the piece count on actual new pieces.
+      this.pieceCount++;
+    }
     // Increase level
     if (this.pieceCount > levelCount) {
       this.level++;
@@ -248,10 +256,6 @@ export default class Player extends GameNode {
         this.onLevelUp?.(this.levels[this.level]);
       }
     }
-    this.canSwap = true;
-    this.board.current = this.deck.pop();
-    this.board.setCurrentPosition(startingCell);
-    this.board.view.addChild(this.board.current.view);
   }
 
   swap() {

@@ -36,10 +36,12 @@ export const freeMode: Level = {
   randomQubit: () => randomQubit(),
   deal: () => {
     let buffer = [];
-    for (let _i of range(4)) {
+    for (let _i of range(5)) {
       buffer.push(QubitPair.random());
     }
-    buffer.push(GatePiece.random());
+    for (let _i of range(2)) {
+      buffer.push(GatePiece.random());
+    }
     for (let _i of range(1)) {
       buffer.push(MeasurementPiece.random());
     }
@@ -56,9 +58,11 @@ function primaryLevel(axis: Axis): Level {
       for (let _i of range(5)) {
         buffer.push(new QubitPair(random(), random()));
       }
-      buffer.push(new GatePiece(axis, choice(gateRotations)));
+      for (let _i of range(2)) {
+        buffer.push(new GatePiece(axis, choice(gateRotations)));
+      }
       buffer.push(new MeasurementPiece(random()));
-      return buffer;
+      return shuffle(buffer);
     },
   };
 }
@@ -72,7 +76,9 @@ function secondaryLevel(axis: Axis): Level {
       for (let _i of range(5)) {
         buffer.push(new QubitPair(random(), random()));
       }
-      buffer.push(new GatePiece(axis, choice(gateRotations)));
+      for (let _i of range(2)) {
+        buffer.push(new GatePiece(axis, choice(gateRotations)));
+      }
       buffer.push(new MeasurementPiece(random()));
       return buffer;
     },
@@ -92,9 +98,11 @@ export const primaryLevels: Level[] = [
       for (let _i of range(5)) {
         buffer.push(new QubitPair(random(), random()));
       }
-      buffer.push(
-        new GatePiece(choice(["X", "Y", "Z"]), choice(gateRotations))
-      );
+      for (let _i of range(2)) {
+        buffer.push(
+          new GatePiece(choice(["X", "Y", "Z"]), choice(gateRotations))
+        );
+      }
       buffer.push(new MeasurementPiece(random()));
       return buffer;
     },
@@ -114,9 +122,11 @@ export const secondaryLevels: Level[] = [
       for (let _i of range(5)) {
         buffer.push(new QubitPair(random(), random()));
       }
-      buffer.push(
-        new GatePiece(choice(["X", "Y", "Z"]), choice(gateRotations))
-      );
+      for (let _i of range(2)) {
+        buffer.push(
+          new GatePiece(choice(["X", "Y", "Z"]), choice(gateRotations))
+        );
+      }
       buffer.push(new MeasurementPiece(random()));
       return buffer;
     },
