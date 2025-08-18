@@ -46,6 +46,7 @@ interface Options {
  * The board and deck for a single player.
  */
 export default class Player extends GameNode {
+  onTopOut?: () => void;
   onGameOver?: (score: number) => void;
   onLevelUp?: (level: Level) => void;
   pressedKeys: Record<string, number> = {};
@@ -224,6 +225,7 @@ export default class Player extends GameNode {
 
   // Resolve the current piece's action when it can't move any more.
   gameOver() {
+    this.onTopOut?.();
     this.currentState = "pause";
     playSound("gameOver");
     this.fallOff().then(() => {

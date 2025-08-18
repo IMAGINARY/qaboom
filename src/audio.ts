@@ -11,6 +11,7 @@ import score5 from "./assets/audio/score5.ogg";
 import clear from "./assets/audio/clear.ogg";
 import levelUp from "./assets/audio/levelUp.ogg";
 import gameOver from "./assets/audio/gameOver.ogg";
+import bgMusic from "./assets/audio/bgMusic.ogg";
 import { sound } from "@pixi/sound";
 
 const soundMap = {
@@ -27,6 +28,7 @@ const soundMap = {
   clear,
   levelUp,
   gameOver,
+  bgMusic,
 };
 type SoundKey = keyof typeof soundMap;
 export function initSounds() {
@@ -35,11 +37,11 @@ export function initSounds() {
   }
 }
 
-export function playSound(key: SoundKey) {
-  sound.play(key);
+export async function playSound(key: SoundKey, options?: any) {
+  return await sound.play(key, options);
 }
 
 export function playScoreSound(level: number) {
   level = Math.max(0, Math.min(4, level));
-  sound.play("score" + (level + 1));
+  return sound.play("score" + (level + 1));
 }

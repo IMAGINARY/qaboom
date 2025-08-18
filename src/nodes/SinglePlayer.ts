@@ -7,6 +7,8 @@ import Background from "./Background";
 import { inputs } from "../inputs";
 import ScoreScreen from "./ScoreScreen";
 import Countdown from "./Countdown";
+import { type IMediaInstance } from "@pixi/sound";
+import { playSound } from "../audio";
 
 type Mode = "game" | "score";
 
@@ -15,6 +17,7 @@ export default class SinglePlayer extends GameNode {
   onFinish?: () => void;
   background: Background;
   mode: Mode = "game";
+  music?: IMediaInstance;
 
   constructor(background: Background) {
     super();
@@ -28,6 +31,9 @@ export default class SinglePlayer extends GameNode {
 
     this.player.onLevelUp = (level) => {
       this.background.setGenerator(level.randomQubit);
+    };
+    this.player.onTopOut = () => {
+      this.music?.stop();
     };
     this.player.onGameOver = (score) => {
       this.view.removeChild(this.player.view);
@@ -49,6 +55,7 @@ export default class SinglePlayer extends GameNode {
     await countdown.start();
     this.player.start();
     this.view.removeChild(countdown.view);
+    this.music = await playSound("bgMusic", { loop: true });
   }
 
   tick = (time: Ticker) => {

@@ -6,11 +6,14 @@ import { freeMode } from "../levels";
 import Background from "./Background";
 import { inputs } from "../inputs";
 import Countdown from "./Countdown";
+import type { IMediaInstance } from "@pixi/sound";
+import { playSound } from "../audio";
 
 export default class Multiplayer extends GameNode {
   players: Player[];
   background: Background;
   onFinish?: () => void;
+  music?: IMediaInstance;
 
   constructor(background: Background) {
     super();
@@ -30,6 +33,9 @@ export default class Multiplayer extends GameNode {
     ];
 
     for (let player of this.players) {
+      player.onTopOut = () => {
+        this.music?.stop();
+      };
       player.onGameOver = () => {
         for (let p2 of this.players) {
           this.view.removeChild(p2.view);
@@ -50,6 +56,7 @@ export default class Multiplayer extends GameNode {
     for (let player of this.players) {
       player.start();
     }
+    this.music = await playSound("bgMusic", { loop: true });
   }
 
   tick = (time: Ticker) => {
