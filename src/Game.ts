@@ -24,14 +24,14 @@ export default class Game {
 
     const background = new Background();
 
-    const menu = new Menu();
+    const menu = new Menu(background);
     app.stage.addChild(background.view);
     app.ticker.add(background.tick);
     menu.show(app.stage);
-    menu.onStart = (numPlayers) => {
+    menu.onStart = (numPlayers, level) => {
       menu.hide();
       if (numPlayers === 1) {
-        const singlePlayer = new SinglePlayer(background);
+        const singlePlayer = new SinglePlayer(background, level);
         singlePlayer.onFinish = () => {
           app.ticker.remove(singlePlayer.tick);
           app.stage.removeChild(singlePlayer.view);
@@ -41,7 +41,7 @@ export default class Game {
         singlePlayer.start();
         app.ticker.add(singlePlayer.tick);
       } else {
-        const multiplayer = new Multiplayer(background);
+        const multiplayer = new Multiplayer(background, level);
         multiplayer.onFinish = () => {
           app.ticker.remove(multiplayer.tick);
           app.stage.removeChild(multiplayer.view);

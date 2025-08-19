@@ -2,7 +2,7 @@ import { type Ticker } from "pixi.js";
 import { WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
-import { freeMode } from "../levels";
+import { campaign } from "../levels";
 import Background from "./Background";
 import { inputs } from "../inputs";
 import Countdown from "./Countdown";
@@ -15,20 +15,22 @@ export default class Multiplayer extends GameNode {
   onFinish?: () => void;
   music?: IMediaInstance;
 
-  constructor(background: Background) {
+  constructor(background: Background, startLevel: number) {
     super();
     this.background = background;
     this.players = [
       new Player({
         position: { x: 0, y: 0 },
         inputMap: inputs.player1,
-        levels: [freeMode],
+        levels: campaign,
+        startLevel,
       }),
 
       new Player({
         position: { x: WIDTH / 2, y: 0 },
         inputMap: inputs.player2,
-        levels: [freeMode],
+        levels: campaign,
+        startLevel,
       }),
     ];
 

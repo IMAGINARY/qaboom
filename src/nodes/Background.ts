@@ -2,7 +2,7 @@ import { BlurFilter, ColorMatrixFilter, NoiseFilter, Ticker } from "pixi.js";
 import GameNode from "./GameNode";
 import { CELL_SIZE, HEIGHT, WIDTH } from "../constants";
 import QubitPiece from "./QubitPiece";
-import { randomBasis, type Qubit } from "../quantum";
+import { randomQubit, type Qubit } from "../quantum";
 import { range } from "../random";
 
 const scale = 0.75;
@@ -10,7 +10,7 @@ const piecesWidth = Math.ceil(WIDTH / CELL_SIZE / scale);
 const piecesHeight = Math.ceil(HEIGHT / CELL_SIZE / scale);
 // A background of qubits
 export default class Background extends GameNode {
-  generator = randomBasis;
+  generator = randomQubit;
   pieces: QubitPiece[] = [];
   constructor() {
     super();

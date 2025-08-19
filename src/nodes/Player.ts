@@ -40,6 +40,7 @@ interface Options {
   levels: Level[];
   position: PointData;
   inputMap: PlayerInput;
+  startLevel: number;
 }
 
 /**
@@ -73,8 +74,9 @@ export default class Player extends GameNode {
   inputMap: PlayerInput;
   keyDelays: Record<string, number> = {};
 
-  constructor({ position, inputMap, levels }: Options) {
+  constructor({ position, inputMap, levels, startLevel }: Options) {
     super();
+    this.#level = startLevel;
     // TODO be able to reference the "current" position based on the board.
     this.inputMap = inputMap;
     this.keyDelays = {

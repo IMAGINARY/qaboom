@@ -5,15 +5,26 @@ import { inputs } from "../inputs";
 import { container } from "../util";
 import { pulse } from "../animations";
 import { playSound } from "../audio";
+import { campaign } from "../levels";
+import type Background from "./Background";
+
+type State = "player-select" | "level-select";
 
 export default class Menu extends GameNode {
-  onStart?: (numPlayers: number) => void;
+  state: State = "player-select";
+  onStart?: (numPlayers: number, level: number) => void;
   numPlayers = 1;
+  level = 0;
   player1Text: HTMLText;
   player2Text: HTMLText;
+  levelText: HTMLText;
+  playerSelect = new Container();
+  levelSelect = new Container();
+  background: Background;
 
-  constructor() {
+  constructor(background: Background) {
     super();
+    this.background = background;
     this.view.position.x = WIDTH / 2;
     this.view.position.y = HEIGHT / 2;
 
@@ -56,7 +67,7 @@ export default class Menu extends GameNode {
     this.player1Text.position.x = 0;
     this.player1Text.position.y = 50;
     this.player1Text.anchor = { x: 0.5, y: 0.5 };
-    this.view.addChild(this.player1Text);
+    this.playerSelect.addChild(this.player1Text);
     this.player2Text = new HTMLText({
       text: "2 Players",
       style: {
@@ -70,7 +81,30 @@ export default class Menu extends GameNode {
     this.player2Text.position.x = 0;
     this.player2Text.position.y = 200;
     this.player2Text.anchor = { x: 0.5, y: 0.5 };
-    this.view.addChild(this.player2Text);
+    this.playerSelect.addChild(this.player2Text);
+    this.view.addChild(this.playerSelect);
+    this.levelText = new HTMLText({
+      text: "Level 1",
+      style: {
+        align: "center",
+        fill: theme.colors.primary,
+        fontWeight: "bold",
+        fontFamily: TEXT_FONT,
+        fontSize: 72,
+      },
+    });
+    this.levelText.anchor = { x: 0.5, y: 0.5 };
+    this.levelSelect.position.x = 0;
+    this.levelSelect.position.y = 100;
+    this.levelSelect.addChild(this.levelText);
+    const leftArrow = new Graphics()
+      .poly([-300, 0, -250, 30, -250, -30])
+      .fill(theme.colors.primary);
+    const rightArrow = new Graphics()
+      .poly([300, 0, 250, 30, 250, -30])
+      .fill(theme.colors.primary);
+    this.levelSelect.addChild(leftArrow);
+    this.levelSelect.addChild(rightArrow);
   }
 
   toggleNumPlayers() {
@@ -92,23 +126,65 @@ export default class Menu extends GameNode {
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
-    switch (e.key) {
-      case inputs.player1.flip:
-      case inputs.player2.flip: {
-        playSound("clear");
-        this.onStart?.(this.numPlayers);
+    switch (this.state) {
+      case "player-select": {
+        switch (e.key) {
+          case inputs.player1.flip:
+          case inputs.player2.flip: {
+            playSound("clear");
+            this.showLevelSelect();
+            break;
+          }
+          case inputs.player1.up:
+          case inputs.player1.down:
+          case inputs.player2.up:
+          case inputs.player2.down: {
+            playSound("turn");
+            this.toggleNumPlayers();
+            break;
+          }
+        }
         break;
       }
-      case inputs.player1.up:
-      case inputs.player1.down:
-      case inputs.player2.up:
-      case inputs.player2.down: {
-        playSound("turn");
-        this.toggleNumPlayers();
+      case "level-select": {
+        switch (e.key) {
+          case inputs.player1.flip:
+          case inputs.player2.flip: {
+            playSound("clear");
+            this.onStart?.(this.numPlayers, this.level);
+            break;
+          }
+          case inputs.player1.left:
+          case inputs.player2.left: {
+            this.toggleLevel((this.level || campaign.length) - 1);
+            break;
+          }
+
+          case inputs.player1.right:
+          case inputs.player2.right: {
+            this.toggleLevel((this.level + 1) % campaign.length);
+            break;
+          }
+        }
         break;
       }
     }
   };
+
+  showLevelSelect() {
+    this.state = "level-select";
+    this.view.removeChild(this.playerSelect);
+    this.view.addChild(this.levelSelect);
+    this.toggleLevel(this.level);
+  }
+
+  toggleLevel(level: number) {
+    this.level = level;
+    this.levelText.text = `Level ${this.level + 1}`;
+    playSound("turn");
+    pulse(this.levelSelect);
+    this.background.setGenerator(campaign[this.level].randomQubit);
+  }
 
   show(parent: Container) {
     parent.addChild(this.view);

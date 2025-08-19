@@ -19,13 +19,14 @@ export default class SinglePlayer extends GameNode {
   mode: Mode = "game";
   music?: IMediaInstance;
 
-  constructor(background: Background) {
+  constructor(background: Background, startLevel: number) {
     super();
     this.background = background;
     this.player = new Player({
       position: { x: WIDTH / 2 - 300, y: 0 },
       inputMap: inputs.player1,
       levels: campaign,
+      startLevel,
     });
     this.view.addChild(this.player.view);
 
