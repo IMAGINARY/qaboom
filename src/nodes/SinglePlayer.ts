@@ -23,11 +23,14 @@ export default class SinglePlayer extends GameNode {
     super();
     this.background = background;
     this.player = new Player({
-      position: { x: WIDTH / 2 - 300, y: 0 },
       inputMap: inputs.player1,
       levels: campaign,
       startLevel,
     });
+    this.player.view.position = {
+      x: WIDTH / 2 - this.player.view.width / 2,
+      y: 0,
+    };
     this.view.addChild(this.player.view);
 
     this.player.onLevelUp = (level) => {

@@ -1,4 +1,4 @@
-import { HTMLText, Point, Ticker, type PointData } from "pixi.js";
+import { HTMLText, Ticker } from "pixi.js";
 import "pixi.js/math-extras";
 import MeasurementPiece from "./MeasurementPiece";
 import { DOWN, LEFT, RIGHT, UP } from "../points";
@@ -38,7 +38,6 @@ const BOARD_OFFSET_Y = 80;
 
 interface Options {
   levels: Level[];
-  position: PointData;
   inputMap: PlayerInput;
   startLevel: number;
 }
@@ -74,7 +73,7 @@ export default class Player extends GameNode {
   inputMap: PlayerInput;
   keyDelays: Record<string, number> = {};
 
-  constructor({ position, inputMap, levels, startLevel }: Options) {
+  constructor({ inputMap, levels, startLevel }: Options) {
     super();
     this.#level = startLevel;
     // TODO be able to reference the "current" position based on the board.
@@ -128,11 +127,7 @@ export default class Player extends GameNode {
     this.levelSign.position = { x: 50, y: 10 };
     this.view.addChild(this.levelSign);
 
-    this.view.pivot.set(this.view.width / 2, this.view.height / 2);
-    this.view.position = new Point(
-      position.x + this.view.width / 2,
-      position.y + this.view.height / 2
-    );
+    this.view.origin.set(this.view.width / 2, this.view.height / 2);
 
     this.newCurrent();
   }

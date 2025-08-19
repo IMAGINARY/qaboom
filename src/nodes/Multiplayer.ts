@@ -20,19 +20,25 @@ export default class Multiplayer extends GameNode {
     this.background = background;
     this.players = [
       new Player({
-        position: { x: 0, y: 0 },
         inputMap: inputs.player1,
         levels: campaign,
         startLevel,
       }),
 
       new Player({
-        position: { x: WIDTH / 2, y: 0 },
         inputMap: inputs.player2,
         levels: campaign,
         startLevel,
       }),
     ];
+    this.players[0].view.position = {
+      x: (1 / 4) * WIDTH - this.players[0].view.width / 2,
+      y: 0,
+    };
+    this.players[1].view.position = {
+      x: (3 / 4) * WIDTH - this.players[1].view.width / 2,
+      y: 0,
+    };
 
     for (let player of this.players) {
       player.onTopOut = () => {
