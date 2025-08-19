@@ -45,7 +45,7 @@ export default class Menu extends GameNode {
       style: {
         align: "center",
         fill: theme.colors.primary,
-        fontFamily: "sans-serif",
+        fontFamily: TEXT_FONT,
         // fontWeight: "bold",
         fontSize: 220,
       },
