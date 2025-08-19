@@ -220,6 +220,7 @@ export default class ScoreScreen extends GameNode {
   }
 
   start() {
+    playSound("ending");
     document.addEventListener("keydown", this.handleKeyDown);
   }
 
