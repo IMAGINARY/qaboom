@@ -13,6 +13,7 @@ import {
   CELL_SIZE,
   PIECE_RADIUS,
   TEXT_FONT,
+  theme,
 } from "../constants";
 import { range, uniqWith } from "lodash-es";
 import type { Piece } from "./Deck";
@@ -233,6 +234,7 @@ export default class Board extends GameNode {
     const uniqMeasured = uniqWith(measuredQubits, (a, b) => a.equals(b));
     if (uniqMeasured.length > 0) {
       playSound("clear");
+      this.showBoom(uniqMeasured.length);
     }
     let score = 0;
     score += triangular(uniqMeasured.length);
@@ -273,6 +275,37 @@ export default class Board extends GameNode {
       }
       await delay(150);
     } while (anyFalling);
+  }
+
+  async showBoom(count: number) {
+    if (!(this.current instanceof MeasurementPiece)) {
+      return;
+    }
+    const text = new HTMLText({
+      text: count >= 15 ? `QABOOM!` : count >= 6 ? "BOOM!" : "boom.",
+      style: new TextStyle({
+        fontSize: Math.min(BOARD_WIDTH * CELL_SIZE * 1.25, 60 + 5 * count),
+        fontFamily: TEXT_FONT,
+        fontWeight: "bold",
+        fill: theme.colors.primary,
+      }),
+    });
+    // Have the text above everything else
+    text.zIndex = 100;
+    text.anchor = { x: 0.5, y: 0.5 };
+    text.position = {
+      x: (BOARD_WIDTH * CELL_SIZE) / 2,
+      y: (BOARD_HEIGHT * CELL_SIZE) / 2,
+    };
+    text.scale = 0;
+    // text.position =
+    this.view.addChild(text);
+    await animate([
+      [text.scale, { x: 1.5, y: 1.5 }, { duration: 0.5 }],
+      [text.scale, { x: 1, y: 1 }, { duration: 0.5 }],
+      [text, { alpha: 0 }, { at: 0.5, duration: 0.5 }],
+    ]);
+    this.view.removeChild(text);
   }
 
   async pingScore(position: Point, score: number) {
