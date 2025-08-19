@@ -1,5 +1,5 @@
-import { Point, type Ticker } from "pixi.js";
-import { WIDTH } from "../constants";
+import { HTMLText, Point, type Ticker } from "pixi.js";
+import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "../levels";
@@ -11,11 +11,13 @@ import { playSound } from "../audio";
 import { LEFT, RIGHT } from "../points";
 import { slideIn } from "../animations";
 
+type State = "game" | "end";
 export default class Multiplayer extends GameNode {
   players: Player[];
   background: Background;
   onFinish?: () => void;
   music?: IMediaInstance;
+  state: State = "game";
 
   constructor(background: Background, startLevel: number) {
     super();
@@ -33,7 +35,7 @@ export default class Multiplayer extends GameNode {
         startLevel,
       }),
     ];
-    for (let player of this.players) {
+    for (let [index, player] of this.players.entries()) {
       player.onTopOut = () => {
         this.music?.stop();
         for (let p2 of this.players) {
@@ -41,17 +43,36 @@ export default class Multiplayer extends GameNode {
         }
       };
       player.onGameOver = () => {
-        for (let p2 of this.players) {
-          this.view.removeChild(p2.view);
-          p2.destroy();
-        }
-        // TODO show win screen
-        this.onFinish?.();
+        playSound("ending");
+        const text = new HTMLText({
+          text: `Player ${2 - index} Wins!`,
+          style: {
+            fontSize: 72,
+            fontFamily: TEXT_FONT,
+            fill: theme.colors.primary,
+            stroke: { color: theme.colors.background, width: 10 },
+            fontWeight: "bold",
+          },
+        });
+        text.anchor = { x: 0.5, y: 0.5 };
+        text.position = {
+          x: (index === 0 ? 1 / 4 : 3 / 4) * WIDTH,
+          y: HEIGHT / 2,
+        };
+        this.view.addChild(text);
+        this.state = "end";
+        // for (let p2 of this.players) {
+        //   this.view.removeChild(p2.view);
+        //   p2.destroy();
+        // }
+        // // TODO show win screen
+        // this.onFinish?.();
       };
     }
   }
 
   async start() {
+    document.addEventListener("keydown", this.handleKeyDown);
     for (let player of this.players) {
       this.view.addChild(player.view);
     }
@@ -75,6 +96,19 @@ export default class Multiplayer extends GameNode {
     }
     this.music = await playSound("bgMusic", { loop: true });
   }
+
+  handleKeyDown = () => {
+    if (this.state !== "end") {
+      return;
+    }
+    for (let p2 of this.players) {
+      this.view.removeChild(p2.view);
+      p2.destroy();
+    }
+    document.removeEventListener("keydown", this.handleKeyDown);
+    this.onFinish?.();
+    // End the game
+  };
 
   tick = (time: Ticker) => {
     for (let player of this.players) {
