@@ -5,6 +5,7 @@ import SinglePlayer from "./nodes/SinglePlayer";
 import Multiplayer from "./nodes/Multiplayer";
 import Background from "./nodes/Background";
 import { initSounds } from "./audio";
+import { inputs } from "./inputs";
 
 export default class Game {
   async start() {
@@ -21,6 +22,13 @@ export default class Game {
 
     // Append the application canvas to the document body
     document.getElementById("app")!.appendChild(app.canvas);
+
+    // Button to manually refresh the app
+    document.addEventListener("keydown", (e) => {
+      if (e.key === inputs.refresh) {
+        window.location.reload();
+      }
+    });
 
     const background = new Background();
 

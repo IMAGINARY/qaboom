@@ -7,6 +7,7 @@ export interface PlayerInput {
   hold: string;
 }
 export const inputs = {
+  refresh: "r",
   pause: "p",
   player1: {
     left: "a",
