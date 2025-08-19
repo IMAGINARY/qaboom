@@ -15,6 +15,7 @@ export default class Countdown extends GameNode {
       text: "",
       style: {
         fill: theme.colors.primary,
+        stroke: { color: theme.colors.background, width: 10 },
         fontFamily: TEXT_FONT,
         fontWeight: "bold",
         fontSize: 256,
