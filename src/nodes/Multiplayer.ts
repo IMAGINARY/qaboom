@@ -37,6 +37,9 @@ export default class Multiplayer extends GameNode {
     for (let player of this.players) {
       player.onTopOut = () => {
         this.music?.stop();
+        for (let p2 of this.players) {
+          p2.currentState = "pause";
+        }
       };
       player.onGameOver = () => {
         for (let p2 of this.players) {
