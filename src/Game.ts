@@ -1,4 +1,4 @@
-import { Application } from "pixi.js";
+import { Application, Assets } from "pixi.js";
 import Menu from "./nodes/Menu";
 import { HEIGHT, WIDTH } from "./constants";
 import SinglePlayer from "./nodes/SinglePlayer";
@@ -6,6 +6,7 @@ import Multiplayer from "./nodes/Multiplayer";
 import Background from "./nodes/Background";
 import { initSounds } from "./audio";
 import { inputs } from "./inputs";
+import ministryLogoPath from "./assets/img/ministry-logo.png";
 
 export default class Game {
   async start() {
@@ -20,6 +21,8 @@ export default class Game {
       height: HEIGHT,
     });
 
+    const ministryLogoTexture = await Assets.load(ministryLogoPath);
+
     // Append the application canvas to the document body
     document.getElementById("app")!.appendChild(app.canvas);
 
@@ -32,7 +35,7 @@ export default class Game {
 
     const background = new Background();
 
-    const menu = new Menu(background);
+    const menu = new Menu(background, ministryLogoTexture);
     app.stage.addChild(background.view);
     app.ticker.add(background.tick);
     menu.show(app.stage);

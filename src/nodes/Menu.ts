@@ -1,4 +1,4 @@
-import { Container, Graphics, HTMLText } from "pixi.js";
+import { Container, Graphics, HTMLText, Sprite } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import { inputs } from "../inputs";
@@ -22,14 +22,14 @@ export default class Menu extends GameNode {
   levelSelect = new Container();
   background: Background;
 
-  constructor(background: Background) {
+  constructor(background: Background, ministryLogo: any) {
     super();
     this.background = background;
     this.view.position.x = WIDTH / 2;
     this.view.position.y = HEIGHT / 2;
 
     const boxHeight = 900;
-    const boxWidth = 1500;
+    const boxWidth = 1400;
     this.view.addChild(
       container(
         new Graphics().roundRect(
@@ -105,6 +105,12 @@ export default class Menu extends GameNode {
       .fill(theme.colors.primary);
     this.levelSelect.addChild(leftArrow);
     this.levelSelect.addChild(rightArrow);
+
+    const logo = new Sprite(ministryLogo);
+    logo.anchor = { x: 0, y: 1 };
+    logo.position = { x: -WIDTH / 2, y: HEIGHT / 2 };
+    logo.scale = 0.3;
+    this.view.addChild(logo);
   }
 
   toggleNumPlayers() {
