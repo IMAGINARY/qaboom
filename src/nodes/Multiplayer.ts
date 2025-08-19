@@ -1,4 +1,4 @@
-import { type Ticker } from "pixi.js";
+import { Point, type Ticker } from "pixi.js";
 import { WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
@@ -8,6 +8,8 @@ import { inputs } from "../inputs";
 import Countdown from "./Countdown";
 import type { IMediaInstance } from "@pixi/sound";
 import { playSound } from "../audio";
+import { LEFT, RIGHT } from "../points";
+import { slideIn } from "../animations";
 
 export default class Multiplayer extends GameNode {
   players: Player[];
@@ -31,15 +33,6 @@ export default class Multiplayer extends GameNode {
         startLevel,
       }),
     ];
-    this.players[0].view.position = {
-      x: (1 / 4) * WIDTH - this.players[0].view.width / 2,
-      y: 0,
-    };
-    this.players[1].view.position = {
-      x: (3 / 4) * WIDTH - this.players[1].view.width / 2,
-      y: 0,
-    };
-
     for (let player of this.players) {
       player.onTopOut = () => {
         this.music?.stop();
@@ -55,11 +48,24 @@ export default class Multiplayer extends GameNode {
         // TODO show win screen
         this.onFinish?.();
       };
-      this.view.addChild(player.view);
     }
   }
 
   async start() {
+    for (let player of this.players) {
+      this.view.addChild(player.view);
+    }
+    slideIn(
+      this.players[0].view,
+      new Point((1 / 4) * WIDTH - this.players[0].view.width / 2, 0),
+      LEFT
+    );
+    slideIn(
+      this.players[1].view,
+      new Point((3 / 4) * WIDTH - this.players[1].view.width / 2, 0),
+      RIGHT
+    );
+
     const countdown = new Countdown();
     this.view.addChild(countdown.view);
     await countdown.start();

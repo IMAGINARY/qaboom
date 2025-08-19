@@ -1,4 +1,4 @@
-import { type Ticker } from "pixi.js";
+import { Point, type Ticker } from "pixi.js";
 import { WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
@@ -9,6 +9,8 @@ import ScoreScreen from "./ScoreScreen";
 import Countdown from "./Countdown";
 import { type IMediaInstance } from "@pixi/sound";
 import { playSound } from "../audio";
+import { slideIn } from "../animations";
+import { UP } from "../points";
 
 type Mode = "game" | "score";
 
@@ -27,12 +29,6 @@ export default class SinglePlayer extends GameNode {
       levels: campaign,
       startLevel,
     });
-    this.player.view.position = {
-      x: WIDTH / 2 - this.player.view.width / 2,
-      y: 0,
-    };
-    this.view.addChild(this.player.view);
-
     this.player.onLevelUp = (level) => {
       this.background.setGenerator(level.randomQubit);
     };
@@ -54,6 +50,13 @@ export default class SinglePlayer extends GameNode {
   }
 
   async start() {
+    this.view.addChild(this.player.view);
+    slideIn(
+      this.player.view,
+      new Point(WIDTH / 2 - this.player.view.width / 2, 0),
+      UP
+    );
+
     const countdown = new Countdown();
     this.view.addChild(countdown.view);
     await countdown.start();
