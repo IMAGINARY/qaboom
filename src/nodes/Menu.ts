@@ -171,6 +171,12 @@ export default class Menu extends GameNode {
     }
   };
 
+  showPlayerSelect() {
+    this.state = "player-select";
+    this.view.removeChild(this.levelSelect);
+    this.view.addChild(this.playerSelect);
+  }
+
   showLevelSelect() {
     this.state = "level-select";
     this.view.removeChild(this.playerSelect);
@@ -188,6 +194,7 @@ export default class Menu extends GameNode {
 
   show(parent: Container) {
     parent.addChild(this.view);
+    this.showPlayerSelect();
     document.addEventListener("keydown", this.handleKeyDown);
   }
 
