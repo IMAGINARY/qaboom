@@ -7,6 +7,11 @@ import Background from "./nodes/Background";
 import { initSounds } from "./audio";
 import { inputs } from "./inputs";
 import ministryLogoPath from "./assets/img/ministry-logo.png";
+import IdleMode from "./nodes/IdleMode";
+import { randomInt } from "mathjs";
+import { campaign } from "./levels";
+
+const IDLE_TIMEOUT = 60 * 1000;
 
 export default class Game {
   async start() {
@@ -38,15 +43,46 @@ export default class Game {
     const menu = new Menu(background, ministryLogoTexture);
     app.stage.addChild(background.view);
     app.ticker.add(background.tick);
-    menu.show(app.stage);
+
+    let timeout: number;
+    function setIdleTimeout() {
+      timeout = setTimeout(() => {
+        menu.hide();
+        const idleMode = new IdleMode(
+          background,
+          randomInt(0, campaign.length)
+        );
+        idleMode.onFinish = () => {
+          app.ticker.remove(idleMode.tick);
+          app.stage.removeChild(idleMode.view);
+          showMenu();
+        };
+        app.stage.addChild(idleMode.view);
+        idleMode.start();
+        app.ticker.add(idleMode.tick);
+      }, IDLE_TIMEOUT);
+    }
+    const resetIdleTimeout = () => {
+      clearTimeout(timeout);
+      setIdleTimeout();
+    };
+    const showMenu = () => {
+      menu.show(app.stage);
+      setIdleTimeout();
+      document.addEventListener("keydown", resetIdleTimeout);
+    };
+
+    showMenu();
     menu.onStart = (numPlayers, level) => {
+      document.removeEventListener("keydown", resetIdleTimeout);
+      clearTimeout(timeout);
       menu.hide();
       if (numPlayers === 1) {
         const singlePlayer = new SinglePlayer(background, level);
         singlePlayer.onFinish = () => {
           app.ticker.remove(singlePlayer.tick);
           app.stage.removeChild(singlePlayer.view);
-          menu.show(app.stage);
+          showMenu();
         };
         app.stage.addChild(singlePlayer.view);
         singlePlayer.start();
@@ -56,7 +92,7 @@ export default class Game {
         multiplayer.onFinish = () => {
           app.ticker.remove(multiplayer.tick);
           app.stage.removeChild(multiplayer.view);
-          menu.show(app.stage);
+          showMenu();
         };
         app.stage.addChild(multiplayer.view);
         multiplayer.start();
