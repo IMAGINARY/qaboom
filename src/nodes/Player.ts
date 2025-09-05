@@ -240,6 +240,9 @@ export default class Player extends GameNode {
       // Only increase the piece count on actual new pieces.
       this.pieceCount++;
     }
+    if (this.board.current instanceof GatePiece) {
+      this.board.current.outline.alpha = 1;
+    }
     // Increase level
     if (this.pieceCount > levelCount) {
       this.level++;
@@ -259,6 +262,12 @@ export default class Player extends GameNode {
     this.canSwap = false;
     playSound("swap");
     [this.board.current, this.hold] = [this.hold, this.board.current];
+    if (this.board.current instanceof GatePiece) {
+      this.board.current.outline.alpha = 1;
+    }
+    if (this.hold instanceof GatePiece) {
+      this.hold.outline.alpha = 0;
+    }
     if (!this.board.current) {
       this.newCurrent();
     }

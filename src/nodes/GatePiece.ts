@@ -1,5 +1,5 @@
 import { Container, Graphics, Ticker } from "pixi.js";
-import { PIECE_RADIUS, theme } from "../constants";
+import { CELL_SIZE, PIECE_RADIUS, theme } from "../constants";
 import { choice } from "../random";
 import { getColor } from "../colors";
 import { getBlochCoords, octet, rotationGate, type Axis } from "../quantum";
@@ -13,6 +13,7 @@ export default class GatePiece extends GameNode {
   axis: Axis;
   background: Graphics;
   angleMarker: Graphics;
+  outline: Graphics;
 
   constructor(axis: Axis, angle: number) {
     super();
@@ -21,6 +22,17 @@ export default class GatePiece extends GameNode {
     this.view = new Container();
     this.angleMarker = new Graphics();
     this.background = new Graphics();
+    this.outline = new Graphics()
+      .roundRect(
+        -CELL_SIZE * 1.5,
+        -CELL_SIZE * 1.5,
+        3 * CELL_SIZE,
+        3 * CELL_SIZE,
+        10
+      )
+      .stroke({ color: "white", width: 2, alpha: 0.5 });
+    this.outline.alpha = 0;
+    this.view.addChild(this.outline);
     const colorMap = octet(axis);
     for (let i = 0; i < 8; i++) {
       let angle = (i / 8) * 2 * Math.PI - Math.PI / 2;
