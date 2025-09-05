@@ -11,7 +11,7 @@ import score5 from "./assets/audio/score5.ogg";
 import clear from "./assets/audio/clear.ogg";
 import levelUp from "./assets/audio/levelUp.ogg";
 import gameOver from "./assets/audio/gameOver.ogg";
-import bgMusic from "./assets/audio/bgMusic.ogg";
+import bgMusic from "./assets/audio/bgMusic.wav";
 import ending from "./assets/audio/ending.ogg";
 import { sound } from "@pixi/sound";
 
