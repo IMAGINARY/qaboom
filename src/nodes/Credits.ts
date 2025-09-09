@@ -160,7 +160,7 @@ export default class Credits extends GameNode {
     const imaginaryLogoTexture = await Assets.load(imaginaryLogoPath);
     const mpiLogoTexture = await Assets.load(mpiLogoPath);
     const titleText2 = new HTMLText({
-      text: "Part of Quantum Arcade by",
+      text: "Part of quantum-arcade.org by",
       style: {
         align: "center",
         fill: "black",
