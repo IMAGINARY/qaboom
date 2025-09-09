@@ -1,5 +1,5 @@
 import { Point, type Ticker } from "pixi.js";
-import { WIDTH } from "../constants";
+import { HEIGHT, WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "../levels";
@@ -40,6 +40,7 @@ export default class SinglePlayer extends GameNode {
       this.player.destroy();
       this.mode = "score";
       const scores = new ScoreScreen(score * 100, inputs.player1);
+      scores.view.position = { x: WIDTH / 2, y: HEIGHT / 2 };
       this.view.addChild(scores.view);
       scores.onFinish = () => {
         scores.destroy();

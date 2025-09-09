@@ -1,5 +1,5 @@
 import { Container, Graphics, HTMLText } from "pixi.js";
-import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
+import { HEIGHT, TEXT_FONT, theme } from "../constants";
 import GameNode from "./GameNode";
 import { type PlayerInput } from "../inputs";
 import { getScores, setScores, type Score } from "../storage";
@@ -25,7 +25,6 @@ export default class ScoreScreen extends GameNode {
     super();
     this.score = score;
     this.inputMap = inputMap;
-    this.view.position = { x: WIDTH / 2, y: HEIGHT / 2 };
 
     const containerSize = HEIGHT * 0.75;
     this.view.addChild(
@@ -204,7 +203,9 @@ export default class ScoreScreen extends GameNode {
       }
     } else {
       // Press any key to go back to start
-      this.onFinish?.();
+      if (Object.values(this.inputMap).includes(e.key)) {
+        this.onFinish?.();
+      }
     }
   };
 

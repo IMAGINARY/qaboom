@@ -1,5 +1,5 @@
-import { HTMLText, Point, type Ticker } from "pixi.js";
-import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
+import { Point, type Ticker } from "pixi.js";
+import { HEIGHT, WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "../levels";
@@ -10,6 +10,7 @@ import type { IMediaInstance } from "@pixi/sound";
 import { playSound } from "../audio";
 import { LEFT, RIGHT } from "../points";
 import { slideIn } from "../animations";
+import ScoreScreen from "./ScoreScreen";
 
 type State = "game" | "end";
 export default class Multiplayer extends GameNode {
@@ -18,6 +19,8 @@ export default class Multiplayer extends GameNode {
   onFinish?: () => void;
   music?: IMediaInstance;
   state: State = "game";
+  outPlayers: number[] = [];
+  scoreFinishPlayers: number[] = [];
 
   constructor(background: Background, startLevel: number) {
     super();
@@ -37,42 +40,37 @@ export default class Multiplayer extends GameNode {
     ];
     for (let [index, player] of this.players.entries()) {
       player.onTopOut = () => {
-        this.music?.stop();
-        for (let p2 of this.players) {
-          p2.currentState = "pause";
+        this.outPlayers.push(index);
+        if (this.outPlayers.length === 2) {
+          this.music?.stop();
         }
       };
-      player.onGameOver = () => {
-        playSound("ending");
-        const text = new HTMLText({
-          text: `Player ${2 - index} Wins!`,
-          style: {
-            fontSize: 72,
-            fontFamily: TEXT_FONT,
-            fill: theme.colors.primary,
-            stroke: { color: theme.colors.background, width: 10 },
-            fontWeight: "bold",
-          },
-        });
-        text.anchor = { x: 0.5, y: 0.5 };
-        text.position = {
-          x: (index === 0 ? 1 / 4 : 3 / 4) * WIDTH,
+      player.onGameOver = (score) => {
+        this.view.removeChild(player.view);
+        player.destroy();
+        const scores = new ScoreScreen(
+          score * 100,
+          inputs[index === 0 ? "player1" : "player2"]
+        );
+        scores.view.position = {
+          x: WIDTH * (index === 0 ? 0.25 : 0.75),
           y: HEIGHT / 2,
         };
-        this.view.addChild(text);
-        this.state = "end";
-        // for (let p2 of this.players) {
-        //   this.view.removeChild(p2.view);
-        //   p2.destroy();
-        // }
-        // // TODO show win screen
-        // this.onFinish?.();
+        this.view.addChild(scores.view);
+        scores.onFinish = () => {
+          this.view.removeChild(scores.view);
+          scores.destroy();
+          this.scoreFinishPlayers.push(index);
+          if (this.scoreFinishPlayers.length === 2) {
+            this.onFinish?.();
+          }
+        };
+        scores.start();
       };
     }
   }
 
   async start() {
-    document.addEventListener("keydown", this.handleKeyDown);
     for (let player of this.players) {
       this.view.addChild(player.view);
     }
@@ -96,19 +94,6 @@ export default class Multiplayer extends GameNode {
     }
     this.music = await playSound("bgMusic", { loop: true });
   }
-
-  handleKeyDown = () => {
-    if (this.state !== "end") {
-      return;
-    }
-    for (let p2 of this.players) {
-      this.view.removeChild(p2.view);
-      p2.destroy();
-    }
-    document.removeEventListener("keydown", this.handleKeyDown);
-    this.onFinish?.();
-    // End the game
-  };
 
   tick = (time: Ticker) => {
     for (let player of this.players) {
