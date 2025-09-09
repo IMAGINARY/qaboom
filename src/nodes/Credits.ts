@@ -1,7 +1,8 @@
-import { Point, Container, Graphics, HTMLText } from "pixi.js";
+import { Point, Container, Graphics, HTMLText, Assets, Sprite } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import { container } from "../util";
 import GameNode from "./GameNode";
+import ministryLogoPath from "../assets/img/ministry-logo.png";
 
 export default class Credits extends GameNode {
   onFinish?: () => void;
@@ -60,7 +61,7 @@ export default class Credits extends GameNode {
       "Oliver Schön"
     );
     this.drawCredit(
-      new Point(width, -HEIGHT * 0.15),
+      new Point(width, -HEIGHT * 0.125),
       "Arcade Machine Graphic Design",
       "Eric Londaits"
     );
@@ -69,7 +70,7 @@ export default class Credits extends GameNode {
       "Arcade Machine Building",
       "Retr-O-Mat"
     );
-    this.drawCredit(new Point(0, HEIGHT * 0.1), "Funded by", "BMFTR");
+    // this.drawCredit(new Point(0, HEIGHT * 0.1), "Funded by", "BMFTR");
   }
 
   drawCredit(position: Point, title: string, ...names: string[]) {
@@ -110,4 +111,28 @@ export default class Credits extends GameNode {
     document.removeEventListener("keydown", this.handleKeyDown);
     this.onFinish?.();
   };
+
+  async load() {
+    const fundedBy = new Container();
+    fundedBy.position = { x: -WIDTH * 0.2, y: HEIGHT * 0.2 };
+    const ministryLogoTexture = await Assets.load(ministryLogoPath);
+    const titleText = new HTMLText({
+      text: "Funded by",
+      style: {
+        align: "center",
+        fill: theme.colors.primary,
+        fontFamily: TEXT_FONT,
+        fontWeight: "bold",
+        fontSize: 40,
+      },
+    });
+    titleText.anchor = { x: 0.5, y: 0 };
+    fundedBy.addChild(titleText);
+    const sprite = new Sprite(ministryLogoTexture);
+    sprite.anchor = { x: 0.5, y: 0 };
+    sprite.position.y = 50;
+    sprite.scale = 0.3;
+    fundedBy.addChild(sprite);
+    this.view.addChild(fundedBy);
+  }
 }
