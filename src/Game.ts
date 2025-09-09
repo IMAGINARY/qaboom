@@ -10,6 +10,7 @@ import ministryLogoPath from "./assets/img/ministry-logo.png";
 import IdleMode from "./nodes/IdleMode";
 import { randomInt } from "mathjs";
 import { campaign } from "./levels";
+import Credits from "./nodes/Credits";
 
 const IDLE_TIMEOUT = 60 * 1000;
 
@@ -99,6 +100,16 @@ export default class Game {
         app.ticker.add(multiplayer.tick);
       }
     };
-    menu.onCredits = () => {};
+    menu.onCredits = () => {
+      document.removeEventListener("keydown", resetIdleTimeout);
+      clearTimeout(timeout);
+      menu.hide();
+      const credits = new Credits();
+      app.stage.addChild(credits.view);
+      credits.onFinish = () => {
+        app.stage.removeChild(credits.view);
+        showMenu();
+      };
+    };
   }
 }
