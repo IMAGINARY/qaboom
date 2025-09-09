@@ -3,6 +3,9 @@ import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import { container } from "../util";
 import GameNode from "./GameNode";
 import ministryLogoPath from "../assets/img/ministry-logo.png";
+import imaginaryLogoPath from "../assets/img/imaginary-logo.png";
+import mpiLogoPath from "../assets/img/mpi-logo.png";
+import { inputs } from "../inputs";
 
 export default class Credits extends GameNode {
   onFinish?: () => void;
@@ -21,9 +24,19 @@ export default class Credits extends GameNode {
           -boxWidth / 2,
           -boxHeight / 2,
           boxWidth,
-          boxHeight
+          boxHeight - 350
         )
       )
+    );
+    this.view.addChild(
+      container(
+        new Graphics().roundRect(
+          -boxWidth / 2,
+          boxHeight / 2 - 350,
+          boxWidth,
+          350
+        )
+      ).fill("white")
     );
     const titleText = new HTMLText({
       text: "Credits",
@@ -107,20 +120,27 @@ export default class Credits extends GameNode {
     }
   }
 
-  handleKeyDown = () => {
-    document.removeEventListener("keydown", this.handleKeyDown);
-    this.onFinish?.();
+  handleKeyDown = (e: KeyboardEvent) => {
+    if (
+      [
+        ...Object.values(inputs.player1),
+        ...Object.values(inputs.player2),
+      ].includes(e.key)
+    ) {
+      document.removeEventListener("keydown", this.handleKeyDown);
+      this.onFinish?.();
+    }
   };
 
   async load() {
     const fundedBy = new Container();
-    fundedBy.position = { x: -WIDTH * 0.2, y: HEIGHT * 0.2 };
+    fundedBy.position = { x: -WIDTH * 0.3, y: HEIGHT * 0.2 };
     const ministryLogoTexture = await Assets.load(ministryLogoPath);
     const titleText = new HTMLText({
       text: "Funded by",
       style: {
         align: "center",
-        fill: theme.colors.primary,
+        fill: "black",
         fontFamily: TEXT_FONT,
         fontWeight: "bold",
         fontSize: 40,
@@ -134,5 +154,33 @@ export default class Credits extends GameNode {
     sprite.scale = 0.3;
     fundedBy.addChild(sprite);
     this.view.addChild(fundedBy);
+
+    const partOf = new Container();
+    partOf.position = { x: WIDTH * 0.1, y: HEIGHT * 0.2 };
+    const imaginaryLogoTexture = await Assets.load(imaginaryLogoPath);
+    const mpiLogoTexture = await Assets.load(mpiLogoPath);
+    const titleText2 = new HTMLText({
+      text: "Part of Quantum Arcade by",
+      style: {
+        align: "center",
+        fill: "black",
+        fontFamily: TEXT_FONT,
+        fontWeight: "bold",
+        fontSize: 40,
+      },
+    });
+    titleText2.anchor = { x: 0.5, y: 0 };
+    partOf.addChild(titleText2);
+    const sprite1 = new Sprite(imaginaryLogoTexture);
+    sprite1.anchor = { x: 0.5, y: 0 };
+    sprite1.position = { x: -300, y: 100 };
+    sprite1.scale = 0.5;
+    const sprite2 = new Sprite(mpiLogoTexture);
+    sprite2.anchor = { x: 0.5, y: 0 };
+    sprite2.position = { x: 300, y: 50 };
+    sprite2.scale = 0.5;
+    partOf.addChild(sprite1);
+    partOf.addChild(sprite2);
+    this.view.addChild(partOf);
   }
 }
