@@ -1,4 +1,4 @@
-import { Container, Graphics, HTMLText, Sprite } from "pixi.js";
+import { Container, Graphics, HTMLText } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
 import { inputs } from "../inputs";
@@ -10,19 +10,26 @@ import type Background from "./Background";
 
 type State = "player-select" | "level-select";
 
+const options = [
+  "1 Player",
+  "2 Player",
+  // TODO High score
+  "Credits",
+];
+
 export default class Menu extends GameNode {
   state: State = "player-select";
   onStart?: (numPlayers: number, level: number) => void;
-  numPlayers = 1;
+  onCredits?: () => void;
+  optionIndex: number = 0;
+  optionTexts: HTMLText[];
   level = 0;
-  player1Text: HTMLText;
-  player2Text: HTMLText;
   levelText: HTMLText;
   playerSelect = new Container();
   levelSelect = new Container();
   background: Background;
 
-  constructor(background: Background, ministryLogo: any) {
+  constructor(background: Background) {
     super();
     this.background = background;
     this.view.position.x = WIDTH / 2;
@@ -54,35 +61,25 @@ export default class Menu extends GameNode {
     titleText.position.y = -HEIGHT / 6;
     this.view.addChild(titleText);
 
-    this.player1Text = new HTMLText({
-      text: "<| 1 Player |>",
-      style: {
-        align: "center",
-        fill: theme.colors.primary,
-        fontFamily: TEXT_FONT,
-        fontWeight: "bold",
-        fontSize: 72,
-      },
-    });
-    this.player1Text.position.x = 0;
-    this.player1Text.position.y = 50;
-    this.player1Text.anchor = { x: 0.5, y: 0.5 };
-    this.playerSelect.addChild(this.player1Text);
-    this.player2Text = new HTMLText({
-      text: "2 Players",
-      style: {
-        align: "center",
-        fill: theme.colors.muted,
-        fontWeight: "bold",
-        fontFamily: TEXT_FONT,
-        fontSize: 72,
-      },
-    });
-    this.player2Text.position.x = 0;
-    this.player2Text.position.y = 200;
-    this.player2Text.anchor = { x: 0.5, y: 0.5 };
-    this.playerSelect.addChild(this.player2Text);
-    this.view.addChild(this.playerSelect);
+    this.optionTexts = [];
+    for (let [i, option] of options.entries()) {
+      const text = new HTMLText({
+        text: option,
+        style: {
+          align: "center",
+          fill: theme.colors.muted,
+          fontFamily: TEXT_FONT,
+          fontWeight: "bold",
+          fontSize: 72,
+        },
+      });
+      text.anchor = { x: 0.5, y: 0.5 };
+      text.position.y = i * 100;
+      this.optionTexts.push(text);
+      this.playerSelect.addChild(text);
+    }
+    this.setOptionIndex(this.optionIndex);
+
     this.levelText = new HTMLText({
       text: "Level 1",
       style: {
@@ -105,30 +102,14 @@ export default class Menu extends GameNode {
       .fill(theme.colors.primary);
     this.levelSelect.addChild(leftArrow);
     this.levelSelect.addChild(rightArrow);
-
-    const logo = new Sprite(ministryLogo);
-    logo.anchor = { x: 0, y: 1 };
-    logo.position = { x: -WIDTH / 2, y: HEIGHT / 2 };
-    logo.scale = 0.3;
-    this.view.addChild(logo);
   }
 
-  toggleNumPlayers() {
-    if (this.numPlayers === 1) {
-      this.player1Text.text = "1 Player";
-      this.player1Text.style.fill = theme.colors.muted;
-      this.player2Text.text = "<| 2 Players |>";
-      this.player2Text.style.fill = theme.colors.primary;
-      pulse(this.player2Text, 1.1);
-      this.numPlayers = 2;
-    } else {
-      this.player1Text.text = "<| 1 Player |>";
-      this.player1Text.style.fill = theme.colors.primary;
-      pulse(this.player1Text, 1.1);
-      this.player2Text.text = "2 Players";
-      this.player2Text.style.fill = theme.colors.muted;
-      this.numPlayers = 1;
-    }
+  setOptionIndex(index: number) {
+    this.optionTexts[this.optionIndex].text = options[this.optionIndex];
+    this.optionTexts[this.optionIndex].style.fill = theme.colors.muted;
+    this.optionTexts[index].text = `<| ${options[index]} |>`;
+    this.optionTexts[index].style.fill = theme.colors.primary;
+    this.optionIndex = index;
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
@@ -138,15 +119,23 @@ export default class Menu extends GameNode {
           case inputs.player1.flip:
           case inputs.player2.flip: {
             playSound("clear");
-            this.showLevelSelect();
+            if (this.optionIndex === 2) {
+              this.onCredits?.();
+            } else {
+              this.showLevelSelect();
+            }
             break;
           }
           case inputs.player1.up:
+          case inputs.player2.up: {
+            playSound("turn");
+            this.setOptionIndex((this.optionIndex || options.length) - 1);
+            break;
+          }
           case inputs.player1.down:
-          case inputs.player2.up:
           case inputs.player2.down: {
             playSound("turn");
-            this.toggleNumPlayers();
+            this.setOptionIndex((this.optionIndex + 1) % options.length);
             break;
           }
         }
@@ -157,7 +146,7 @@ export default class Menu extends GameNode {
           case inputs.player1.flip:
           case inputs.player2.flip: {
             playSound("clear");
-            this.onStart?.(this.numPlayers, this.level);
+            this.onStart?.(this.optionIndex + 1, this.level);
             break;
           }
           case inputs.player1.left:

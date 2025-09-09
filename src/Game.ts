@@ -40,7 +40,7 @@ export default class Game {
 
     const background = new Background();
 
-    const menu = new Menu(background, ministryLogoTexture);
+    const menu = new Menu(background);
     app.stage.addChild(background.view);
     app.ticker.add(background.tick);
 
@@ -99,5 +99,6 @@ export default class Game {
         app.ticker.add(multiplayer.tick);
       }
     };
+    menu.onCredits = () => {};
   }
 }
