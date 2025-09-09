@@ -39,7 +39,7 @@ export default class SinglePlayer extends GameNode {
       this.view.removeChild(this.player.view);
       this.player.destroy();
       this.mode = "score";
-      const scores = new ScoreScreen(score * 100);
+      const scores = new ScoreScreen(score * 100, inputs.player1);
       this.view.addChild(scores.view);
       scores.onFinish = () => {
         scores.destroy();

@@ -1,7 +1,7 @@
 import { Container, Graphics, HTMLText } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
-import { inputs } from "../inputs";
+import { type PlayerInput } from "../inputs";
 import { getScores, setScores, type Score } from "../storage";
 import { playSound } from "../audio";
 import { container } from "../util";
@@ -18,11 +18,13 @@ export default class ScoreScreen extends GameNode {
   nameEnter = new Container();
   arrows = new Container();
   state: State = "enter_name";
+  inputMap: PlayerInput;
   onFinish?: () => void;
 
-  constructor(score: number) {
+  constructor(score: number, inputMap: PlayerInput) {
     super();
     this.score = score;
+    this.inputMap = inputMap;
     this.view.position = { x: WIDTH / 2, y: HEIGHT / 2 };
 
     const containerSize = HEIGHT * 0.75;
@@ -167,7 +169,7 @@ export default class ScoreScreen extends GameNode {
     if (this.state === "enter_name") {
       switch (e.key) {
         // up/down: change letter
-        case inputs.player1.up: {
+        case this.inputMap.up: {
           const currentLetter = this.letters[this.#activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex || LETTERS.length) - 1];
@@ -175,7 +177,7 @@ export default class ScoreScreen extends GameNode {
           playSound("move");
           break;
         }
-        case inputs.player1.down: {
+        case this.inputMap.down: {
           const currentLetter = this.letters[this.#activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex + 1) % LETTERS.length];
@@ -184,17 +186,17 @@ export default class ScoreScreen extends GameNode {
           break;
         }
         // left/right: change active index
-        case inputs.player1.left: {
+        case this.inputMap.left: {
           this.activeIndex = (this.activeIndex || this.letters.length) - 1;
           playSound("move");
           break;
         }
-        case inputs.player1.right: {
+        case this.inputMap.right: {
           this.activeIndex = (this.activeIndex + 1) % this.letters.length;
           playSound("move");
           break;
         }
-        case inputs.player1.flip: {
+        case this.inputMap.flip: {
           playSound("clear");
           this.showHighScores();
           break;
