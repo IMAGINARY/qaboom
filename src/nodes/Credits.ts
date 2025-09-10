@@ -64,7 +64,7 @@ export default class Credits extends GameNode {
       "Content & Coordination",
       "Christian Stussak",
       "Andreas Matt",
-      "Skye Rosenstein"
+      "Skye Rothstein"
     );
     this.drawCredit(new Point(-width, HEIGHT * 0), "Music", "Landis Seralian");
     this.drawCredit(
