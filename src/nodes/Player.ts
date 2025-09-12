@@ -21,6 +21,7 @@ import { inputs, type PlayerInput } from "../inputs";
 import { pulse } from "../animations";
 import { delay } from "../util";
 import { playSound } from "../audio";
+import HoldArea from "./HoldArea";
 
 type State = "pause" | "game";
 
@@ -54,6 +55,7 @@ export default class Player extends GameNode {
   levels: Level[];
   board: Board;
   deck: Deck;
+  holdArea: HoldArea;
   scoreboard: HTMLText;
   levelSign: HTMLText;
 
@@ -97,6 +99,11 @@ export default class Player extends GameNode {
     this.deck.view.scale = 0.75;
     this.view.addChild(this.deck.view);
 
+    this.holdArea = new HoldArea();
+    this.holdArea.view.position.x = 50 + BOARD_WIDTH * CELL_SIZE + 35;
+    this.holdArea.view.position.y =
+      this.deck.view.position.y + this.deck.view.height + 25;
+    this.view.addChild(this.holdArea.view);
     this.scoreboard = new HTMLText({
       text: "" + this.score,
       style: {
@@ -261,23 +268,19 @@ export default class Player extends GameNode {
   swap() {
     this.canSwap = false;
     playSound("swap");
-    [this.board.current, this.hold] = [this.hold, this.board.current];
+    this.board.current = this.holdArea.setHold(this.board.current!);
     if (this.board.current instanceof GatePiece) {
       this.board.current.outline.alpha = 1;
     }
-    if (this.hold instanceof GatePiece) {
-      this.hold.outline.alpha = 0;
+    if (this.holdArea.held instanceof GatePiece) {
+      this.holdArea.held.outline.alpha = 0;
     }
     if (!this.board.current) {
       this.newCurrent();
+    } else {
+      this.board.view.addChild(this.board.current.view);
     }
     this.board.setCurrentPosition(startingCell);
-    if (this.hold) {
-      this.hold.view.position = {
-        x: this.board.view.width + 100,
-        y: this.deck.view.height + 150,
-      };
-    }
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
