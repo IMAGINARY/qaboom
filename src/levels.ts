@@ -19,6 +19,7 @@ import type { Piece } from "./nodes/Deck";
 export interface Level {
   randomQubit: () => Qubit;
   deal: () => Piece[];
+  scoreBase: number;
 }
 
 // TODO use this for more balanced dealing?
@@ -32,25 +33,9 @@ export function* getCombos<T>(array: T[]) {
 
 const gateRotations = [Math.PI / 2, Math.PI, Math.PI * (3 / 2)];
 
-export const freeMode: Level = {
-  randomQubit: () => randomQubit(),
-  deal: () => {
-    let buffer = [];
-    for (let _i of range(5)) {
-      buffer.push(QubitPair.random());
-    }
-    for (let _i of range(2)) {
-      buffer.push(GatePiece.random());
-    }
-    for (let _i of range(1)) {
-      buffer.push(MeasurementPiece.random());
-    }
-    return shuffle(buffer);
-  },
-};
-
 function primaryLevel(axis: Axis): Level {
   return {
+    scoreBase: 100,
     randomQubit: () => choice(quartet(axis)),
     deal: () => {
       const random = () => choice(quartet(axis));
@@ -67,30 +52,13 @@ function primaryLevel(axis: Axis): Level {
   };
 }
 
-function secondaryLevel(axis: Axis): Level {
-  return {
-    randomQubit: () => choice(octet(axis)),
-    deal: () => {
-      const random = () => choice(octet(axis));
-      let buffer = [];
-      for (let _i of range(5)) {
-        buffer.push(new QubitPair(random(), random()));
-      }
-      for (let _i of range(2)) {
-        buffer.push(new GatePiece(axis, choice(gateRotations)));
-      }
-      buffer.push(new MeasurementPiece(random()));
-      return buffer;
-    },
-  };
-}
-
 // The primary stage of the campaign, only dealing with basis qubit states
 export const primaryLevels: Level[] = [
   primaryLevel("X"),
   primaryLevel("Y"),
   primaryLevel("Z"),
   {
+    scoreBase: 150,
     randomQubit: () => choice(qubitBases),
     deal: () => {
       const random = () => choice(qubitBases);
@@ -109,12 +77,32 @@ export const primaryLevels: Level[] = [
   },
 ];
 
+function secondaryLevel(axis: Axis): Level {
+  return {
+    scoreBase: 250,
+    randomQubit: () => choice(octet(axis)),
+    deal: () => {
+      const random = () => choice(octet(axis));
+      let buffer = [];
+      for (let _i of range(5)) {
+        buffer.push(new QubitPair(random(), random()));
+      }
+      for (let _i of range(2)) {
+        buffer.push(new GatePiece(axis, choice(gateRotations)));
+      }
+      buffer.push(new MeasurementPiece(random()));
+      return buffer;
+    },
+  };
+}
+
 // The second stage of the campaign, dealing with all secondary colors
 export const secondaryLevels: Level[] = [
   secondaryLevel("X"),
   secondaryLevel("Y"),
   secondaryLevel("Z"),
   {
+    scoreBase: 300,
     randomQubit: () => choice(secondaryQubits),
     deal: () => {
       const random = () => choice(secondaryQubits);
@@ -133,10 +121,27 @@ export const secondaryLevels: Level[] = [
   },
 ];
 
-// export const campaign = [freeMode];
-// export const campaign = secondaryColors;
+export const freeMode: Level = {
+  scoreBase: 500,
+  randomQubit: () => randomQubit(),
+  deal: () => {
+    let buffer = [];
+    for (let _i of range(5)) {
+      buffer.push(QubitPair.random());
+    }
+    for (let _i of range(2)) {
+      buffer.push(GatePiece.random());
+    }
+    for (let _i of range(1)) {
+      buffer.push(MeasurementPiece.random());
+    }
+    return shuffle(buffer);
+  },
+};
+
 export const campaign: Level[] = [
   {
+    scoreBase: 50,
     randomQubit: () => choice([ZERO, ONE]),
     deal: () => {
       const random = () => choice([ZERO, ONE]);

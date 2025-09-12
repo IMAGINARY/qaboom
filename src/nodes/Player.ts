@@ -14,7 +14,7 @@ import Deck, { type Piece } from "./Deck";
 import QubitPair from "./QubitPair";
 import Board, { inBounds, startingCell } from "./Board";
 import GatePiece from "./GatePiece";
-import { type Level } from "../levels";
+import { campaign, type Level } from "../levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
 import { inputs, type PlayerInput } from "../inputs";
@@ -209,7 +209,7 @@ export default class Player extends GameNode {
     }
     this.currentState = "pause";
     if (
-      await this.board.resolve((score) => {
+      await this.board.resolve(campaign[this.#level].scoreBase, (score) => {
         this.score += score;
       })
     ) {

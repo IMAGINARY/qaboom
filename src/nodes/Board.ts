@@ -138,7 +138,7 @@ export default class Board extends GameNode {
 
   // Resolve the current piece action.
   // Return whether the game still continues.
-  async resolve(onScore: (score: number) => void) {
+  async resolve(scoreMult: number, onScore: (score: number) => void) {
     // If it's a pair of qubits, just add it to the grid.
     if (this.current instanceof QubitPair) {
       playSound("set");
@@ -159,7 +159,7 @@ export default class Board extends GameNode {
       await this.fall();
     } else if (this.current instanceof MeasurementPiece) {
       // If it's a measurement, trigger the measurement reaction chain.
-      await this.measure(onScore);
+      await this.measure(scoreMult, onScore);
     } else if (this.current instanceof GatePiece) {
       // If it's a gate, trigger the gate.
       await this.triggerGate();
@@ -183,7 +183,7 @@ export default class Board extends GameNode {
     this.view.removeChild(this.current?.view);
   }
 
-  async measure(onScore: (score: number) => void) {
+  async measure(scoreMult: number, onScore: (score: number) => void) {
     if (!(this.current instanceof MeasurementPiece)) {
       throw new Error("Attempting to measure without a MeasurementPiece");
     }
@@ -212,8 +212,8 @@ export default class Board extends GameNode {
             this.drawLine(point, nbr, current.base);
             qubit.bounce();
             measuredQubits.push(nbr);
-            const score = measuredQubits.length * 100;
-            this.pingScore(nbr, score);
+            const score = measuredQubits.length * scoreMult;
+            this.pingScore(nbr, measuredQubits.length, scoreMult);
             scoreToAdd += score;
             newQueue.push(nbr);
           } else {
@@ -309,15 +309,15 @@ export default class Board extends GameNode {
     this.view.removeChild(text);
   }
 
-  async pingScore(position: Point, score: number) {
+  async pingScore(position: Point, baseScore: number, multiplier: number) {
     if (!(this.current instanceof MeasurementPiece)) {
       return;
     }
     const coords = getBlochCoords(this.current.base);
     const text = new HTMLText({
-      text: score,
+      text: baseScore * multiplier,
       style: new TextStyle({
-        fontSize: 24 + (2 * score) / 100,
+        fontSize: 24 + 2 * baseScore,
         fontFamily: TEXT_FONT,
         fontWeight: "bold",
         fill: getColor(coords),
