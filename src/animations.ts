@@ -25,3 +25,15 @@ export async function slideIn(
     [obj, { alpha: 1 }, { at: 0, duration: 1 }],
   ]);
 }
+
+export async function bump(obj: Container, direction: Point, amount: number) {
+  await animate(obj.position, direction.multiplyScalar(amount), {
+    duration: 0.05,
+    ease: "easeIn",
+  });
+  await animate(
+    obj.position,
+    { x: 0, y: 0 },
+    { duration: 0.1, ease: "easeOut" }
+  );
+}

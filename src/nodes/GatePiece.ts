@@ -11,6 +11,8 @@ const rotationSpeed = Math.PI / 16;
 export default class GatePiece extends GameNode {
   angle: number;
   axis: Axis;
+
+  container: Container;
   background: Graphics;
   angleMarker: Graphics;
   outline: Graphics;
@@ -19,7 +21,9 @@ export default class GatePiece extends GameNode {
     super();
     this.axis = axis;
     this.angle = angle;
-    this.view = new Container();
+    this.container = new Container();
+    this.view.addChild(this.container);
+
     this.angleMarker = new Graphics();
     this.background = new Graphics();
     this.outline = new Graphics()
@@ -32,7 +36,7 @@ export default class GatePiece extends GameNode {
       )
       .stroke({ color: "white", width: 2, alpha: 0.5 });
     this.outline.alpha = 0;
-    this.view.addChild(this.outline);
+    this.container.addChild(this.outline);
     const colorMap = octet(axis);
     for (let i = 0; i < 8; i++) {
       let angle = (i / 8) * 2 * Math.PI - Math.PI / 2;
@@ -48,8 +52,8 @@ export default class GatePiece extends GameNode {
         )
         .fill(getColor(getBlochCoords(colorMap[i])));
     }
-    this.view.addChild(this.background);
-    this.view.addChild(this.angleMarker);
+    this.container.addChild(this.background);
+    this.container.addChild(this.angleMarker);
     this.drawAngle();
   }
 

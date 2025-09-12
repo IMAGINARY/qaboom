@@ -1,4 +1,4 @@
-import { Graphics } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import { getBlochCoords, getOrtho, randomQubit, type Qubit } from "../quantum";
 import { getColor } from "../colors";
 import { PIECE_RADIUS } from "../constants";
@@ -6,18 +6,23 @@ import GameNode from "./GameNode";
 
 // Represents a measurement along an axis
 export default class MeasurementPiece extends GameNode {
+  container: Container;
+
   sprite: Graphics;
   rod: Graphics;
   base: Qubit;
   ortho: Qubit;
   constructor(base: Qubit) {
     super();
+    this.container = new Container();
+    this.view.addChild(this.container);
+
     this.base = base;
     this.ortho = getOrtho(base);
     this.sprite = new Graphics();
     this.rod = new Graphics();
-    this.view.addChild(this.sprite);
-    this.view.addChild(this.rod);
+    this.container.addChild(this.sprite);
+    this.container.addChild(this.rod);
     this.draw();
   }
 

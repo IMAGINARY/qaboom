@@ -2,20 +2,25 @@ import { CELL_SIZE } from "../constants";
 import { randomQubit, type Qubit } from "../quantum";
 import QubitPiece from "./QubitPiece";
 import GameNode from "./GameNode";
+import { Container } from "pixi.js";
 
 type Orientation = "vertical" | "horizontal";
 // A pair of qubits
 export default class QubitPair extends GameNode {
+  container: Container;
   first: QubitPiece;
   second: QubitPiece;
   orientation: Orientation = "vertical";
 
   constructor(first: Qubit, second: Qubit) {
     super();
+    this.container = new Container();
+    this.view.addChild(this.container);
+
     this.first = new QubitPiece(first);
     this.second = new QubitPiece(second);
-    this.view.addChild(this.first.view);
-    this.view.addChild(this.second.view);
+    this.container.addChild(this.first.view);
+    this.container.addChild(this.second.view);
     this.setPositions();
   }
 

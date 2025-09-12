@@ -18,7 +18,7 @@ import { campaign, type Level } from "../levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
 import { inputs, type PlayerInput } from "../inputs";
-import { pulse } from "../animations";
+import { bump, pulse } from "../animations";
 import { delay } from "../util";
 import { playSound } from "../audio";
 import HoldArea from "./HoldArea";
@@ -323,6 +323,7 @@ export default class Player extends GameNode {
           break;
         this.board.setCurrentPosition(left);
         playSound("move");
+        bump(this.board.current!.container, LEFT, CELL_SIZE / 8);
         break;
       }
       case this.inputMap.right: {
@@ -344,6 +345,7 @@ export default class Player extends GameNode {
         }
         this.board.setCurrentPosition(right);
         playSound("move");
+        bump(this.board.current!.container, RIGHT, CELL_SIZE / 8);
         break;
       }
       // If the player presses down, speed up the steps
