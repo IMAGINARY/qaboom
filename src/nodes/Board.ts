@@ -212,8 +212,9 @@ export default class Board extends GameNode {
             this.drawLine(point, nbr, current.base);
             qubit.bounce();
             measuredQubits.push(nbr);
-            this.pingScore(nbr, measuredQubits.length);
-            scoreToAdd += measuredQubits.length;
+            const score = measuredQubits.length * 100;
+            this.pingScore(nbr, score);
+            scoreToAdd += score;
             newQueue.push(nbr);
           } else {
             this.drawLine(point, nbr, current.ortho);
@@ -314,9 +315,9 @@ export default class Board extends GameNode {
     }
     const coords = getBlochCoords(this.current.base);
     const text = new HTMLText({
-      text: `${score * 100}`,
+      text: score,
       style: new TextStyle({
-        fontSize: 24 + 2 * score,
+        fontSize: 24 + (2 * score) / 100,
         fontFamily: TEXT_FONT,
         fontWeight: "bold",
         fill: getColor(coords),

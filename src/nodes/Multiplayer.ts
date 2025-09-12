@@ -53,7 +53,7 @@ export default class Multiplayer extends GameNode {
         this.view.removeChild(player.view);
         player.destroy();
         const scores = new ScoreScreen(
-          score * 100,
+          score,
           inputs[index === 0 ? "player1" : "player2"]
         );
         this.scores.push(scores);

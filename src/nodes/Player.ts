@@ -146,7 +146,7 @@ export default class Player extends GameNode {
 
   set score(value: number) {
     this.#score = value;
-    this.scoreboard.text = `${this.#score * 100}`;
+    this.scoreboard.text = this.#score;
     pulse(this.scoreboard);
   }
 
