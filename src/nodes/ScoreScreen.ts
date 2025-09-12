@@ -19,6 +19,8 @@ export default class ScoreScreen extends GameNode {
   arrows = new Container();
   state: State = "enter_name";
   inputMap: PlayerInput;
+  // Called when the player finishes typing their name
+  onInputFinish?: () => void;
   onFinish?: () => void;
 
   constructor(score: number, inputMap: PlayerInput) {
@@ -105,6 +107,7 @@ export default class ScoreScreen extends GameNode {
   }
 
   showHighScores() {
+    this.onInputFinish?.();
     this.state = "high_scores";
     this.view.removeChild(this.nameEnter);
     const scores = getScores();

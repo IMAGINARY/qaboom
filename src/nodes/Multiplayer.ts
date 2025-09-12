@@ -21,6 +21,7 @@ export default class Multiplayer extends GameNode {
   state: State = "game";
   outPlayers: number[] = [];
   scoreFinishPlayers: number[] = [];
+  scores: ScoreScreen[] = [];
 
   constructor(background: Background, startLevel: number) {
     super();
@@ -55,16 +56,22 @@ export default class Multiplayer extends GameNode {
           score * 100,
           inputs[index === 0 ? "player1" : "player2"]
         );
+        this.scores.push(scores);
         scores.view.position = {
           x: WIDTH * (index === 0 ? 0.25 : 0.75),
           y: HEIGHT / 2,
         };
         this.view.addChild(scores.view);
+        scores.onInputFinish = () => {
+          this.scoreFinishPlayers.push(index);
+        };
         scores.onFinish = () => {
           this.view.removeChild(scores.view);
           scores.destroy();
-          this.scoreFinishPlayers.push(index);
           if (this.scoreFinishPlayers.length === 2) {
+            for (let score of this.scores) {
+              score.destroy();
+            }
             this.onFinish?.();
           }
         };
