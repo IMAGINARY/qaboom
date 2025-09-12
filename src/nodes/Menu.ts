@@ -110,6 +110,7 @@ export default class Menu extends GameNode {
     this.optionTexts[index].text = `<| ${options[index]} |>`;
     this.optionTexts[index].style.fill = theme.colors.primary;
     this.optionIndex = index;
+    pulse(this.optionTexts[index]);
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
