@@ -39,6 +39,9 @@ export default class Multiplayer extends GameNode {
       }),
     ];
     for (let [index, player] of this.players.entries()) {
+      player.onLevelUp = (level) => {
+        this.background.setGenerator(level.randomQubit);
+      };
       player.onTopOut = () => {
         this.outPlayers.push(index);
         if (this.outPlayers.length === 2) {
