@@ -13,6 +13,6 @@ export const theme = {
   colors: {
     primary: "#ddd",
     background: "#080808",
-    muted: "grey",
+    muted: "#aaa",
   },
 };

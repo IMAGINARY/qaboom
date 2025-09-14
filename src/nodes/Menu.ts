@@ -10,16 +10,12 @@ import type Background from "./Background";
 
 type State = "player-select" | "level-select";
 
-const options = [
-  "1 Player",
-  "2 Player",
-  // TODO High score
-  "Credits",
-];
+const options = ["1 Player", "2 Player", "High Scores", "Credits"];
 
 export default class Menu extends GameNode {
   state: State = "player-select";
   onStart?: (numPlayers: number, level: number) => void;
+  onHighScores?: () => void;
   onCredits?: () => void;
   optionIndex: number = 0;
   optionTexts: HTMLText[];
@@ -121,6 +117,9 @@ export default class Menu extends GameNode {
           case inputs.player2.flip: {
             playSound("clear");
             if (this.optionIndex === 2) {
+              this.onHighScores?.();
+            }
+            if (this.optionIndex === 3) {
               this.onCredits?.();
             } else {
               this.showLevelSelect();

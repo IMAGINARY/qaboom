@@ -10,6 +10,7 @@ import IdleMode from "./nodes/IdleMode";
 import { randomInt } from "mathjs";
 import { campaign } from "./levels";
 import Credits from "./nodes/Credits";
+import HighScoreScreen from "./nodes/HighScoreScreen";
 
 const IDLE_TIMEOUT = 60 * 1000;
 
@@ -96,6 +97,18 @@ export default class Game {
         multiplayer.start();
         app.ticker.add(multiplayer.tick);
       }
+    };
+    menu.onHighScores = () => {
+      document.removeEventListener("keydown", resetIdleTimeout);
+      clearTimeout(timeout);
+      menu.hide();
+      const highScores = new HighScoreScreen();
+      // highScores.load();
+      app.stage.addChild(highScores.view);
+      highScores.onFinish = () => {
+        app.stage.removeChild(highScores.view);
+        showMenu();
+      };
     };
     menu.onCredits = () => {
       document.removeEventListener("keydown", resetIdleTimeout);

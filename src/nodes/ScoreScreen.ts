@@ -141,11 +141,12 @@ export default class ScoreScreen extends GameNode {
   }
 
   showEntry(index: number, entry: Score, position: number, highlight = false) {
+    const fill = highlight ? theme.colors.primary : theme.colors.muted;
     const nameText = new HTMLText({
       text: `${(index + 1 + "").padStart(3)} ${entry.name}`,
       style: {
         fontFamily: TEXT_FONT,
-        fill: highlight ? theme.colors.primary : theme.colors.muted,
+        fill,
         fontSize: 48,
         fontWeight: "bold",
       },
@@ -156,7 +157,7 @@ export default class ScoreScreen extends GameNode {
       text: entry.score,
       style: {
         fontFamily: TEXT_FONT,
-        fill: theme.colors.primary,
+        fill,
         fontSize: 48,
         fontWeight: "bold",
       },
