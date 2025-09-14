@@ -104,6 +104,18 @@ export default class Board extends GameNode {
     return !!this.getPiece(p);
   }
 
+  // Returns whether the board is completely empty
+  isEmpty() {
+    for (let y = 0; y < BOARD_HEIGHT; y++) {
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        if (this.containsPoint(new Point(x, y))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   // Whether the cell is a valid empty cell in the grid
   isEmptyCell(p: Point) {
     return inBounds(p) && !this.getPiece(p);
@@ -233,10 +245,6 @@ export default class Board extends GameNode {
     } while (newMeasures);
 
     const uniqMeasured = uniqWith(measuredQubits, (a, b) => a.equals(b));
-    if (uniqMeasured.length > 0) {
-      playSound("clear");
-      this.showBoom(uniqMeasured.length);
-    }
     let score = 0;
     score += triangular(uniqMeasured.length);
     const removedPieces: QubitPiece[] = [];
@@ -246,6 +254,10 @@ export default class Board extends GameNode {
         removedPieces.push(piece);
       }
       this.setPiece(point, null, false);
+    }
+    if (uniqMeasured.length > 0) {
+      playSound("clear");
+      this.showBoom(uniqMeasured.length);
     }
     this.view.removeChild(this.current.view);
     this.lines.removeChildren();
@@ -293,8 +305,15 @@ export default class Board extends GameNode {
     if (!(this.current instanceof MeasurementPiece)) {
       return;
     }
+    const boomText = this.isEmpty()
+      ? "ALL QLEAR!"
+      : count >= 15
+      ? `QABOOM!`
+      : count >= 6
+      ? "BOOM!"
+      : "boom.";
     const text = new HTMLText({
-      text: count >= 15 ? `QABOOM!` : count >= 6 ? "BOOM!" : "boom.",
+      text: boomText,
       style: new TextStyle({
         fontSize: Math.min(BOARD_WIDTH * CELL_SIZE * 1.25, 60 + 5 * count),
         fontFamily: TEXT_FONT,
