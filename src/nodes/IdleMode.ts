@@ -76,6 +76,7 @@ export default class IdleMode extends GameNode {
   endIdle() {
     this.music?.stop();
     document.removeEventListener("keydown", this.handleKeyDown);
+    this.player.destroy();
     this.onFinish?.();
   }
 
