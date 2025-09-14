@@ -257,25 +257,36 @@ export default class Board extends GameNode {
   }
 
   async fall() {
-    let anyFalling = false;
-    do {
-      anyFalling = false;
-      for (let x = 0; x < BOARD_WIDTH; x++) {
-        for (let y = BOARD_HEIGHT - 2; y >= 0; y--) {
-          const point = new Point(x, y);
-          if (
-            this.containsPoint(point) &&
-            !this.containsPoint(point.add(DOWN))
-          ) {
-            const piece = this.getPiece(point);
-            this.setPiece(point, null);
-            this.setPiece(point.add(DOWN), piece);
-            anyFalling = true;
+    const promises = [];
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      let gap = 0;
+      for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
+        const point = new Point(x, y);
+        const piece = this.getPiece(point)!;
+        if (!piece) {
+          gap++;
+        } else {
+          if (gap === 0) {
+            continue;
           }
+          this.setPiece(point, null, false);
+          const currentGap = gap;
+          promises.push(
+            animate(
+              piece.view.position,
+              {
+                x: piece.view.position.x,
+                y: (y + currentGap) * CELL_SIZE,
+              },
+              { duration: 0.075 * currentGap, ease: "linear" }
+            ).then(() => {
+              this.setPiece(point.add(DOWN.multiplyScalar(currentGap)), piece);
+            })
+          );
         }
       }
-      await delay(150);
-    } while (anyFalling);
+    }
+    await Promise.all(promises);
   }
 
   async showBoom(count: number) {
