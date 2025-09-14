@@ -278,7 +278,7 @@ export default class Board extends GameNode {
                 x: piece.view.position.x,
                 y: (y + currentGap) * CELL_SIZE,
               },
-              { duration: 0.075 * currentGap, ease: "linear" }
+              { duration: 0.05 * currentGap, ease: "linear" }
             ).then(() => {
               this.setPiece(point.add(DOWN.multiplyScalar(currentGap)), piece);
             })
