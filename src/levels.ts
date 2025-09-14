@@ -19,7 +19,10 @@ import type { Piece } from "./nodes/Deck";
 export interface Level {
   randomQubit: () => Qubit;
   deal: () => Piece[];
+  // Base multiplier for the score.
   scoreBase: number;
+  // Number needed to advance to the next level.
+  count: number;
 }
 
 // TODO use this for more balanced dealing?
@@ -36,6 +39,7 @@ const gateRotations = [Math.PI / 2, Math.PI, Math.PI * (3 / 2)];
 function primaryLevel(axis: Axis): Level {
   return {
     scoreBase: 100,
+    count: 16,
     randomQubit: () => choice(quartet(axis)),
     deal: () => {
       const random = () => choice(quartet(axis));
@@ -59,6 +63,7 @@ export const primaryLevels: Level[] = [
   primaryLevel("Z"),
   {
     scoreBase: 150,
+    count: 24,
     randomQubit: () => choice(qubitBases),
     deal: () => {
       const random = () => choice(qubitBases);
@@ -80,6 +85,7 @@ export const primaryLevels: Level[] = [
 function secondaryLevel(axis: Axis): Level {
   return {
     scoreBase: 250,
+    count: 20,
     randomQubit: () => choice(octet(axis)),
     deal: () => {
       const random = () => choice(octet(axis));
@@ -103,6 +109,7 @@ export const secondaryLevels: Level[] = [
   secondaryLevel("Z"),
   {
     scoreBase: 300,
+    count: 28,
     randomQubit: () => choice(secondaryQubits),
     deal: () => {
       const random = () => choice(secondaryQubits);
@@ -123,6 +130,7 @@ export const secondaryLevels: Level[] = [
 
 export const freeMode: Level = {
   scoreBase: 500,
+  count: 16,
   randomQubit: () => randomQubit(),
   deal: () => {
     let buffer = [];
@@ -142,6 +150,7 @@ export const freeMode: Level = {
 export const campaign: Level[] = [
   {
     scoreBase: 50,
+    count: 12,
     randomQubit: () => choice([ZERO, ONE]),
     deal: () => {
       const random = () => choice([ZERO, ONE]);

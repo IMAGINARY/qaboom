@@ -33,7 +33,6 @@ const INITIAL_STEP_RATE = 1000;
 const INPUT_POLL_RATE = 120;
 
 const rateMultiplier = 0.9;
-const levelCount = 16;
 
 const BOARD_OFFSET_Y = 80;
 
@@ -254,6 +253,8 @@ export default class Player extends GameNode {
       this.board.current.outline.alpha = 1;
     }
     // Increase level
+    const levelCount =
+      campaign[Math.min(this.level, campaign.length - 1)].count;
     if (this.pieceCount > levelCount) {
       this.level++;
       playSound("levelUp");
