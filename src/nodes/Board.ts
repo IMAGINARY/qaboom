@@ -345,7 +345,7 @@ export default class Board extends GameNode {
     }
     const coords = getBlochCoords(this.current.base);
     const text = new HTMLText({
-      text: baseScore * multiplier,
+      text: `+${baseScore * multiplier}`,
       style: new TextStyle({
         fontSize: 24 + 2 * baseScore,
         fontFamily: TEXT_FONT,
