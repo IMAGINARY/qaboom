@@ -216,9 +216,12 @@ export default class Player extends GameNode {
     }
     this.currentState = "pause";
     if (
-      await this.board.resolve(campaign[this.#level].scoreBase, (score) => {
-        this.score += score;
-      })
+      await this.board.resolve(
+        campaign[Math.min(this.#level, campaign.length - 1)].scoreBase,
+        (score) => {
+          this.score += score;
+        }
+      )
     ) {
       this.newCurrent();
       this.currentState = "game";
