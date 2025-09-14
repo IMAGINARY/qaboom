@@ -135,17 +135,17 @@ export default class ScoreScreen extends GameNode {
     highScoresLabel.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(highScoresLabel);
     for (let [i, entry] of scores.slice(0, 8).entries()) {
-      this.showEntry(i, entry, -200 + i * 60);
+      this.showEntry(i, entry, -200 + i * 60, i === index);
     }
-    this.showEntry(index, newEntry, -200 + 9 * 60);
+    this.showEntry(index, newEntry, -200 + 9 * 60, true);
   }
 
-  showEntry(index: number, entry: Score, position: number) {
+  showEntry(index: number, entry: Score, position: number, highlight = false) {
     const nameText = new HTMLText({
       text: `${(index + 1 + "").padStart(3)} ${entry.name}`,
       style: {
         fontFamily: TEXT_FONT,
-        fill: theme.colors.primary,
+        fill: highlight ? theme.colors.primary : theme.colors.muted,
         fontSize: 48,
         fontWeight: "bold",
       },
