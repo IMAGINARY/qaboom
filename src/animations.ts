@@ -37,3 +37,15 @@ export async function bump(obj: Container, direction: Point, amount: number) {
     { duration: 0.1, ease: "easeOut" }
   );
 }
+
+export async function bumpRotate(obj: Container) {
+  await animate(
+    obj,
+    { rotation: Math.PI / 16 },
+    {
+      duration: 0.05,
+      ease: "easeIn",
+    }
+  );
+  await animate(obj, { rotation: 0 }, { duration: 0.1, ease: "easeOut" });
+}

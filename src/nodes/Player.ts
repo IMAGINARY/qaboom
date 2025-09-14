@@ -18,7 +18,7 @@ import { campaign, type Level } from "../levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
 import { inputs, type PlayerInput } from "../inputs";
-import { bump, pulse } from "../animations";
+import { bump, bumpRotate, pulse } from "../animations";
 import { delay } from "../util";
 import { playSound } from "../audio";
 import HoldArea from "./HoldArea";
@@ -379,9 +379,8 @@ export default class Player extends GameNode {
         }
         break;
       }
-      // If the player presses the trigger, rotate the qubit (if possible)
+      // If the player presses the trigger, activate the "flip" functionality
       case this.inputMap.flip: {
-        // Can only rotate qubit pairs
         if (this.board.current instanceof MeasurementPiece) {
           this.board.current.flip();
           playSound("turn");
@@ -421,6 +420,7 @@ export default class Player extends GameNode {
           }
           this.board.current.rotate();
           playSound("turn");
+          bumpRotate(this.board.current.container);
         }
         break;
       }
