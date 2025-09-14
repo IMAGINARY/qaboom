@@ -280,7 +280,9 @@ export default class Player extends GameNode {
       this.holdArea.held.outline.alpha = 0;
     }
     if (!this.board.current) {
+      // `newCurrent` resets canSwap so reset it back.
       this.newCurrent();
+      this.canSwap = false;
     } else {
       this.board.view.addChild(this.board.current.view);
     }
