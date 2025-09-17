@@ -1,12 +1,12 @@
 import "@pixi/layout";
-import { Point, Container, Graphics, HTMLText, Assets, Sprite } from "pixi.js";
+import { Container, HTMLText, Assets, Sprite, Texture } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
-import { container } from "../util";
 import GameNode from "./GameNode";
 import ministryLogoPath from "../assets/img/ministry-logo.png";
 import imaginaryLogoPath from "../assets/img/imaginary-logo.png";
 import mpiLogoPath from "../assets/img/mpi-logo.png";
 import { inputs } from "../inputs";
+import { LayoutContainer } from "@pixi/layout/components";
 
 export default class Credits extends GameNode {
   onFinish?: () => void;
@@ -17,43 +17,27 @@ export default class Credits extends GameNode {
     this.view.layout = {
       width: WIDTH,
       height: HEIGHT,
+      display: "flex",
+      flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
+      gap: 50,
     };
-    const credits = new Container({
+    const credits = new LayoutContainer({
       layout: {
+        padding: 50,
         borderRadius: 20,
         backgroundColor: "#0008",
         borderColor: "white",
         borderWidth: 2,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 20,
       },
     });
     this.view.addChild(credits);
-    // this.view.position.x = WIDTH / 2;
-    // this.view.position.y = HEIGHT / 2;
 
-    // const boxHeight = HEIGHT * 0.9;
-    // const boxWidth = WIDTH * 0.9;
-    // this.view.addChild(
-    //   container(
-    //     new Graphics().roundRect(
-    //       -boxWidth / 2,
-    //       -boxHeight / 2,
-    //       boxWidth,
-    //       boxHeight - 350
-    //     )
-    //   )
-    // );
-    // this.view.addChild(
-    //   container(
-    //     new Graphics().roundRect(
-    //       -boxWidth / 2,
-    //       boxHeight / 2 - 350,
-    //       boxWidth,
-    //       350
-    //     )
-    //   ).fill("white")
-    // );
     const titleText = new HTMLText({
       layout: true,
       text: "Credits",
@@ -67,49 +51,63 @@ export default class Credits extends GameNode {
     });
     credits.addChild(titleText);
 
-    // titleText.anchor = { x: 0.5, y: 0.5 };
-    // titleText.position.y = -HEIGHT / 2 + 144;
-    // this.view.addChild(titleText);
+    const columns = new Container({
+      layout: {
+        display: "flex",
+        gap: 75,
+      },
+    });
+    credits.addChild(columns);
 
-    // const width = WIDTH * 0.2;
-    // this.drawCredit(
-    //   new Point(-width, -HEIGHT * 0.3),
-    //   "Concept & Development",
-    //   "Nat Alison"
-    // );
+    const column1 = new Container({
+      layout: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 20,
+      },
+    });
+    const column2 = new Container({
+      layout: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 20,
+      },
+    });
 
-    // this.drawCredit(
-    //   new Point(-width, -HEIGHT * 0.2),
-    //   "Content & Coordination",
-    //   "Christian Stussak",
-    //   "Andreas Matt",
-    //   "Skye Rothstein"
-    // );
-    // this.drawCredit(new Point(-width, HEIGHT * 0), "Music", "Landis Seralian");
-    // this.drawCredit(
-    //   new Point(width, -HEIGHT * 0.3),
-    //   "Support",
-    //   "Karla Schön",
-    //   "Oliver Schön"
-    // );
-    // this.drawCredit(
-    //   new Point(width, -HEIGHT * 0.125),
-    //   "Arcade Machine Graphic Design",
-    //   "Eric Londaits"
-    // );
-    // this.drawCredit(
-    //   new Point(width, HEIGHT * 0),
-    //   "Arcade Machine Building",
-    //   "Retr-O-Mat"
-    // );
-    // this.drawCredit(new Point(0, HEIGHT * 0.1), "Funded by", "BMFTR");
+    columns.addChild(column1);
+    columns.addChild(column2);
+
+    column1.addChild(this.drawCredit("Concept & Development", "Nat Alison"));
+
+    column1.addChild(
+      this.drawCredit(
+        "Content & Coordination",
+        "Christian Stussak",
+        "Andreas Matt",
+        "Skye Rothstein"
+      )
+    );
+    column1.addChild(this.drawCredit("Music", "Landis Seralian"));
+
+    column2.addChild(this.drawCredit("Support", "Karla Schön", "Oliver Schön"));
+    column2.addChild(
+      this.drawCredit("Arcade Machine Graphic Design", "Eric Londaits")
+    ),
+      column2.addChild(
+        this.drawCredit("Arcade Machine Building", "Retr-O-Mat")
+      );
   }
 
-  drawCredit(position: Point, title: string, ...names: string[]) {
-    const credit = new Container();
-    credit.position = position;
-    this.view.addChild(credit);
+  drawCredit(title: string, ...names: string[]) {
+    const credit = new Container({
+      layout: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      },
+    });
     const titleText = new HTMLText({
+      layout: true,
       text: title,
       style: {
         align: "center",
@@ -119,11 +117,11 @@ export default class Credits extends GameNode {
         fontSize: 40,
       },
     });
-    titleText.anchor = { x: 0.5, y: 0 };
     credit.addChild(titleText);
 
-    for (let [i, name] of names.entries()) {
+    for (let [_i, name] of names.entries()) {
       const nameText = new HTMLText({
+        layout: true,
         text: name,
         style: {
           align: "center",
@@ -133,10 +131,9 @@ export default class Credits extends GameNode {
           fontSize: 40,
         },
       });
-      nameText.anchor = { x: 0.5, y: 0 };
-      nameText.position.y = (i + 1) * 50;
       credit.addChild(nameText);
     }
+    return credit;
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
@@ -152,11 +149,26 @@ export default class Credits extends GameNode {
   };
 
   async load() {
-    return;
-    const fundedBy = new Container();
-    fundedBy.position = { x: -WIDTH * 0.3, y: HEIGHT * 0.2 };
+    const logos = new LayoutContainer({
+      layout: {
+        backgroundColor: "white",
+        borderRadius: 20,
+        display: "flex",
+        gap: 100,
+        padding: 50,
+      },
+    });
+
+    const fundedBy = new Container({
+      layout: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      },
+    });
     const ministryLogoTexture = await Assets.load(ministryLogoPath);
     const titleText = new HTMLText({
+      layout: true,
       text: "Funded by",
       style: {
         align: "center",
@@ -166,20 +178,22 @@ export default class Credits extends GameNode {
         fontSize: 40,
       },
     });
-    titleText.anchor = { x: 0.5, y: 0 };
     fundedBy.addChild(titleText);
-    const sprite = new Sprite(ministryLogoTexture);
-    sprite.anchor = { x: 0.5, y: 0 };
-    sprite.position.y = 50;
-    sprite.scale = 0.3;
-    fundedBy.addChild(sprite);
-    this.view.addChild(fundedBy);
+    fundedBy.addChild(this.drawImage(ministryLogoTexture, 250));
+    logos.addChild(fundedBy);
 
-    const partOf = new Container();
-    partOf.position = { x: WIDTH * 0.1, y: HEIGHT * 0.2 };
+    const partOf = new Container({
+      layout: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 20,
+      },
+    });
     const imaginaryLogoTexture = await Assets.load(imaginaryLogoPath);
     const mpiLogoTexture = await Assets.load(mpiLogoPath);
     const titleText2 = new HTMLText({
+      layout: true,
       text: "Part of quantum-arcade.org by",
       style: {
         align: "center",
@@ -189,18 +203,29 @@ export default class Credits extends GameNode {
         fontSize: 40,
       },
     });
-    titleText2.anchor = { x: 0.5, y: 0 };
     partOf.addChild(titleText2);
-    const sprite1 = new Sprite(imaginaryLogoTexture);
-    sprite1.anchor = { x: 0.5, y: 0 };
-    sprite1.position = { x: -300, y: 100 };
-    sprite1.scale = 0.5;
-    const sprite2 = new Sprite(mpiLogoTexture);
-    sprite2.anchor = { x: 0.5, y: 0 };
-    sprite2.position = { x: 300, y: 50 };
-    sprite2.scale = 0.5;
-    partOf.addChild(sprite1);
-    partOf.addChild(sprite2);
-    this.view.addChild(partOf);
+    const partOfSprites = new Container({
+      layout: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 20,
+      },
+    });
+    partOfSprites.addChild(this.drawImage(imaginaryLogoTexture, 300));
+    partOfSprites.addChild(this.drawImage(mpiLogoTexture, 500));
+    partOf.addChild(partOfSprites);
+    logos.addChild(partOf);
+    this.view.addChild(logos);
+  }
+
+  drawImage(texture: Texture, width: number) {
+    return new Sprite({
+      texture,
+      layout: {
+        width,
+        height: (width * texture.height) / texture.width,
+      },
+    });
   }
 }
