@@ -1,3 +1,4 @@
+import "@pixi/layout";
 import { Point, Container, Graphics, HTMLText, Assets, Sprite } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import { container } from "../util";
@@ -13,32 +14,48 @@ export default class Credits extends GameNode {
   constructor() {
     super();
     document.addEventListener("keydown", this.handleKeyDown);
-    this.view.position.x = WIDTH / 2;
-    this.view.position.y = HEIGHT / 2;
+    this.view.layout = {
+      width: WIDTH,
+      height: HEIGHT,
+      justifyContent: "center",
+      alignItems: "center",
+    };
+    const credits = new Container({
+      layout: {
+        borderRadius: 20,
+        backgroundColor: "#0008",
+        borderColor: "white",
+        borderWidth: 2,
+      },
+    });
+    this.view.addChild(credits);
+    // this.view.position.x = WIDTH / 2;
+    // this.view.position.y = HEIGHT / 2;
 
-    const boxHeight = HEIGHT * 0.9;
-    const boxWidth = WIDTH * 0.9;
-    this.view.addChild(
-      container(
-        new Graphics().roundRect(
-          -boxWidth / 2,
-          -boxHeight / 2,
-          boxWidth,
-          boxHeight - 350
-        )
-      )
-    );
-    this.view.addChild(
-      container(
-        new Graphics().roundRect(
-          -boxWidth / 2,
-          boxHeight / 2 - 350,
-          boxWidth,
-          350
-        )
-      ).fill("white")
-    );
+    // const boxHeight = HEIGHT * 0.9;
+    // const boxWidth = WIDTH * 0.9;
+    // this.view.addChild(
+    //   container(
+    //     new Graphics().roundRect(
+    //       -boxWidth / 2,
+    //       -boxHeight / 2,
+    //       boxWidth,
+    //       boxHeight - 350
+    //     )
+    //   )
+    // );
+    // this.view.addChild(
+    //   container(
+    //     new Graphics().roundRect(
+    //       -boxWidth / 2,
+    //       boxHeight / 2 - 350,
+    //       boxWidth,
+    //       350
+    //     )
+    //   ).fill("white")
+    // );
     const titleText = new HTMLText({
+      layout: true,
       text: "Credits",
       style: {
         align: "center",
@@ -48,41 +65,43 @@ export default class Credits extends GameNode {
         fontSize: 72,
       },
     });
-    titleText.anchor = { x: 0.5, y: 0.5 };
-    titleText.position.y = -HEIGHT / 2 + 144;
-    this.view.addChild(titleText);
+    credits.addChild(titleText);
 
-    const width = WIDTH * 0.2;
-    this.drawCredit(
-      new Point(-width, -HEIGHT * 0.3),
-      "Concept & Development",
-      "Nat Alison"
-    );
+    // titleText.anchor = { x: 0.5, y: 0.5 };
+    // titleText.position.y = -HEIGHT / 2 + 144;
+    // this.view.addChild(titleText);
 
-    this.drawCredit(
-      new Point(-width, -HEIGHT * 0.2),
-      "Content & Coordination",
-      "Christian Stussak",
-      "Andreas Matt",
-      "Skye Rothstein"
-    );
-    this.drawCredit(new Point(-width, HEIGHT * 0), "Music", "Landis Seralian");
-    this.drawCredit(
-      new Point(width, -HEIGHT * 0.3),
-      "Support",
-      "Karla Schön",
-      "Oliver Schön"
-    );
-    this.drawCredit(
-      new Point(width, -HEIGHT * 0.125),
-      "Arcade Machine Graphic Design",
-      "Eric Londaits"
-    );
-    this.drawCredit(
-      new Point(width, HEIGHT * 0),
-      "Arcade Machine Building",
-      "Retr-O-Mat"
-    );
+    // const width = WIDTH * 0.2;
+    // this.drawCredit(
+    //   new Point(-width, -HEIGHT * 0.3),
+    //   "Concept & Development",
+    //   "Nat Alison"
+    // );
+
+    // this.drawCredit(
+    //   new Point(-width, -HEIGHT * 0.2),
+    //   "Content & Coordination",
+    //   "Christian Stussak",
+    //   "Andreas Matt",
+    //   "Skye Rothstein"
+    // );
+    // this.drawCredit(new Point(-width, HEIGHT * 0), "Music", "Landis Seralian");
+    // this.drawCredit(
+    //   new Point(width, -HEIGHT * 0.3),
+    //   "Support",
+    //   "Karla Schön",
+    //   "Oliver Schön"
+    // );
+    // this.drawCredit(
+    //   new Point(width, -HEIGHT * 0.125),
+    //   "Arcade Machine Graphic Design",
+    //   "Eric Londaits"
+    // );
+    // this.drawCredit(
+    //   new Point(width, HEIGHT * 0),
+    //   "Arcade Machine Building",
+    //   "Retr-O-Mat"
+    // );
     // this.drawCredit(new Point(0, HEIGHT * 0.1), "Funded by", "BMFTR");
   }
 
@@ -133,6 +152,7 @@ export default class Credits extends GameNode {
   };
 
   async load() {
+    return;
     const fundedBy = new Container();
     fundedBy.position = { x: -WIDTH * 0.3, y: HEIGHT * 0.2 };
     const ministryLogoTexture = await Assets.load(ministryLogoPath);

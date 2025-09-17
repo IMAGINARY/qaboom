@@ -15,11 +15,13 @@
     "vite": "^7.0.4"
   },
   "dependencies": {
+    "@pixi/layout": "^3.1.0",
     "@pixi/sound": "^6.0.1",
     "culori": "^4.0.2",
     "lodash-es": "^4.17.21",
     "mathjs": "^14.5.3",
     "motion": "^12.23.12",
-    "pixi.js": "^8.11.0"
+    "pixi.js": "^8.11.0",
+    "yoga-layout": "^3.2.1"
   }
 }
