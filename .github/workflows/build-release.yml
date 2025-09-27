@@ -1,0 +1,81 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - "v*.*"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: read
+    env:
+      RELEASE_ZIP_FILENAME: ${{ github.event.repository.name }}-${{ github.ref_name }}.zip
+      RELEASE_TAR_GZ_FILENAME: ${{ github.event.repository.name }}-${{ github.ref_name }}.tar.gz
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+
+      - name: Set up Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        with:
+          node-version: "18.19.x"
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build
+        run: yarn build
+
+      - name: "Build Changelog"
+        id: build_changelog
+        uses: requarks/changelog-action@4a2c34a1a8fcfa9e48e61960aad0affc15066393
+        with:
+          tag: ${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          writeToFile: false
+          includeInvalidCommits: true
+
+      - name: Create Zip Archive
+        run: |
+          echo "::start:: Creating zip archive..."
+          (cd dist && \
+            zip \
+              -r ../$RELEASE_ZIP_FILENAME . \
+              -x "node_modules/*" "*/node_modules/*" \
+              $(test -f ../.releaseignore && echo "-x@../.releaseignore")\
+          )
+          echo "::end:: Created zip archive."
+
+      - name: Create Tar Gz Archive
+        run: |
+          echo "::start:: Creating tar.gz archive..."
+          (cd dist && \
+          tar \
+            -czv -f ../$RELEASE_TAR_GZ_FILENAME \
+            --exclude "node_modules/*" \
+            --exclude "*/node_modules/*" \
+            $(test -f ../.releaseignore && echo "--exclude-from ../.releaseignore") \
+            .
+          )
+          echo "::end:: Created tar.gz archive."
+
+      - name: Create the release
+        uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981
+        with:
+          files: |
+            ${{ env.RELEASE_ZIP_FILENAME }}
+            ${{ env.RELEASE_TAR_GZ_FILENAME }}
+          body: ${{ steps.build_changelog.outputs.changes }}
