@@ -1,7 +1,5 @@
 import { AbstractText, Container } from "pixi.js";
 
-const I18N_ATTR = "data-i18n";
-
 let languages: string[] = [];
 const strings: Record<string, any> = {};
 let currentLang: string = "en";
@@ -37,13 +35,6 @@ export function setI18nKey(
   translate(node);
 }
 
-// export function createI18nText(tag: string, key: string) {
-//   const el = document.createElement(tag);
-//   el.textContent = translate(key);
-//   el.setAttribute(I18N_ATTR, key);
-//   return el;
-// }
-
 /**
  * Retranslate all translateable text in the current language.
  */
@@ -56,10 +47,6 @@ export function refreshI18nText(node: any) {
   if (node instanceof AbstractText) {
     translate(node);
   }
-  // for (const el of document.querySelectorAll(`[${I18N_ATTR}]`)) {
-  //   const key = el.getAttribute(I18N_ATTR) ?? "";
-  //   el.textContent = translate(key);
-  // }
 }
 
 export function getCurrentLang() {
