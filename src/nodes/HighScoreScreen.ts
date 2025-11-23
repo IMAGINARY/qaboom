@@ -4,6 +4,7 @@ import GameNode from "./GameNode";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import { getScores, type Score } from "../storage";
 import { inputs } from "../inputs";
+import { setI18nKey } from "../i18n";
 
 // The high score screen displayed in the main menu
 // TODO: deduplicate from `ScoreScreen`
@@ -27,7 +28,6 @@ export default class HighScoreScreen extends GameNode {
     );
     const scores = getScores();
     const highScoresLabel = new HTMLText({
-      text: "High Scores",
       style: {
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
@@ -35,6 +35,7 @@ export default class HighScoreScreen extends GameNode {
         fontWeight: "bold",
       },
     });
+    setI18nKey(highScoresLabel, "menu.high_scores");
     highScoresLabel.position.y = -300;
     highScoresLabel.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(highScoresLabel);

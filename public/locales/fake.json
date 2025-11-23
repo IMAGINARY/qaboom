@@ -1,0 +1,33 @@
+{
+  "menu": {
+    "title": "FFFFFF",
+    "1_player": "FFFFFF",
+    "2_player": "FFFFFF",
+    "high_scores": "FFFFFF",
+    "credits": "FFFFFF",
+    "level": "{level} FFFFFF"
+  },
+  "credits": {
+    "title": "FFFFFF",
+    "concept_development": "FFFFFF",
+    "content_coord": "FFFFFF",
+    "music": "FFFFFF",
+    "support": "FFFFFF",
+    "graphic_design": "FFFFFF",
+    "building": "FFFFFF",
+    "funded_by": "FFFFFF",
+    "part_of": "FFFFFF"
+  },
+  "game": {
+    "go": "FFFFFF",
+    "lvl": "FFF {level}",
+    "hold": "FFFFFF",
+    "boom_text": {
+      "small": "ffff.",
+      "medium": "FFFF!",
+      "large": "FFFFFF!",
+      "all_clear": "FFF FFFF!"
+    },
+    "enter_name": "FFFFFF"
+  }
+}

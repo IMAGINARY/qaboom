@@ -22,6 +22,7 @@ import { bump, bumpRotate, pulse } from "../animations";
 import { delay } from "../util";
 import { playSound } from "../audio";
 import HoldArea from "./HoldArea";
+import { setFormat, setI18nKey } from "../i18n";
 
 type State = "pause" | "game";
 
@@ -121,7 +122,6 @@ export default class Player extends GameNode {
     this.view.addChild(this.scoreboard);
 
     this.levelSign = new HTMLText({
-      text: "Lvl " + (this.level + 1),
       style: {
         align: "center",
         fill: theme.colors.primary,
@@ -130,6 +130,9 @@ export default class Player extends GameNode {
         fontSize: 48,
       },
     });
+    setI18nKey(this.levelSign, "game.lvl", (t) =>
+      t.replace("{level}", "" + (this.level + 1))
+    );
     this.levelSign.position = { x: 50, y: 10 };
     this.view.addChild(this.levelSign);
 
@@ -143,7 +146,9 @@ export default class Player extends GameNode {
   }
   set level(value: number) {
     this.#level = value;
-    this.levelSign.text = `Lvl ${this.#level + 1}`;
+    setFormat(this.levelSign, (t) =>
+      t.replace("{level}", "" + (this.#level + 1))
+    );
   }
 
   get score() {

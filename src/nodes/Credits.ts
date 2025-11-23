@@ -7,6 +7,7 @@ import imaginaryLogoPath from "../assets/img/imaginary-logo.png";
 import mpiLogoPath from "../assets/img/mpi-logo.png";
 import { inputs } from "../inputs";
 import { LayoutContainer } from "@pixi/layout/components";
+import { setI18nKey } from "../i18n";
 
 export default class Credits extends GameNode {
   onFinish?: () => void;
@@ -40,7 +41,6 @@ export default class Credits extends GameNode {
 
     const titleText = new HTMLText({
       layout: true,
-      text: "Credits",
       style: {
         align: "center",
         fill: theme.colors.primary,
@@ -49,6 +49,7 @@ export default class Credits extends GameNode {
         fontSize: 72,
       },
     });
+    setI18nKey(titleText, "credits.title");
     credits.addChild(titleText);
 
     const columns = new Container({
@@ -77,28 +78,30 @@ export default class Credits extends GameNode {
     columns.addChild(column1);
     columns.addChild(column2);
 
-    column1.addChild(this.drawCredit("Concept & Development", "Nat Alison"));
+    column1.addChild(
+      this.drawCredit("credits.concept_development", "Nat Alison")
+    );
 
     column1.addChild(
       this.drawCredit(
-        "Content & Coordination",
+        "credits.content_coord",
         "Christian Stussak",
         "Andreas Matt",
         "Skye Rothstein"
       )
     );
-    column1.addChild(this.drawCredit("Music", "Landis Seralian"));
+    column1.addChild(this.drawCredit("credits.music", "Landis Seralian"));
 
-    column2.addChild(this.drawCredit("Support", "Karla Schön", "Oliver Schön"));
     column2.addChild(
-      this.drawCredit("Arcade Machine Graphic Design", "Eric Londaits")
+      this.drawCredit("credits.support", "Karla Schön", "Oliver Schön")
+    );
+    column2.addChild(
+      this.drawCredit("credits.graphic_design", "Eric Londaits")
     ),
-      column2.addChild(
-        this.drawCredit("Arcade Machine Building", "Retr-O-Mat")
-      );
+      column2.addChild(this.drawCredit("credits.building", "Retr-O-Mat"));
   }
 
-  drawCredit(title: string, ...names: string[]) {
+  drawCredit(key: string, ...names: string[]) {
     const credit = new Container({
       layout: {
         display: "flex",
@@ -108,7 +111,6 @@ export default class Credits extends GameNode {
     });
     const titleText = new HTMLText({
       layout: true,
-      text: title,
       style: {
         align: "center",
         fill: theme.colors.primary,
@@ -117,6 +119,7 @@ export default class Credits extends GameNode {
         fontSize: 40,
       },
     });
+    setI18nKey(titleText, key);
     credit.addChild(titleText);
 
     for (let [_i, name] of names.entries()) {
@@ -169,7 +172,6 @@ export default class Credits extends GameNode {
     const ministryLogoTexture = await Assets.load(ministryLogoPath);
     const titleText = new HTMLText({
       layout: true,
-      text: "Funded by",
       style: {
         align: "center",
         fill: "black",
@@ -178,6 +180,7 @@ export default class Credits extends GameNode {
         fontSize: 40,
       },
     });
+    setI18nKey(titleText, "credits.funded_by");
     fundedBy.addChild(titleText);
     fundedBy.addChild(this.drawImage(ministryLogoTexture, 250));
     logos.addChild(fundedBy);
@@ -194,7 +197,6 @@ export default class Credits extends GameNode {
     const mpiLogoTexture = await Assets.load(mpiLogoPath);
     const titleText2 = new HTMLText({
       layout: true,
-      text: "Part of quantum-arcade.org by",
       style: {
         align: "center",
         fill: "black",
@@ -203,6 +205,7 @@ export default class Credits extends GameNode {
         fontSize: 40,
       },
     });
+    setI18nKey(titleText2, "credits.part_of");
     partOf.addChild(titleText2);
     const partOfSprites = new Container({
       layout: {

@@ -27,6 +27,7 @@ import { playScoreSound, playSound } from "../audio";
 import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 import { animate } from "motion";
+import { setI18nKey } from "../i18n";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -305,15 +306,14 @@ export default class Board extends GameNode {
     if (!(this.current instanceof MeasurementPiece)) {
       return;
     }
-    const boomText = this.isEmpty()
-      ? "ALL QLEAR!"
+    const boomKey = this.isEmpty()
+      ? "all_clear"
       : count >= 15
-      ? `QABOOM!`
+      ? "large"
       : count >= 6
-      ? "BOOM!"
-      : "boom.";
+      ? "medium"
+      : "small";
     const text = new HTMLText({
-      text: boomText,
       style: new TextStyle({
         fontSize: Math.min(BOARD_WIDTH * CELL_SIZE * 1.25, 60 + 5 * count),
         fontFamily: TEXT_FONT,
@@ -321,6 +321,7 @@ export default class Board extends GameNode {
         fill: theme.colors.primary,
       }),
     });
+    setI18nKey(text, `game.boom_text.${boomKey}`);
     // Have the text above everything else
     text.zIndex = 100;
     text.anchor = { x: 0.5, y: 0.5 };

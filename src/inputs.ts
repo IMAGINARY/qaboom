@@ -9,6 +9,7 @@ export interface PlayerInput {
 export const inputs = {
   refresh: "r",
   pause: "p",
+  translate: "t",
   player1: {
     left: "a",
     right: "d",
