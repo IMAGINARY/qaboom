@@ -80,6 +80,9 @@ export function setFormat(node: AbstractText, format: (t: string) => string) {
 
 function translate(node: AbstractText) {
   const key = (node as any).i18nKey;
+  if (!key) {
+    return;
+  }
   const format = (node as any).i18nFormat;
   node.text = format(getNestedKey(strings[currentLang], key.split(".")));
 }
