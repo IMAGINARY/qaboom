@@ -7,6 +7,7 @@ import { pulse } from "../animations";
 import { playSound } from "../audio";
 import { campaign } from "../levels";
 import type Background from "./Background";
+import { setI18nKey } from "../i18n";
 
 type State = "player-select" | "level-select";
 
@@ -44,15 +45,14 @@ export default class Menu extends GameNode {
       )
     );
     const titleText = new HTMLText({
-      text: "<strong>Qaboom!</strong>",
       style: {
         align: "center",
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
-        // fontWeight: "bold",
         fontSize: 220,
       },
     });
+    setI18nKey(titleText, "menu.title", (t) => `<strong>${t}</strong>`);
     titleText.anchor = { x: 0.5, y: 0.5 };
     titleText.position.y = -HEIGHT / 6;
     this.view.addChild(titleText);

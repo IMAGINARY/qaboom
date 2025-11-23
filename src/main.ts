@@ -1,7 +1,8 @@
 import Game from "./Game";
+import { loadLanguages } from "./i18n";
 
 (async () => {
-  // TODO pass in configuration and translations.
+  await loadLanguages(["en", "fake"]);
   const game = new Game();
   await game.start();
 })();

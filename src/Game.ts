@@ -11,6 +11,7 @@ import { randomInt } from "mathjs";
 import { campaign } from "./levels";
 import Credits from "./nodes/Credits";
 import HighScoreScreen from "./nodes/HighScoreScreen";
+import { switchLanguage } from "./i18n";
 
 const IDLE_TIMEOUT = 60 * 1000;
 
@@ -34,6 +35,9 @@ export default class Game {
     document.addEventListener("keydown", (e) => {
       if (e.key === inputs.refresh) {
         window.location.reload();
+      }
+      if (e.key === "t") {
+        switchLanguage(app.stage);
       }
     });
 
