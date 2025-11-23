@@ -73,6 +73,11 @@ export function changeLanguage(newLang: string) {
   currentLang = newLang;
 }
 
+export function setFormat(node: AbstractText, format: (t: string) => string) {
+  (node as any).i18nFormat = format;
+  translate(node);
+}
+
 function translate(node: AbstractText) {
   const key = (node as any).i18nKey;
   const format = (node as any).i18nFormat;

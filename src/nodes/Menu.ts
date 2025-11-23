@@ -7,11 +7,11 @@ import { pulse } from "../animations";
 import { playSound } from "../audio";
 import { campaign } from "../levels";
 import type Background from "./Background";
-import { setI18nKey } from "../i18n";
+import { setFormat, setI18nKey } from "../i18n";
 
 type State = "player-select" | "level-select";
 
-const options = ["1 Player", "2 Player", "High Scores", "Credits"];
+const options = ["1_player", "2_player", "high_scores", "credits"];
 
 export default class Menu extends GameNode {
   state: State = "player-select";
@@ -60,7 +60,6 @@ export default class Menu extends GameNode {
     this.optionTexts = [];
     for (let [i, option] of options.entries()) {
       const text = new HTMLText({
-        text: option,
         style: {
           align: "center",
           fill: theme.colors.muted,
@@ -69,6 +68,7 @@ export default class Menu extends GameNode {
           fontSize: 72,
         },
       });
+      setI18nKey(text, `menu.${option}`);
       text.anchor = { x: 0.5, y: 0.5 };
       text.position.y = i * 100;
       this.optionTexts.push(text);
@@ -77,7 +77,6 @@ export default class Menu extends GameNode {
     this.setOptionIndex(this.optionIndex);
 
     this.levelText = new HTMLText({
-      text: "Level 1",
       style: {
         align: "center",
         fill: theme.colors.primary,
@@ -86,6 +85,7 @@ export default class Menu extends GameNode {
         fontSize: 72,
       },
     });
+    setI18nKey(this.levelText, "menu.level", (t) => t.replace("{level}", "1"));
     this.levelText.anchor = { x: 0.5, y: 0.5 };
     this.levelSelect.position.x = 0;
     this.levelSelect.position.y = 100;
@@ -101,9 +101,9 @@ export default class Menu extends GameNode {
   }
 
   setOptionIndex(index: number) {
-    this.optionTexts[this.optionIndex].text = options[this.optionIndex];
+    setFormat(this.optionTexts[this.optionIndex], (t) => t);
     this.optionTexts[this.optionIndex].style.fill = theme.colors.muted;
-    this.optionTexts[index].text = `<| ${options[index]} |>`;
+    setFormat(this.optionTexts[index], (t) => `<| ${t} |>`);
     this.optionTexts[index].style.fill = theme.colors.primary;
     this.optionIndex = index;
     pulse(this.optionTexts[index]);
@@ -181,7 +181,9 @@ export default class Menu extends GameNode {
 
   toggleLevel(level: number) {
     this.level = level;
-    this.levelText.text = `Level ${this.level + 1}`;
+    setFormat(this.levelText, (t) =>
+      t.replace("{level}", "" + (this.level + 1))
+    );
     playSound("turn");
     pulse(this.levelSelect);
     this.background.setGenerator(campaign[this.level].randomQubit);

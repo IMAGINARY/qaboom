@@ -5,7 +5,7 @@
     "2_player": "FFFFFF",
     "high_scores": "FFFFFF",
     "credits": "FFFFFF",
-    "level": "FFFFFF"
+    "level": "{level} FFFFFF"
   },
   "credits": {
     "title": "FFFFFF",
