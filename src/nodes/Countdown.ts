@@ -4,6 +4,7 @@ import GameNode from "./GameNode";
 import { playScoreSound, playSound } from "../audio";
 import { delay } from "../util";
 import { pulse } from "../animations";
+import { setI18nKey } from "../i18n";
 
 export default class Countdown extends GameNode {
   text: HTMLText;
@@ -33,7 +34,7 @@ export default class Countdown extends GameNode {
       pulse(this.text, 1.5);
       await delay(1000 * (5 / 8));
     }
-    this.text.text = "GO!";
+    setI18nKey(this.text, "game.go");
     playSound("levelUp");
     await delay(1000);
   }

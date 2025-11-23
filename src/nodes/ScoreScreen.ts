@@ -6,6 +6,7 @@ import { getScores, setScores, type Score } from "../storage";
 import { playSound } from "../audio";
 import { container } from "../util";
 import { pulse } from "../animations";
+import { setI18nKey } from "../i18n";
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 type State = "enter_name" | "high_scores";
@@ -55,7 +56,6 @@ export default class ScoreScreen extends GameNode {
       );
     }
     const title = new HTMLText({
-      text: "Enter your name",
       style: {
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
@@ -63,6 +63,7 @@ export default class ScoreScreen extends GameNode {
         fontSize: 48,
       },
     });
+    setI18nKey(title, "game.enter_name");
     title.anchor = { x: 0.5, y: 0.5 };
     title.position.y = -300;
     this.nameEnter.addChild(title);
@@ -123,7 +124,6 @@ export default class ScoreScreen extends GameNode {
     scores.splice(index, 0, newEntry);
     setScores(scores);
     const highScoresLabel = new HTMLText({
-      text: "High Scores",
       style: {
         fill: theme.colors.primary,
         fontFamily: TEXT_FONT,
@@ -131,6 +131,7 @@ export default class ScoreScreen extends GameNode {
         fontWeight: "bold",
       },
     });
+    setI18nKey(highScoresLabel, "menu.high_scores");
     highScoresLabel.position.y = -300;
     highScoresLabel.anchor = { x: 0.5, y: 0.5 };
     this.view.addChild(highScoresLabel);

@@ -20,13 +20,13 @@
   },
   "game": {
     "go": "FFFFFF",
-    "lvl": "FFFFFF",
+    "lvl": "FFF {level}",
     "hold": "FFFFFF",
     "boom_text": {
-      "small": "FFFFFF",
-      "medium": "FFFFFF",
-      "large": "FFFFFF",
-      "all_clear": "FFFFFF"
+      "small": "ffff.",
+      "medium": "FFFF!",
+      "large": "FFFFFF!",
+      "all_clear": "FFF FFFF!"
     },
     "enter_name": "FFFFFF"
   }

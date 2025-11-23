@@ -4,6 +4,7 @@ import GameNode from "./GameNode";
 import type { Piece } from "./Deck";
 import QubitPair from "./QubitPair";
 import { CELL_SIZE, TEXT_FONT, theme } from "../constants";
+import { setI18nKey } from "../i18n";
 
 const header = 75;
 const width = 200;
@@ -29,6 +30,7 @@ export default class HoldArea extends GameNode {
         fontSize: 48,
       },
     });
+    setI18nKey(text, "game.hold");
     text.anchor = { x: 0.5, y: 0.5 };
     text.position = { x: width / 2, y: header / 2 };
     this.view.addChild(text);

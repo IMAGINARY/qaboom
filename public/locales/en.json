@@ -21,7 +21,7 @@
   "game": {
     "go": "GO!",
     "lvl": "Lvl {level}",
-    "hold": "Hold",
+    "hold": "HOLD",
     "boom_text": {
       "small": "boom.",
       "medium": "BOOM!",
