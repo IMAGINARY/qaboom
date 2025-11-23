@@ -4,7 +4,7 @@ let languages: string[] = [];
 const strings: Record<string, any> = {};
 let currentLang: string = "en";
 
-export async function loadLanguages(langs: string[]) {
+export async function loadLanguages(langs: string[], startLang: string) {
   languages = langs;
   for (const code of languages) {
     const response = await fetch(`/locales/${code}.json`, {
@@ -12,6 +12,7 @@ export async function loadLanguages(langs: string[]) {
     });
     strings[code] = await response.json();
   }
+  currentLang = startLang;
 }
 
 export async function switchLanguage(node: any) {
