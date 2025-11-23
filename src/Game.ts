@@ -36,7 +36,7 @@ export default class Game {
       if (e.key === inputs.refresh) {
         window.location.reload();
       }
-      if (e.key === "t") {
+      if (e.key === inputs.translate) {
         switchLanguage(app.stage);
       }
     });
