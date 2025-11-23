@@ -7,7 +7,7 @@ import { pulse } from "../animations";
 import { playSound } from "../audio";
 import { campaign } from "../levels";
 import type Background from "./Background";
-import { setFormat, setI18nKey } from "../i18n";
+import { refreshI18nText, setFormat, setI18nKey } from "../i18n";
 
 type State = "player-select" | "level-select";
 
@@ -170,6 +170,7 @@ export default class Menu extends GameNode {
     this.state = "player-select";
     this.view.removeChild(this.levelSelect);
     this.view.addChild(this.playerSelect);
+    refreshI18nText(this.view);
   }
 
   showLevelSelect() {
