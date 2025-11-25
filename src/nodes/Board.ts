@@ -14,6 +14,7 @@ import {
   TEXT_FONT,
   theme,
 } from "../constants";
+import * as math from "mathjs";
 import { range, uniqWith } from "lodash-es";
 import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
@@ -31,6 +32,7 @@ import BaseQubit from "./BaseQubit";
 import EntanglerPiece from "./EntanglerPiece";
 import EntangledPair from "./EntangledPair";
 import EntangledQubit from "./EntangledQubit";
+import QubitPiece from "./QubitPiece";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -228,6 +230,17 @@ export default class Board extends GameNode {
     this.view.removeChild(this.current?.view);
   }
 
+  getPosition(value: BaseQubit) {
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      for (let y = 0; y < BOARD_HEIGHT; y++) {
+        let p = new Point(x, y);
+        if (this.getPiece(new Point(x, y)) === value) {
+          return p;
+        }
+      }
+    }
+  }
+
   async measure(scoreMult: number, onScore: (score: number) => void) {
     if (!(this.current instanceof MeasurementPiece)) {
       throw new Error("Attempting to measure without a MeasurementPiece");
@@ -263,6 +276,29 @@ export default class Board extends GameNode {
           } else {
             this.drawLine(point, nbr, current.ortho);
             qubit.bounceIn();
+          }
+          if (qubit instanceof EntangledQubit) {
+            const value = measured ? current.base : current.ortho;
+            const newPiece = new QubitPiece(value);
+            this.setPiece(point, newPiece);
+            // Set the paired qubit
+            const isFirst = qubit === qubit.parent!.first;
+            const pairPoint = this.getPosition(
+              value ? qubit.parent!.second : qubit.parent!.first
+            )!;
+            const matrix = isFirst
+              ? math.kron(
+                  (math as any).ctranspose(value),
+                  math.identity(2) as math.Matrix
+                )
+              : math.kron(
+                  math.identity(2) as math.Matrix,
+                  (math as any).ctranspose(value)
+                );
+            const newPairPiece = new QubitPiece(
+              math.multiply(matrix as any, qubit.parent!.value) as any
+            );
+            this.setPiece(pairPoint, newPairPiece);
           }
         }
       }
