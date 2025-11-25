@@ -234,7 +234,7 @@ export default class Board extends GameNode {
     for (let x = 0; x < BOARD_WIDTH; x++) {
       for (let y = 0; y < BOARD_HEIGHT; y++) {
         let p = new Point(x, y);
-        if (this.getPiece(new Point(x, y)) === value) {
+        if (this.getPiece(p) === value) {
           return p;
         }
       }
@@ -280,11 +280,11 @@ export default class Board extends GameNode {
           if (qubit instanceof EntangledQubit) {
             const value = measured ? current.base : current.ortho;
             const newPiece = new QubitPiece(value);
-            this.setPiece(point, newPiece);
+            this.setPiece(nbr, newPiece);
             // Set the paired qubit
             const isFirst = qubit === qubit.parent!.first;
             const pairPoint = this.getPosition(
-              value ? qubit.parent!.second : qubit.parent!.first
+              isFirst ? qubit.parent!.second : qubit.parent!.first
             )!;
             const matrix = isFirst
               ? math.kron(
