@@ -10,7 +10,9 @@ export default class EntangledQubit extends BaseQubit {
 
   constructor() {
     super();
-    this.container = new Graphics().circle(0, 0, PIECE_RADIUS).fill("grey");
+    this.container.addChild(
+      new Graphics().circle(0, 0, PIECE_RADIUS).fill("grey")
+    );
   }
 
   tick() {}

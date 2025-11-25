@@ -41,7 +41,6 @@ export default class QubitPiece extends BaseQubit {
     this.container.addChild(this.circle);
     this.container.addChild(this.rod);
     this.container.addChild(this.outline);
-    this.view.addChild(this.container);
     this.#current = getBlochCoords(value);
     this.#goal = this.#current;
     this.setSprite(this.#current);

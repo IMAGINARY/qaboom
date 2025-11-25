@@ -23,6 +23,8 @@ import { delay } from "../util";
 import { playSound } from "../audio";
 import HoldArea from "./HoldArea";
 import { setFormat, setI18nKey } from "../i18n";
+import EntanglerPiece from "./EntanglerPiece";
+import { choice } from "../random";
 
 type State = "pause" | "game";
 
@@ -256,6 +258,9 @@ export default class Player extends GameNode {
     }
     if (this.board.current instanceof GatePiece) {
       this.board.current.outline.alpha = 1;
+    }
+    if (this.board.current instanceof EntanglerPiece) {
+      this.board.current.target = choice(this.board.validCells);
     }
     // Increase level
     const levelCount =

@@ -11,6 +11,7 @@ export default abstract class BaseQubit extends GameNode {
   constructor() {
     super();
     this.container = new Container();
+    this.view.addChild(this.container);
   }
 
   abstract tick(time: Ticker): void;

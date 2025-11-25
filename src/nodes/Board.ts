@@ -29,6 +29,8 @@ import { animate } from "motion";
 import { setI18nKey } from "../i18n";
 import BaseQubit from "./BaseQubit";
 import EntanglerPiece from "./EntanglerPiece";
+import EntangledPair from "./EntangledPair";
+import EntangledQubit from "./EntangledQubit";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -36,6 +38,7 @@ const RECT_MARGIN = PIECE_RADIUS / 2;
 export default class Board extends GameNode {
   grid: (BaseQubit | null)[][] = [];
   lines: Container;
+  // Cells that can be chosen to be entangled
   validCells: Point[] = [];
 
   // Either a pair of qubit, a gate, or a measurement
@@ -102,6 +105,12 @@ export default class Board extends GameNode {
         this.view.addChild(value.view);
       }
       value.view.position = this.gridToLocal(point);
+    }
+    if (value && !(value instanceof EntangledQubit)) {
+      this.validCells.push(point);
+    } else {
+      const index = this.validCells.findIndex((p) => p.equals(point));
+      this.validCells.splice(index, 1);
     }
   }
 
@@ -194,6 +203,11 @@ export default class Board extends GameNode {
     } else if (this.current instanceof GatePiece) {
       // If it's a gate, trigger the gate.
       await this.triggerGate();
+    } else if (this.current instanceof EntanglerPiece) {
+      const pair = new EntangledPair();
+      this.setPiece(this.currentPosition, pair.first);
+      this.setPiece(this.current.target, pair.second);
+      this.view.removeChild(this.current?.view);
     }
     return true;
   }
