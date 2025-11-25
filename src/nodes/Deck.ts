@@ -5,8 +5,9 @@ import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 import GameNode from "./GameNode";
 import { container } from "../util";
+import type EntanglerPiece from "./EntanglerPiece";
 
-export type Piece = QubitPair | MeasurementPiece | GatePiece;
+export type Piece = QubitPair | MeasurementPiece | GatePiece | EntanglerPiece;
 const DECK_SIZE = 4;
 
 const DECK_WIDTH = CELL_SIZE * 1.5;

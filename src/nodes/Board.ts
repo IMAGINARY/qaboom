@@ -6,7 +6,6 @@ import {
   TextStyle,
   Ticker,
 } from "pixi.js";
-import QubitPiece from "./QubitPiece";
 import {
   BOARD_HEIGHT,
   BOARD_WIDTH,
@@ -18,7 +17,7 @@ import {
 import { range, uniqWith } from "lodash-es";
 import type { Piece } from "./Deck";
 import GameNode from "./GameNode";
-import { applyGate, getBlochCoords, measure, type Qubit } from "../quantum";
+import { getBlochCoords, type Qubit } from "../quantum";
 import { getColor, getSecondaryColor } from "../colors";
 import { container, delay } from "../util";
 import { DOWN, neighbors, orthoNeighbors, RIGHT, UP } from "../points";
@@ -28,21 +27,26 @@ import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 import { animate } from "motion";
 import { setI18nKey } from "../i18n";
+import BaseQubit from "./BaseQubit";
+import EntanglerPiece from "./EntanglerPiece";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
 
 export default class Board extends GameNode {
-  grid: (QubitPiece | null)[][] = [];
+  grid: (BaseQubit | null)[][] = [];
   lines: Container;
+  validCells: Point[] = [];
 
   // Either a pair of qubit, a gate, or a measurement
   current: Piece | null = null;
   currentPosition = startingCell;
+  currentEntanglerLine: Graphics;
 
   constructor() {
     super();
     this.grid = this.initGrid();
+    this.currentEntanglerLine = new Graphics();
     this.view.addChild(
       container(
         new Graphics().roundRect(
@@ -56,6 +60,7 @@ export default class Board extends GameNode {
     );
     this.lines = new Container();
     this.view.addChild(this.lines);
+    this.view.addChild(this.currentEntanglerLine);
   }
 
   tick(time: Ticker) {
@@ -84,7 +89,7 @@ export default class Board extends GameNode {
     return this.grid[point.y][point.x];
   }
 
-  setPiece(point: Point, value: QubitPiece | null, remove = true) {
+  setPiece(point: Point, value: BaseQubit | null, remove = true) {
     // remove the previous item from the grid.
     const prevValue = this.grid[point.y][point.x];
     if (prevValue && remove) {
@@ -125,6 +130,9 @@ export default class Board extends GameNode {
   setCurrentPosition(p: Point) {
     this.currentPosition = p;
     this.current!.view.position = this.gridToLocal(this.currentPosition);
+    if (this.current instanceof EntanglerPiece) {
+      this.drawEntanglerLine(this.currentPosition, this.current.target);
+    }
   }
 
   gridToLocal(p: Point) {
@@ -132,6 +140,16 @@ export default class Board extends GameNode {
       x: (p.x + 0.5) * CELL_SIZE,
       y: (p.y + 0.5) * CELL_SIZE,
     };
+  }
+
+  drawEntanglerLine(p1: Point, p2: Point) {
+    const pos1 = this.gridToLocal(p1);
+    const pos2 = this.gridToLocal(p2);
+    this.currentEntanglerLine
+      .clear()
+      .moveTo(pos1.x, pos1.y)
+      .lineTo(pos2.x, pos2.y)
+      .stroke({ color: "white", width: 3 });
   }
 
   drawLine(p1: Point, p2: Point, value: Qubit) {
@@ -189,7 +207,7 @@ export default class Board extends GameNode {
     for (let p of neighbors(this.currentPosition)) {
       let piece = this.getPiece(p);
       if (piece) {
-        piece.setValue(applyGate(this.current.matrix, piece.value));
+        piece.applyGate(this.current);
         piece.bounce();
       }
     }
@@ -219,9 +237,8 @@ export default class Board extends GameNode {
           if (!qubit) continue;
           newMeasures = true;
           visited.push(nbr);
-          const measured = measure(qubit.value, current.base);
+          const measured = qubit.measure(current);
           if (measured) {
-            qubit.setValue(current.base);
             this.drawLine(point, nbr, current.base);
             qubit.bounce();
             measuredQubits.push(nbr);
@@ -231,7 +248,6 @@ export default class Board extends GameNode {
             newQueue.push(nbr);
           } else {
             this.drawLine(point, nbr, current.ortho);
-            qubit.setValue(current.ortho);
             qubit.bounceIn();
           }
         }
@@ -248,7 +264,7 @@ export default class Board extends GameNode {
     const uniqMeasured = uniqWith(measuredQubits, (a, b) => a.equals(b));
     let score = 0;
     score += triangular(uniqMeasured.length);
-    const removedPieces: QubitPiece[] = [];
+    const removedPieces: BaseQubit[] = [];
     for (const point of uniqMeasured) {
       const piece = this.getPiece(point);
       if (piece) {

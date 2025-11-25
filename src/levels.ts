@@ -15,6 +15,7 @@ import {
   secondaryQubits,
 } from "./quantum";
 import type { Piece } from "./nodes/Deck";
+import EntanglerPiece from "./nodes/EntanglerPiece";
 
 export interface Level {
   randomQubit: () => Qubit;
@@ -51,6 +52,7 @@ function primaryLevel(axis: Axis): Level {
         buffer.push(new GatePiece(axis, choice(gateRotations)));
       }
       buffer.push(new MeasurementPiece(random()));
+      buffer.push(new EntanglerPiece());
       return shuffle(buffer);
     },
   };
@@ -77,6 +79,7 @@ export const primaryLevels: Level[] = [
         );
       }
       buffer.push(new MeasurementPiece(random()));
+      buffer.push(new EntanglerPiece());
       return buffer;
     },
   },
@@ -97,6 +100,7 @@ function secondaryLevel(axis: Axis): Level {
         buffer.push(new GatePiece(axis, choice(gateRotations)));
       }
       buffer.push(new MeasurementPiece(random()));
+      buffer.push(new EntanglerPiece());
       return buffer;
     },
   };
@@ -123,6 +127,7 @@ export const secondaryLevels: Level[] = [
         );
       }
       buffer.push(new MeasurementPiece(random()));
+      buffer.push(new EntanglerPiece());
       return buffer;
     },
   },
@@ -143,6 +148,7 @@ export const freeMode: Level = {
     for (let _i of range(1)) {
       buffer.push(MeasurementPiece.random());
     }
+    buffer.push(new EntanglerPiece());
     return shuffle(buffer);
   },
 };
@@ -159,6 +165,7 @@ export const campaign: Level[] = [
         buffer.push(new QubitPair(random(), random()));
       }
       buffer.push(new MeasurementPiece(random()));
+      buffer.push(new EntanglerPiece());
       return buffer;
     },
   },

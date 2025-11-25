@@ -1,21 +1,21 @@
+import * as math from "mathjs";
 import { Container, Graphics, Ticker } from "pixi.js";
-import { getBlochCoords, randomQubit, type Qubit } from "../quantum";
+import { getBlochCoords, measure, randomQubit, type Qubit } from "../quantum";
 import { PIECE_RADIUS, theme } from "../constants";
 import { getColor, getSecondaryColor } from "../colors";
 import { floatEquals } from "../math";
-import GameNode from "./GameNode";
 import { animate } from "motion";
-import { pulse } from "../animations";
+import BaseQubit from "./BaseQubit";
+import type MeasurementPiece from "./MeasurementPiece";
+import type GatePiece from "./GatePiece";
 
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
 const rate = 500;
-export default class QubitPiece extends GameNode {
+export default class QubitPiece extends BaseQubit {
   // The qubit value
   value: Qubit;
-  // Container for internal stuff for animation;
-  container: Container;
   circle: Graphics;
   rod: Graphics;
   outline: Graphics;
@@ -26,7 +26,6 @@ export default class QubitPiece extends GameNode {
 
   constructor(value: Qubit) {
     super();
-    this.container = new Container();
     this.value = value;
     this.circle = new Graphics()
       .circle(0, 0, PIECE_RADIUS)
@@ -93,14 +92,6 @@ export default class QubitPiece extends GameNode {
     this.#alpha = 0;
   }
 
-  bounce() {
-    pulse(this.container);
-  }
-
-  bounceIn() {
-    pulse(this.container, 0.85);
-  }
-
   async destroy() {
     // await animate(this.container.scale, { x: 0, y: 0 }, { duration: 0.15 });
     this.view.removeChild(this.container);
@@ -150,5 +141,19 @@ export default class QubitPiece extends GameNode {
     this.rod.tint = secondaryColor;
     this.rod.scale.y = length;
     this.outline.tint = secondaryColor;
+  }
+
+  measure(measurement: MeasurementPiece) {
+    const measured = measure(this.value, measurement.base);
+    if (measured) {
+      this.setValue(measurement.base);
+    } else {
+      this.setValue(measurement.ortho);
+    }
+    return measured;
+  }
+
+  applyGate(gate: GatePiece) {
+    this.setValue(math.multiply(gate.matrix, this.value) as Qubit);
   }
 }
