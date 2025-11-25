@@ -299,6 +299,8 @@ export default class Board extends GameNode {
               math.multiply(matrix as any, qubit.parent!.value) as any
             );
             this.setPiece(pairPoint, newPairPiece);
+            // TODO animate the paired qubit
+            // TODO if the paired qubit matches the current base, add it to the new queue
           }
         }
       }
