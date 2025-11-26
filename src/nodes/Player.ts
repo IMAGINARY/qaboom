@@ -261,6 +261,10 @@ export default class Player extends GameNode {
     }
     if (this.board.current instanceof EntanglerPiece) {
       this.board.current.target = choice(this.board.validCells);
+      this.board.drawEntanglerLine(
+        this.board.currentPosition,
+        this.board.current.target
+      );
     }
     // Increase level
     const levelCount =
@@ -399,6 +403,15 @@ export default class Player extends GameNode {
           break;
         } else if (this.board.current instanceof GatePiece) {
           this.board.current.rotate();
+          playSound("turn");
+          break;
+        } else if (this.board.current instanceof EntanglerPiece) {
+          // Switch which qubit to get entangled with
+          this.board.current.target = choice(this.board.validCells);
+          this.board.drawEntanglerLine(
+            this.board.currentPosition,
+            this.board.current.target
+          );
           playSound("turn");
           break;
         } else if (this.board.current instanceof QubitPair) {
