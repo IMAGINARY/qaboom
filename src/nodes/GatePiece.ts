@@ -6,6 +6,7 @@ import { getBlochCoords, octet, rotationGate, type Axis } from "../quantum";
 import GameNode from "./GameNode";
 
 const rotationSpeed = Math.PI / 16;
+const opacitySpeed = 1;
 
 // A piece representing a (1-qubit) gate
 export default class GatePiece extends GameNode {
@@ -16,6 +17,9 @@ export default class GatePiece extends GameNode {
   background: Graphics;
   angleMarker: Graphics;
   outline: Graphics;
+
+  fadingOut = false;
+  doFade = false;
 
   constructor(axis: Axis, angle: number) {
     super();
@@ -70,6 +74,20 @@ export default class GatePiece extends GameNode {
 
   tick(time: Ticker) {
     this.background.rotation += (time.deltaMS * rotationSpeed) / 1000;
+    if (!this.doFade) {
+      this.outline.alpha = 0;
+    } else {
+      this.outline.alpha +=
+        ((time.deltaMS * opacitySpeed) / 1000) * (this.fadingOut ? -1 : 1);
+      if (this.outline.alpha >= 1) {
+        this.outline.alpha = 1;
+        this.fadingOut = true;
+      }
+      if (this.outline.alpha <= 0) {
+        this.outline.alpha = 0;
+        this.fadingOut = false;
+      }
+    }
   }
 
   rotate() {

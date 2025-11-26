@@ -255,7 +255,7 @@ export default class Player extends GameNode {
       this.pieceCount++;
     }
     if (this.board.current instanceof GatePiece) {
-      this.board.current.outline.alpha = 1;
+      this.board.current.doFade = true;
     }
     // Increase level
     const levelCount =
