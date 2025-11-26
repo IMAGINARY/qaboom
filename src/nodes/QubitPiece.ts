@@ -7,10 +7,12 @@ import GameNode from "./GameNode";
 import { animate } from "motion";
 import { pulse } from "../animations";
 
+// Rate at which qubit changes colors
+const rate = 1000;
+
 // A qubit is the basic "piece" that exists in the grid.
 // It has a 3D rotation and amplitude, which are represented in 2D
 // using colors.
-const rate = 500;
 export default class QubitPiece extends GameNode {
   // The qubit value
   value: Qubit;

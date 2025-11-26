@@ -28,6 +28,7 @@ import QubitPair from "./QubitPair";
 import GatePiece from "./GatePiece";
 import { animate } from "motion";
 import { setI18nKey } from "../i18n";
+import { pulse } from "../animations";
 
 export const startingCell = new Point(Math.floor(BOARD_WIDTH / 2 - 1), 0);
 const RECT_MARGIN = PIECE_RADIUS / 2;
@@ -193,6 +194,7 @@ export default class Board extends GameNode {
         piece.bounce();
       }
     }
+    await pulse(this.current.container, 2);
     this.view.removeChild(this.current?.view);
   }
 

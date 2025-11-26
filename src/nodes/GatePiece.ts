@@ -40,7 +40,7 @@ export default class GatePiece extends GameNode {
       )
       .stroke({ color: "white", width: 2, alpha: 0.5 });
     this.outline.alpha = 0;
-    this.container.addChild(this.outline);
+    this.view.addChild(this.outline);
     const colorMap = octet(axis);
     for (let i = 0; i < 8; i++) {
       let angle = (i / 8) * 2 * Math.PI - Math.PI / 2;
