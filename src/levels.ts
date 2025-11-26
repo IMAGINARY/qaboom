@@ -169,7 +169,7 @@ export const campaign: Level[] = [
       buffer.push(new EntanglerPiece());
       buffer.push(new EntanglerPiece());
 
-      return buffer;
+      return shuffle(buffer);
     },
   },
   ...primaryLevels,
