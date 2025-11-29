@@ -4,7 +4,6 @@ import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "../levels";
 import Background from "./Background";
-import { inputs } from "../inputs";
 import ScoreScreen from "./ScoreScreen";
 import Countdown from "./Countdown";
 import { type IMediaInstance } from "@pixi/sound";
@@ -25,7 +24,7 @@ export default class SinglePlayer extends GameNode {
     super();
     this.background = background;
     this.player = new Player({
-      inputMap: inputs.player1,
+      playerIndex: "player1",
       levels: campaign,
       startLevel,
     });
@@ -39,7 +38,7 @@ export default class SinglePlayer extends GameNode {
       this.view.removeChild(this.player.view);
       this.player.destroy();
       this.mode = "score";
-      const scores = new ScoreScreen(score, inputs.player1);
+      const scores = new ScoreScreen(score, "player1");
       scores.view.position = { x: WIDTH / 2, y: HEIGHT / 2 };
       this.view.addChild(scores.view);
       scores.onFinish = () => {

@@ -3,7 +3,7 @@ import { container } from "../util";
 import GameNode from "./GameNode";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import { getScores, type Score } from "../storage";
-import { inputs } from "../inputs";
+import { inputManager, type Input } from "../inputs";
 import { setI18nKey } from "../i18n";
 
 // The high score screen displayed in the main menu
@@ -13,7 +13,7 @@ export default class HighScoreScreen extends GameNode {
 
   constructor() {
     super();
-    document.addEventListener("keydown", this.handleKeyDown);
+    inputManager.addKeydownListener(this.handleKeyDown);
     const containerSize = HEIGHT * 0.75;
     this.view.position = { x: WIDTH / 2, y: HEIGHT / 2 };
     this.view.addChild(
@@ -71,15 +71,8 @@ export default class HighScoreScreen extends GameNode {
     this.view.addChild(nameText);
   }
 
-  handleKeyDown = (e: KeyboardEvent) => {
-    if (
-      [
-        ...Object.values(inputs.player1),
-        ...Object.values(inputs.player2),
-      ].includes(e.key)
-    ) {
-      document.removeEventListener("keydown", this.handleKeyDown);
-      this.onFinish?.();
-    }
+  handleKeyDown = (_input: Input) => {
+    inputManager.removeKeydownListener(this.handleKeyDown);
+    this.onFinish?.();
   };
 }

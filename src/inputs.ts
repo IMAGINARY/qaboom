@@ -7,7 +7,8 @@ export interface PlayerInput {
   hold: string;
 }
 
-type Callback = (input: string) => void;
+export type Input = string;
+type Callback = (input: Input) => void;
 
 class InputManager {
   keydownCallbacks: Callback[] = [];

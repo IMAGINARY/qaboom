@@ -17,7 +17,7 @@ import GatePiece from "./GatePiece";
 import { campaign, type Level } from "../levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
-import { inputs, type PlayerInput } from "../inputs";
+import { inputManager, inputs, type Input } from "../inputs";
 import { bump, bumpRotate, pulse } from "../animations";
 import { delay } from "../util";
 import { playSound } from "../audio";
@@ -39,7 +39,7 @@ const BOARD_OFFSET_Y = 80;
 
 interface Options {
   levels: Level[];
-  inputMap: PlayerInput;
+  playerIndex: string;
   startLevel: number;
 }
 
@@ -72,18 +72,18 @@ export default class Player extends GameNode {
 
   time: number = 0;
   nextTime: number = 0;
-  inputMap: PlayerInput;
+  playerIndex: string;
   keyDelays: Record<string, number> = {};
 
-  constructor({ inputMap, levels, startLevel }: Options) {
+  constructor({ playerIndex, levels, startLevel }: Options) {
     super();
     this.#level = startLevel;
     // TODO be able to reference the "current" position based on the board.
-    this.inputMap = inputMap;
+    this.playerIndex = playerIndex;
     this.keyDelays = {
-      [this.inputMap.left]: 300,
-      [this.inputMap.right]: 300,
-      [this.inputMap.down]: INPUT_POLL_RATE,
+      [`${playerIndex}.left`]: 300,
+      [`${this.playerIndex}.right`]: 300,
+      [`${this.playerIndex}.down`]: INPUT_POLL_RATE,
     };
 
     this.levels = levels;
@@ -162,15 +162,15 @@ export default class Player extends GameNode {
   }
 
   start() {
-    document.addEventListener("keydown", this.handleKeyDown);
-    document.addEventListener("keyup", this.handleKeyUp);
+    inputManager.addKeydownListener(this.handleKeyDown);
+    inputManager.addKeyupListener(this.handleKeyUp);
     this.currentState = "game";
     this.onLevelUp?.(this.levels[this.level]);
   }
 
   destroy() {
-    document.removeEventListener("keydown", this.handleKeyDown);
-    document.removeEventListener("keyup", this.handleKeyUp);
+    inputManager.removeKeydownListener(this.handleKeyDown);
+    inputManager.removeKeyupListener(this.handleKeyUp);
   }
 
   tick = (time: Ticker) => {
@@ -180,9 +180,9 @@ export default class Player extends GameNode {
       return;
     }
     for (let key of [
-      this.inputMap.left,
-      this.inputMap.right,
-      this.inputMap.down,
+      `${this.playerIndex}.down`,
+      `${this.playerIndex}.left`,
+      `${this.playerIndex}.right`,
     ]) {
       if (this.time >= this.pressedKeys[key]) {
         this.onPress(key);
@@ -294,23 +294,25 @@ export default class Player extends GameNode {
     this.board.setCurrentPosition(startingCell);
   }
 
-  handleKeyDown = (e: KeyboardEvent) => {
-    this.onPress(e.key);
+  handleKeyDown = (input: Input) => {
+    this.onPress(input);
     if (
-      [this.inputMap.left, this.inputMap.right, this.inputMap.down].includes(
-        e.key
-      )
+      [
+        `${this.playerIndex}.down`,
+        `${this.playerIndex}.left`,
+        `${this.playerIndex}.right`,
+      ].includes(input)
     ) {
-      this.pressedKeys[e.key] = this.time + this.keyDelays[e.key];
+      this.pressedKeys[input] = this.time + this.keyDelays[input];
     }
   };
 
-  handleKeyUp = (e: KeyboardEvent) => {
-    delete this.pressedKeys[e.key];
+  handleKeyUp = (input: Input) => {
+    delete this.pressedKeys[input];
   };
 
-  onPress = (key: string) => {
-    if (key === inputs.pause) {
+  onPress = (input: Input) => {
+    if (input === inputs.pause) {
       if (this.currentState === "game") {
         this.currentState = "pause";
       } else {
@@ -321,9 +323,9 @@ export default class Player extends GameNode {
     if (this.currentState !== "game") {
       return;
     }
-    switch (key) {
+    switch (input) {
       // If the player presses left or right, move the current item (if possible)
-      case this.inputMap.left: {
+      case `${this.playerIndex}.left`: {
         const left = this.board.currentPosition.add(LEFT);
         if (!this.board.isEmptyCell(left)) break;
         if (
@@ -337,7 +339,7 @@ export default class Player extends GameNode {
         bump(this.board.current!.container, LEFT, CELL_SIZE / 8);
         break;
       }
-      case this.inputMap.right: {
+      case `${this.playerIndex}.right`: {
         const right = this.board.currentPosition.add(RIGHT);
         if (!this.board.isEmptyCell(right)) break;
         if (this.board.current instanceof QubitPair) {
@@ -360,7 +362,7 @@ export default class Player extends GameNode {
         break;
       }
       // If the player presses down, speed up the steps
-      case this.inputMap.down: {
+      case `${this.playerIndex}.down`: {
         let obstructed = false;
         const down = this.board.currentPosition.add(DOWN);
         if (this.board.containsPoint(down)) obstructed = true;
@@ -380,14 +382,14 @@ export default class Player extends GameNode {
         }
         break;
       }
-      case this.inputMap.hold: {
+      case `${this.playerIndex}.hold`: {
         if (this.canSwap) {
           this.swap();
         }
         break;
       }
       // If the player presses the trigger, activate the "flip" functionality
-      case this.inputMap.flip: {
+      case `${this.playerIndex}.flip`: {
         if (this.board.current instanceof MeasurementPiece) {
           this.board.current.flip();
           playSound("turn");

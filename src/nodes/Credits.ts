@@ -5,7 +5,7 @@ import GameNode from "./GameNode";
 import ministryLogoPath from "../assets/img/ministry-logo.png";
 import imaginaryLogoPath from "../assets/img/imaginary-logo.png";
 import mpiLogoPath from "../assets/img/mpi-logo.png";
-import { inputs } from "../inputs";
+import { inputManager, type Input } from "../inputs";
 import { LayoutContainer } from "@pixi/layout/components";
 import { setI18nKey } from "../i18n";
 
@@ -14,7 +14,7 @@ export default class Credits extends GameNode {
 
   constructor() {
     super();
-    document.addEventListener("keydown", this.handleKeyDown);
+    inputManager.addKeydownListener(this.handleKeyDown);
     this.view.layout = {
       width: WIDTH,
       height: HEIGHT,
@@ -139,16 +139,9 @@ export default class Credits extends GameNode {
     return credit;
   }
 
-  handleKeyDown = (e: KeyboardEvent) => {
-    if (
-      [
-        ...Object.values(inputs.player1),
-        ...Object.values(inputs.player2),
-      ].includes(e.key)
-    ) {
-      document.removeEventListener("keydown", this.handleKeyDown);
-      this.onFinish?.();
-    }
+  handleKeyDown = (_input: Input) => {
+    inputManager.removeKeydownListener(this.handleKeyDown);
+    this.onFinish?.();
   };
 
   async load() {
