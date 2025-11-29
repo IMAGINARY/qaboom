@@ -1,0 +1,33 @@
+{
+  "menu": {
+    "title": "Qaboom!",
+    "1_player": "1 Spieler*in",
+    "2_player": "2 Spieler*innen",
+    "high_scores": "High Scores",
+    "credits": "Credits",
+    "level": "Level {level}"
+  },
+  "credits": {
+    "title": "Credits",
+    "concept_development": "Konzept & Programmierung",
+    "content_coord": "Inhalt & Koordination",
+    "music": "Musik",
+    "support": "Unterstützung",
+    "graphic_design": "Graphik-Design der Arcade-Maschine",
+    "building": "Bau der Arcade-Maschine",
+    "funded_by": "Unterstützt durch",
+    "part_of": "Teil von quantum-arcade.org von"
+  },
+  "game": {
+    "go": "LOS!",
+    "lvl": "Lvl {level}",
+    "hold": "PAUSE",
+    "boom_text": {
+      "small": "boom.",
+      "medium": "BOOM!",
+      "large": "QABOOM!",
+      "all_clear": "ALLES GEQLÄRT!"
+    },
+    "enter_name": "Namen eingeben"
+  }
+}
