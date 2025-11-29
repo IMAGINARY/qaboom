@@ -7,7 +7,7 @@ let currentLang: string = "en";
 export async function loadLanguages(langs: string[], startLang: string) {
   languages = langs;
   for (const code of languages) {
-    const response = await fetch(`/locales/${code}.json`, {
+    const response = await fetch(`locales/${code}.json`, {
       cache: "no-cache",
     });
     strings[code] = await response.json();
