@@ -4,7 +4,7 @@ import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "../levels";
 import Background from "./Background";
-import { inputs } from "../inputs";
+import { inputManager, inputs } from "../inputs";
 import Countdown from "./Countdown";
 import { type IMediaInstance } from "@pixi/sound";
 import { playSound } from "../audio";
@@ -25,7 +25,7 @@ export default class IdleMode extends GameNode {
     super();
     this.background = background;
     this.player = new Player({
-      inputMap: inputs.player1,
+      playerIndex: "player1",
       levels: campaign,
       startLevel,
     });
@@ -43,13 +43,8 @@ export default class IdleMode extends GameNode {
   }
 
   async start() {
-    // this.view.addChild(
-    //   new HTMLText({
-    //     text: "Press any button",
-    //   })
-    // );
     this.view.addChild(this.player.view);
-    document.addEventListener("keydown", this.handleKeyDown);
+    inputManager.addKeydownListener(this.handleKeyDown);
     slideIn(
       this.player.view,
       new Point(WIDTH / 2 - this.player.view.width / 2, 0),
@@ -75,7 +70,7 @@ export default class IdleMode extends GameNode {
 
   endIdle() {
     this.music?.stop();
-    document.removeEventListener("keydown", this.handleKeyDown);
+    inputManager.removeKeydownListener(this.handleKeyDown);
     this.player.destroy();
     this.onFinish?.();
   }

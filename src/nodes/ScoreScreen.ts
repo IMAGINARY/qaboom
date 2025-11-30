@@ -1,7 +1,7 @@
 import { Container, Graphics, HTMLText } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme } from "../constants";
 import GameNode from "./GameNode";
-import { type PlayerInput } from "../inputs";
+import { inputManager } from "../inputs";
 import { getScores, setScores, type Score } from "../storage";
 import { playSound } from "../audio";
 import { container } from "../util";
@@ -19,15 +19,15 @@ export default class ScoreScreen extends GameNode {
   nameEnter = new Container();
   arrows = new Container();
   state: State = "enter_name";
-  inputMap: PlayerInput;
+  playerIndex: string;
   // Called when the player finishes typing their name
   onInputFinish?: () => void;
   onFinish?: () => void;
 
-  constructor(score: number, inputMap: PlayerInput) {
+  constructor(score: number, playerIndex: string) {
     super();
     this.score = score;
-    this.inputMap = inputMap;
+    this.playerIndex = playerIndex;
 
     const containerSize = HEIGHT * 0.75;
     this.view.addChild(
@@ -169,11 +169,11 @@ export default class ScoreScreen extends GameNode {
     this.view.addChild(nameText);
   }
 
-  handleKeyDown = (e: KeyboardEvent) => {
+  handleKeyDown = (input: string) => {
     if (this.state === "enter_name") {
-      switch (e.key) {
+      switch (input) {
         // up/down: change letter
-        case this.inputMap.up: {
+        case `${this.playerIndex}.up`: {
           const currentLetter = this.letters[this.#activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex || LETTERS.length) - 1];
@@ -181,7 +181,7 @@ export default class ScoreScreen extends GameNode {
           playSound("move");
           break;
         }
-        case this.inputMap.down: {
+        case `${this.playerIndex}.down`: {
           const currentLetter = this.letters[this.#activeIndex];
           const letterIndex = LETTERS.indexOf(currentLetter.text);
           currentLetter.text = LETTERS[(letterIndex + 1) % LETTERS.length];
@@ -190,17 +190,17 @@ export default class ScoreScreen extends GameNode {
           break;
         }
         // left/right: change active index
-        case this.inputMap.left: {
+        case `${this.playerIndex}.left`: {
           this.activeIndex = (this.activeIndex || this.letters.length) - 1;
           playSound("move");
           break;
         }
-        case this.inputMap.right: {
+        case `${this.playerIndex}.right`: {
           this.activeIndex = (this.activeIndex + 1) % this.letters.length;
           playSound("move");
           break;
         }
-        case this.inputMap.flip: {
+        case `${this.playerIndex}.flip`: {
           playSound("clear");
           this.showHighScores();
           break;
@@ -208,7 +208,7 @@ export default class ScoreScreen extends GameNode {
       }
     } else {
       // Press any key to go back to start
-      if (Object.values(this.inputMap).includes(e.key)) {
+      if (input.startsWith(this.playerIndex)) {
         this.onFinish?.();
       }
     }
@@ -229,10 +229,10 @@ export default class ScoreScreen extends GameNode {
 
   start() {
     playSound("ending");
-    document.addEventListener("keydown", this.handleKeyDown);
+    inputManager.addKeydownListener(this.handleKeyDown);
   }
 
   destroy() {
-    document.removeEventListener("keydown", this.handleKeyDown);
+    inputManager.removeKeydownListener(this.handleKeyDown);
   }
 }

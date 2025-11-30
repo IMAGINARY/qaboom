@@ -1,7 +1,7 @@
 import { Container, Graphics, HTMLText } from "pixi.js";
 import { HEIGHT, TEXT_FONT, theme, WIDTH } from "../constants";
 import GameNode from "./GameNode";
-import { inputs } from "../inputs";
+import { inputManager, type Input } from "../inputs";
 import { container } from "../util";
 import { pulse } from "../animations";
 import { playSound } from "../audio";
@@ -109,12 +109,12 @@ export default class Menu extends GameNode {
     pulse(this.optionTexts[index]);
   }
 
-  handleKeyDown = (e: KeyboardEvent) => {
+  handleKeyDown = (input: Input) => {
     switch (this.state) {
       case "player-select": {
-        switch (e.key) {
-          case inputs.player1.flip:
-          case inputs.player2.flip: {
+        switch (input) {
+          case "player1.flip":
+          case "player2.flip": {
             playSound("clear");
             if (this.optionIndex === 2) {
               this.onHighScores?.();
@@ -126,14 +126,14 @@ export default class Menu extends GameNode {
             }
             break;
           }
-          case inputs.player1.up:
-          case inputs.player2.up: {
+          case "player1.up":
+          case "player2.up": {
             playSound("turn");
             this.setOptionIndex((this.optionIndex || options.length) - 1);
             break;
           }
-          case inputs.player1.down:
-          case inputs.player2.down: {
+          case "player1.down":
+          case "player2.down": {
             playSound("turn");
             this.setOptionIndex((this.optionIndex + 1) % options.length);
             break;
@@ -142,21 +142,21 @@ export default class Menu extends GameNode {
         break;
       }
       case "level-select": {
-        switch (e.key) {
-          case inputs.player1.flip:
-          case inputs.player2.flip: {
+        switch (input) {
+          case "player1.flip":
+          case "player2.flip": {
             playSound("clear");
             this.onStart?.(this.optionIndex + 1, this.level);
             break;
           }
-          case inputs.player1.left:
-          case inputs.player2.left: {
+          case "player1.left":
+          case "player2.left": {
             this.toggleLevel((this.level || campaign.length) - 1);
             break;
           }
 
-          case inputs.player1.right:
-          case inputs.player2.right: {
+          case "player1.right":
+          case "player2.right": {
             this.toggleLevel((this.level + 1) % campaign.length);
             break;
           }
@@ -193,11 +193,11 @@ export default class Menu extends GameNode {
   show(parent: Container) {
     parent.addChild(this.view);
     this.showPlayerSelect();
-    document.addEventListener("keydown", this.handleKeyDown);
+    inputManager.addKeydownListener(this.handleKeyDown);
   }
 
   hide() {
     this.view.parent.removeChild(this.view);
-    document.removeEventListener("keydown", this.handleKeyDown);
+    inputManager.removeKeydownListener(this.handleKeyDown);
   }
 }

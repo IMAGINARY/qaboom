@@ -4,7 +4,6 @@ import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "../levels";
 import Background from "./Background";
-import { inputs } from "../inputs";
 import Countdown from "./Countdown";
 import type { IMediaInstance } from "@pixi/sound";
 import { playSound } from "../audio";
@@ -28,13 +27,13 @@ export default class Multiplayer extends GameNode {
     this.background = background;
     this.players = [
       new Player({
-        inputMap: inputs.player1,
+        playerIndex: "player1",
         levels: campaign,
         startLevel,
       }),
 
       new Player({
-        inputMap: inputs.player2,
+        playerIndex: "player2",
         levels: campaign,
         startLevel,
       }),
@@ -54,7 +53,7 @@ export default class Multiplayer extends GameNode {
         player.destroy();
         const scores = new ScoreScreen(
           score,
-          inputs[index === 0 ? "player1" : "player2"]
+          index === 0 ? "player1" : "player2"
         );
         this.scores.push(scores);
         scores.view.position = {

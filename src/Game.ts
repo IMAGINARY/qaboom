@@ -5,7 +5,7 @@ import SinglePlayer from "./nodes/SinglePlayer";
 import Multiplayer from "./nodes/Multiplayer";
 import Background from "./nodes/Background";
 import { initSounds } from "./audio";
-import { inputs } from "./inputs";
+import { inputManager, inputs } from "./inputs";
 import IdleMode from "./nodes/IdleMode";
 import { randomInt } from "mathjs";
 import { campaign } from "./levels";
@@ -46,6 +46,7 @@ export default class Game {
     const menu = new Menu(background);
     app.stage.addChild(background.view);
     app.ticker.add(background.tick);
+    app.ticker.add(() => inputManager.tick());
 
     let timeout: number;
     function setIdleTimeout() {
