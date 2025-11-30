@@ -3,13 +3,13 @@ import { difference } from "lodash-es";
 export type Input = string;
 type Callback = (input: Input) => void;
 
+// Singleton that unifies keyboard and gamepad inputs
 class InputManager {
   keydownCallbacks: Callback[] = [];
   keyupCallbacks: Callback[] = [];
 
+  // All currently pressed keys on gamepad
   gamepadPressed: Input[] = [];
-  // simulate behavior of keypresses
-  gamepadCurrent?: Input = undefined;
 
   constructor() {
     document.addEventListener("keydown", (e) => {
@@ -25,6 +25,8 @@ class InputManager {
   }
 
   tick() {
+    // On each tick, fire `keydown` events for each newly pressed gamepad button
+    // and fire `keyup` events for each released button
     const gamepads = navigator.getGamepads();
     let newInputs: Input[] = [];
     if (gamepads[0]) {
@@ -38,25 +40,15 @@ class InputManager {
       );
     }
     for (let input of difference(this.gamepadPressed, newInputs)) {
-      if (this.gamepadCurrent === input) {
-        this.gamepadCurrent = undefined;
-      }
       for (let cb of this.keyupCallbacks) {
         cb(input);
       }
     }
     for (let input of difference(newInputs, this.gamepadPressed)) {
-      this.gamepadCurrent = input;
       for (let cb of this.keydownCallbacks) {
         cb(input);
       }
     }
-    // TODO repeat inputs
-    // if (this.gamepadCurrent) {
-    //   for (let cb of this.keydownCallbacks) {
-    //     cb(this.gamepadCurrent);
-    //   }
-    // }
 
     this.gamepadPressed = newInputs;
   }
@@ -105,8 +97,6 @@ class InputManager {
       this.keyupCallbacks.splice(index, 1);
     }
   }
-
-  // TODO add gamepads
 }
 
 export const inputManager = new InputManager();
@@ -127,26 +117,4 @@ const keyInputs: Record<string, string> = {
   k: "player2.down",
   o: "player2.flip",
   u: "player2.hold",
-};
-
-export const inputs = {
-  refresh: "r",
-  pause: "p",
-  translate: "t",
-  player1: {
-    left: "a",
-    right: "d",
-    up: "w",
-    down: "s",
-    flip: "e",
-    hold: "q",
-  },
-  player2: {
-    left: "j",
-    right: "l",
-    up: "i",
-    down: "k",
-    flip: "o",
-    hold: "u",
-  },
 };
