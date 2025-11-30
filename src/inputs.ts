@@ -101,6 +101,8 @@ class InputManager {
 
 export const inputManager = new InputManager();
 
+export const playerInputs = ["up", "down", "left", "right", "flip", "hold"];
+
 const keyInputs: Record<string, string> = {
   r: "refresh",
   p: "pause",

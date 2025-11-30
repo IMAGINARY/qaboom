@@ -5,7 +5,7 @@ import SinglePlayer from "./nodes/SinglePlayer";
 import Multiplayer from "./nodes/Multiplayer";
 import Background from "./nodes/Background";
 import { initSounds } from "./audio";
-import { inputManager, inputs } from "./inputs";
+import { inputManager } from "./inputs";
 import IdleMode from "./nodes/IdleMode";
 import { randomInt } from "mathjs";
 import { campaign } from "./levels";
@@ -31,12 +31,11 @@ export default class Game {
     // Append the application canvas to the document body
     document.getElementById("app")!.appendChild(app.canvas);
 
-    // Button to manually refresh the app
-    document.addEventListener("keydown", (e) => {
-      if (e.key === inputs.refresh) {
+    inputManager.addKeydownListener((input) => {
+      if (input === "refresh") {
         window.location.reload();
       }
-      if (e.key === inputs.translate) {
+      if (input === "translate") {
         switchLanguage(app.stage);
       }
     });

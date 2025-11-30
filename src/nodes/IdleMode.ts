@@ -4,7 +4,7 @@ import GameNode from "./GameNode";
 import Player from "./Player";
 import { campaign } from "../levels";
 import Background from "./Background";
-import { inputManager, inputs } from "../inputs";
+import { inputManager, playerInputs } from "../inputs";
 import Countdown from "./Countdown";
 import { type IMediaInstance } from "@pixi/sound";
 import { playSound } from "../audio";
@@ -63,8 +63,11 @@ export default class IdleMode extends GameNode {
     if (this.mode === "game") {
       this.player.tick(time);
       // Very simple, just press a random button
-      if (Math.random() < 0.02)
-        this.player.onPress(choice(Object.values(inputs.player1)));
+      if (Math.random() < 0.02) {
+        this.player.onPress(
+          choice(playerInputs.map((input) => `player1.${input}`))
+        );
+      }
     }
   };
 

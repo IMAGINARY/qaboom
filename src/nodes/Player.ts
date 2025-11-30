@@ -17,7 +17,7 @@ import GatePiece from "./GatePiece";
 import { campaign, type Level } from "../levels";
 import GameNode from "./GameNode";
 import { animate } from "motion";
-import { inputManager, inputs, type Input } from "../inputs";
+import { inputManager, type Input } from "../inputs";
 import { bump, bumpRotate, pulse } from "../animations";
 import { delay } from "../util";
 import { playSound } from "../audio";
@@ -312,7 +312,7 @@ export default class Player extends GameNode {
   };
 
   onPress = (input: Input) => {
-    if (input === inputs.pause) {
+    if (input === "pause") {
       if (this.currentState === "game") {
         this.currentState = "pause";
       } else {
